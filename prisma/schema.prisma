@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  email           String            @unique
+  password        String
+  avatar          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime?         @updatedAt
+  StatementPeriod StatementPeriod[]
+  Expense         Expense[]
+
+  @@map("user")
+}
+
+model Bank {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String            @unique
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime?         @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
+  StatementPeriod StatementPeriod[]
+  Expense         Expense[]
+
+  @@map("bank")
+}
+
+model Category {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description String    @unique
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  Expense     Expense[]
+
+  @@map("category")
+}
+
+model PaymentType {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description     String            @unique
+  hasStatement    Boolean
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime?         @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
+  StatementPeriod StatementPeriod[]
+  Expense         Expense[]
+
+  @@map("payment_type")
+}
+
+model StatementPeriod {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description   String    @unique
+  userId        String    @map("user_id") @db.Uuid
+  paymentTypeId String    @map("payment_type_id") @db.Uuid
+  bankId        String    @map("bank_id") @db.Uuid
+  initialDay    String    @map("initial_day")
+  finalDay      String    @map("final_day")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  paymentType PaymentType @relation(fields: [paymentTypeId], references: [id])
+  bank        Bank        @relation(fields: [bankId], references: [id])
+
+  @@map("statement_period")
+}
+
+model Store {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  Expense   Expense[]
+
+  @@map("store")
+}
+
+model Expense {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description   String
+  date          DateTime
+  amount        Int
+  split         Boolean
+  personal      Boolean
+  dueDate       DateTime  @map("due_date")
+  userId        String    @map("user_id") @db.Uuid
+  categoryId    String    @map("category_id") @db.Uuid
+  paymentTypeId String    @map("payment_type_id") @db.Uuid
+  bankId        String    @map("bank_id") @db.Uuid
+  storeId       String    @map("store_id") @db.Uuid
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime? @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  category    Category    @relation(fields: [categoryId], references: [id])
+  paymentType PaymentType @relation(fields: [paymentTypeId], references: [id])
+  bank        Bank        @relation(fields: [bankId], references: [id])
+  store       Store       @relation(fields: [storeId], references: [id])
+
+  @@index([dueDate])
+  @@map("expense")
+}
