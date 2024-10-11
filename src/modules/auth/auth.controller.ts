@@ -1,7 +1,10 @@
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
+import {
+  AuthenticatedUserPresenter
+} from '@/infra/http/presenters/authenticatedUser.presenter'
 import { Body, Controller, Post, UsePipes } from '@nestjs/common'
+import { AuthenticatedUserDTO, LoginDTO, loginSchema } from './auth.dto'
 import { AuthService } from './auth.service'
-import { LoginDTO, loginSchema } from './auth.dto'
 import { Public } from './public.decorator'
 
 @Controller('sessions')
@@ -11,9 +14,8 @@ export class AuthController {
   @Public()
   @Post()
   @UsePipes(new ZodValidationPipe(loginSchema))
-  signIn(
-    @Body() body: LoginDTO
-  ) {
-    return this.authService.signIn(body.email, body.password)
+  async signIn(@Body() body: LoginDTO): Promise<AuthenticatedUserDTO> {
+    const authenticatedUser = await this.authService.signIn(body.email, body.password)
+    return AuthenticatedUserPresenter.toHttp(authenticatedUser)
   }
 }

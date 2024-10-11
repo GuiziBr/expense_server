@@ -1,3 +1,4 @@
+import { AuthenticatedUser } from '@/domains/authentication.domain'
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { compare } from 'bcrypt'
@@ -10,7 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async signIn(email: string, pass: string) {
+  async signIn(email: string, pass: string): Promise<AuthenticatedUser> {
     const user = await this.userService.findUserByEmail(email)
 
     if(!user) {
@@ -24,6 +25,7 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email }
+
     return {
       user,
       token: await this.jwtService.signAsync(payload)

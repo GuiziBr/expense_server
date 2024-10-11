@@ -1,3 +1,4 @@
+import { User } from '@/domains/user.domain'
 import { z } from 'zod'
 
 export const loginSchema = z.object({
@@ -6,3 +7,8 @@ export const loginSchema = z.object({
 })
 
 export type LoginDTO = z.infer<typeof loginSchema>
+
+export interface AuthenticatedUserDTO {
+  user: Omit<User, 'password' | 'createdAt' | 'updatedAt'>
+  token: string
+}
