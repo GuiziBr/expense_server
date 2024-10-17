@@ -1,7 +1,7 @@
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import {
   AuthenticatedUserPresenter
-} from '@/infra/http/presenters/authenticatedUser.presenter'
+} from '@/infra/http/presenters/authenticated-user.presenter'
 import { Body, Controller, Post, UsePipes } from '@nestjs/common'
 import { AuthenticatedUserDTO, LoginDTO, loginSchema } from './auth.dto'
 import { AuthService } from './auth.service'
