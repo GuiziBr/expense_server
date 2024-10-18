@@ -1,7 +1,6 @@
 import { DatabaseService } from '@/infra/database/database.service'
 import { Logger } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { createPaymentType } from '../test-utils/payment-type.factory'
 import { PaymentTypeService } from './payment-type.service'
 
@@ -21,7 +20,7 @@ describe('PaymentTypeService', () => {
             paymentType: {
               findMany: vi.fn().mockResolvedValue([fakePaymentType]),
               findUnique: vi.fn().mockResolvedValue(fakePaymentType),
-              create: vi.fn().mockResolvedValue(fakePaymentType),
+              upsert: vi.fn().mockResolvedValue(fakePaymentType),
               update: vi.fn().mockResolvedValue(fakePaymentType),
               delete: vi.fn()
             }
@@ -96,37 +95,20 @@ describe('PaymentTypeService', () => {
 
   describe('create', () => {
     it('should throw Internal server error exception', async () => {
-      vi.spyOn(databaseService.paymentType, 'create').mockRejectedValue(new Error())
+      vi.spyOn(databaseService.paymentType, 'upsert').mockRejectedValue(new Error())
 
       await expect(paymentTypeService.create('payment', true))
         .rejects
         .toThrow('Internal server error')
 
-      expect(databaseService.paymentType.create).toBeCalledWith({
-        data: { description: 'payment', hasStatement: true }
+      expect(databaseService.paymentType.upsert).toBeCalledWith({
+        where: { description: 'payment' },
+        update: { description: 'payment', hasStatement: true, deletedAt: null },
+        create: { description: 'payment', hasStatement: true }
       })
 
       expect(loggerSpy)
         .toBeCalledWith('Error - Error - creating payment type payment')
-    })
-
-    it('should throw payment type already exists exception', async () => {
-      const prismaError = new PrismaClientKnownRequestError(
-        'error',
-        { code: 'P2002', clientVersion: 'clientVersion' }
-      )
-
-      vi.spyOn(databaseService.paymentType, 'create').mockRejectedValue(prismaError)
-
-      await expect(paymentTypeService.create('payment', true))
-        .rejects
-        .toThrow('Payment type already exists')
-
-      expect(databaseService.paymentType.create).toBeCalledWith({
-        data: { description: 'payment', hasStatement: true }
-      })
-
-      expect(loggerSpy).toBeCalledWith('Payment type payment already exists')
     })
 
     it('should return created payment type', async () => {
@@ -134,8 +116,10 @@ describe('PaymentTypeService', () => {
 
       expect(result).toEqual(fakePaymentType)
 
-      expect(databaseService.paymentType.create).toBeCalledWith({
-        data: { description: 'payment', hasStatement: true }
+      expect(databaseService.paymentType.upsert).toBeCalledWith({
+        where: { description: 'payment' },
+        update: { description: 'payment', hasStatement: true, deletedAt: null },
+        create: { description: 'payment', hasStatement: true }
       })
 
       expect(loggerSpy).not.toBeCalled()
@@ -143,97 +127,113 @@ describe('PaymentTypeService', () => {
   })
 
   describe('update', () => {
-    it('should throw payment type already exists exception', async () => {
-      const prismaError = new PrismaClientKnownRequestError(
-        'error',
-        { code: 'P2022', clientVersion: 'clientVersion' }
+    it('should throw payment not found exception', async () => {
+      vi.spyOn(databaseService.paymentType, 'findUnique').mockResolvedValue(null)
+
+      await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
+        .rejects
+        .toThrow('Payment type not found')
+
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { id: 'payment-id' }
+      })
+
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { description: 'updated-payment' }
+      })
+
+      expect(loggerSpy).toBeCalledWith('Payment type payment-id not found')
+    })
+
+    it('should return updated payment type', async () => {
+      const result = await paymentTypeService.update(
+        fakePaymentType.id,
+        'updated-payment',
+        false
       )
 
-      vi.spyOn(databaseService.paymentType, 'update').mockRejectedValue(prismaError)
+      expect(result).toEqual(fakePaymentType)
 
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { id: fakePaymentType.id }
+      })
+
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { description: 'updated-payment' }
+      })
+
+      expect(databaseService.paymentType.update).toBeCalledWith({
+        where: { id: fakePaymentType.id },
+        data: { description: 'updated-payment', hasStatement: false, deletedAt: null }
+      })
+
+      expect(loggerSpy).not.toBeCalled()
+    })
+
+    it('should throw payment type already exists exception', async () => {
       await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
         .rejects
         .toThrow('There is already a payment type with same description')
 
-      expect(databaseService.paymentType.update).toBeCalledWith({
-        where: { id: 'payment-id' },
-        data: { description: 'updated-payment', hasStatement: true }
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { id: 'payment-id' }
+      })
+
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { description: 'updated-payment' }
       })
 
       expect(loggerSpy)
         .toBeCalledWith('Payment type with description "updated-payment" already exists')
     })
 
-    it('should throw payment not found exception', async () => {
-      const prismaError = new PrismaClientKnownRequestError(
-        'error',
-        { code: 'P2025', clientVersion: 'clientVersion' }
-      )
+    it('should reactivate deleted payment type', async () => {
+      const deletedPaymentType = createPaymentType({ deletedAt: new Date() })
 
-      vi.spyOn(databaseService.paymentType, 'update').mockRejectedValue(prismaError)
+      vi.spyOn(databaseService.paymentType, 'findUnique')
+        .mockResolvedValue(deletedPaymentType)
 
-      await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
-        .rejects
-        .toThrow('Payment type not found')
-
-      expect(databaseService.paymentType.update).toBeCalledWith({
-        where: { id: 'payment-id' },
-        data: { description: 'updated-payment', hasStatement: true }
-      })
-
-      expect(loggerSpy).toBeCalledWith('Payment type payment-id not found')
-    })
-
-    it('should throw database error exception', async () => {
-      const prismaError = new PrismaClientKnownRequestError(
-        'error',
-        { code: 'P2000', clientVersion: 'clientVersion' }
-      )
-
-      vi.spyOn(databaseService.paymentType, 'update').mockRejectedValue(prismaError)
-
-      await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
-        .rejects
-        .toThrow('Internal server error')
-
-      expect(databaseService.paymentType.update).toBeCalledWith({
-        where: { id: 'payment-id' },
-        data: { description: 'updated-payment', hasStatement: true }
-      })
-
-      expect(loggerSpy).toBeCalledWith('Database error updating payment type')
-    })
-
-    it('should throw internal server error exception', async () => {
-      vi.spyOn(databaseService.paymentType, 'update').mockRejectedValue(new Error())
-
-      await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
-        .rejects
-        .toThrow('Internal server error')
-
-      expect(databaseService.paymentType.update).toBeCalledWith({
-        where: { id: 'payment-id' },
-        data: { description: 'updated-payment', hasStatement: true }
-      })
-
-      expect(loggerSpy).toBeCalledWith('Error - Error - updating payment type payment-id')
-    })
-
-    it('should return updated payment type', async () => {
       const result = await paymentTypeService.update(
-        'payment-id',
+        fakePaymentType.id,
         'updated-payment',
-        true
+        false
       )
 
       expect(result).toEqual(fakePaymentType)
 
-      expect(databaseService.paymentType.update).toBeCalledWith({
-        where: { id: 'payment-id' },
-        data: { description: 'updated-payment', hasStatement: true }
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { id: fakePaymentType.id }
       })
 
-      expect(loggerSpy).not.toBeCalled()
+      expect(databaseService.paymentType.findUnique).toBeCalledWith({
+        where: { description: 'updated-payment' }
+      })
+
+      expect(databaseService.paymentType.update).toBeCalledWith({
+        where: { id: fakePaymentType.id },
+        data: { deletedAt: expect.any(Date) }
+      })
+
+      expect(databaseService.paymentType.update).toBeCalledWith({
+        where: { id: deletedPaymentType.id },
+        data: { deletedAt: null }
+      })
+
+
+
+
+
+
+    })
+
+    it('should throw internal server error exception', async () => {
+      vi.spyOn(databaseService.paymentType, 'findUnique').mockRejectedValue(new Error())
+
+      await expect(paymentTypeService.update('payment-id', 'updated-payment', true))
+        .rejects
+        .toThrow('Internal server error')
+
+      expect(loggerSpy).toBeCalledWith('Error - Error - updating payment type payment-id')
     })
   })
 

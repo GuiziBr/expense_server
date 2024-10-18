@@ -3,6 +3,7 @@ import { DatabaseService } from '@/infra/database/database.service'
 import { Injectable, Logger } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import AppError from '../utils/appError'
+import { constants } from '../utils/constants'
 
 @Injectable()
 export class PaymentTypeService {
@@ -40,17 +41,13 @@ export class PaymentTypeService {
 
   async create(description: string, hasStatement: boolean): Promise<PaymentType> {
     try {
-      const paymentType = await this.databaseService.paymentType.create({
-        data: { description, hasStatement }
+      const paymentType = await this.databaseService.paymentType.upsert({
+        where: { description },
+        update: { description, hasStatement, deletedAt: null },
+        create: { description, hasStatement }
       })
       return paymentType
     } catch (error) {
-      if(error instanceof PrismaClientKnownRequestError) {
-        if(error.code === 'P2002') {
-          this.logger.error(`Payment type ${description} already exists`)
-          throw new AppError('Payment type already exists', 400)
-        }
-      }
       this.logger.error(`Error - ${error.message || error} - creating payment type ${description}`)
       throw new AppError('Internal server error', 500)
     }
@@ -62,24 +59,43 @@ export class PaymentTypeService {
     hasStatement?: boolean
   ): Promise<PaymentType> {
     try {
-      const paymentType = await this.databaseService.paymentType.update({
-        where: { id },
-        data: { description, hasStatement }
-      })
-      return paymentType
-    } catch (error) {
-      if(error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-        case 'P2022':
+      const [paymentType, sameDescriptionPaymentType] = await Promise.all([
+        this.databaseService.paymentType.findUnique({ where: { id }}),
+        this.databaseService.paymentType.findUnique({
+          where: { description }
+        })
+      ])
+
+      if(!paymentType) {
+        this.logger.error(`Payment type ${id} not found`)
+        throw new AppError('Payment type not found', 404)
+      }
+
+      if(
+        (paymentType && !sameDescriptionPaymentType)
+        || (sameDescriptionPaymentType?.id === id)
+      ) {
+        const updatedPaymentType = await this.databaseService.paymentType.update({
+          where: { id },
+          data: { description, hasStatement, deletedAt: null }
+        })
+        return updatedPaymentType
+      }
+
+      if(sameDescriptionPaymentType) {
+        if(!sameDescriptionPaymentType?.deletedAt) {
           this.logger.error(`Payment type with description "${description}" already exists`)
           throw new AppError('There is already a payment type with same description', 400)
-        case 'P2025':
-          this.logger.error(`Payment type ${id} not found`)
-          throw new AppError('Payment type not found', 404)
-        default:
-          this.logger.error('Database error updating payment type')
-          throw new AppError('Internal server error', 500)
         }
+        const reactivatedPaymentType = await this.reactivatePaymentType(
+          id,
+          sameDescriptionPaymentType.id
+        )
+        return reactivatedPaymentType
+      }
+    } catch (error) {
+      if(error instanceof AppError) {
+        throw error
       }
       this.logger.error(`Error - ${error.message || error} - updating payment type ${id}`)
       throw new AppError('Internal server error', 500)
@@ -93,15 +109,31 @@ export class PaymentTypeService {
         data: { deletedAt: new Date() }
       })
     } catch (error) {
-      if(error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-        case 'P2025':
-          return
-        default:
-          throw new AppError('Internal server error', 500)
-        }
+      if(error instanceof PrismaClientKnownRequestError
+        && error.code === constants.RECORD_NOT_FOUND
+      ) {
+        return
       }
       this.logger.error(`Error - ${error.message || error} - deleting payment type ${id}`)
+      throw new AppError('Internal server error', 500)
+    }
+  }
+
+  private async reactivatePaymentType(
+    paymentTypeIdToDelete: string,
+    paymentTypeIdToRestore: string
+  ): Promise<PaymentType> {
+    try {
+      const [,reactivatedPaymentType] = await Promise.all([
+        this.delete(paymentTypeIdToDelete),
+        this.databaseService.paymentType.update({
+          where: { id: paymentTypeIdToRestore },
+          data: { deletedAt: null }
+        })
+      ])
+      return reactivatedPaymentType
+    } catch (error) {
+      this.logger.error(`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`)
       throw new AppError('Internal server error', 500)
     }
   }
