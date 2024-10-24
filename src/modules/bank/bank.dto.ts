@@ -1,7 +1,11 @@
-import { Bank } from '@/domains/bank.domain'
 import { z } from 'zod'
 
-export interface BankDTO extends Omit<Bank, 'deletedAt'> {}
+export interface BankDTO {
+  id: string
+  name: string
+  created_at: Date
+  updated_at: Date | null
+}
 
 export const listBanksSchema = z.object({
   offset: z.coerce.number().min(0).default(0),

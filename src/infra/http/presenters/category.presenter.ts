@@ -6,8 +6,8 @@ export class CategoryPresenter {
     return {
       id: category.id,
       description: category.description,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt
+      created_at: category.createdAt,
+      updated_at: category.updatedAt
     }
   }
 }

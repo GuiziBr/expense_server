@@ -6,8 +6,8 @@ export class BankPresenter {
     return {
       id: bank.id,
       name: bank.name,
-      createdAt: bank.createdAt,
-      updatedAt: bank.updatedAt
+      created_at: bank.createdAt,
+      updated_at: bank.updatedAt
     }
   }
 }

@@ -190,7 +190,7 @@ describe('BankService', () => {
     })
 
     it('should reactivate deleted bank', async () => {
-      const deletedBank = createBank({ deletedAt: new Date() })
+      const deletedBank = createBank({ deletedAt: new Date(), updatedAt: new Date() })
 
       vi.spyOn(databaseService.bank, 'findUnique')
         .mockResolvedValue(deletedBank)

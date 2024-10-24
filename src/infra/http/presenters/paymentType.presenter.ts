@@ -12,9 +12,9 @@ export class PaymentTypePresenter {
     return {
       id,
       description,
-      createdAt,
-      updatedAt,
-      hasStatement
+      created_at: createdAt,
+      updated_at: updatedAt,
+      has_statement: hasStatement
     }
   }
 }

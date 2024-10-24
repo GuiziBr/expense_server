@@ -5,7 +5,7 @@ export const createStore = (params: Partial<Store> = {}): Store => ({
   id: faker.string.uuid(),
   name: faker.lorem.word(),
   createdAt: new Date(),
-  updatedAt: new Date(),
+  updatedAt: null,
   deletedAt: null,
   ...params
 })

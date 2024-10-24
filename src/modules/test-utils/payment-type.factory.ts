@@ -5,7 +5,7 @@ export const createPaymentType = (params: Partial<PaymentType> = {}): PaymentTyp
   id: faker.string.uuid(),
   description: faker.lorem.word(),
   createdAt: new Date(),
-  updatedAt: new Date(),
+  updatedAt: null,
   deletedAt: null,
   hasStatement: false,
   ...params

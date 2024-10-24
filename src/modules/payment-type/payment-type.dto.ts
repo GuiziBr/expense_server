@@ -1,7 +1,12 @@
-import { PaymentType } from '@/domains/payment-type.domain'
 import { z } from 'zod'
 
-export interface PaymentTypeDTO extends Omit<PaymentType, 'deletedAt'> {}
+export interface PaymentTypeDTO {
+  id: string
+  description: string
+  has_statement: boolean
+  created_at: Date
+  updated_at: Date | null
+}
 
 export const listPaymentTypesSchema = z.object({
   offset: z.coerce.number().min(0).default(0),

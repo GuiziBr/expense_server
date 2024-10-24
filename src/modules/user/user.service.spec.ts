@@ -2,7 +2,7 @@ import { User } from '@/domains/user.domain'
 import { DatabaseService } from '@/infra/database/database.service'
 import { Logger } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { createPrismaError } from '../test-utils/errors.factory'
 import { UserService } from './user.service'
 
 describe('UserService', () => {
@@ -57,10 +57,7 @@ describe('UserService', () => {
 
   describe('updateUserAvatar', () => {
     it('should throw database error', async () => {
-      const prismaError = new PrismaClientKnownRequestError(
-        'error',
-        { code: 'code', clientVersion: 'clientVersion' }
-      )
+      const prismaError = createPrismaError()
 
       vi.spyOn(databaseService.user, 'update').mockRejectedValue(prismaError)
 
@@ -73,7 +70,8 @@ describe('UserService', () => {
         data: { avatar: 'avatar' }
       })
 
-      expect(loggerSpy).toBeCalledWith('Error - error - updating user avatar user_id')
+      expect(loggerSpy)
+        .toBeCalledWith('Error - prisma error - updating user avatar user_id')
     })
 
     it('should throw internal server error', async () => {

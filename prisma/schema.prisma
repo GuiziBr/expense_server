@@ -14,7 +14,7 @@ model User {
   password        String
   avatar          String?
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime?         @updatedAt
+  updatedAt       DateTime?         @updatedAt @map("updated_at")
   StatementPeriod StatementPeriod[]
   Expense         Expense[]
 
@@ -59,7 +59,6 @@ model PaymentType {
 
 model StatementPeriod {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  description   String    @unique
   userId        String    @map("user_id") @db.Uuid
   paymentTypeId String    @map("payment_type_id") @db.Uuid
   bankId        String    @map("bank_id") @db.Uuid
@@ -73,6 +72,8 @@ model StatementPeriod {
   paymentType PaymentType @relation(fields: [paymentTypeId], references: [id])
   bank        Bank        @relation(fields: [bankId], references: [id])
 
+  @@unique([userId, paymentTypeId, bankId])
+  @@index([userId, paymentTypeId, bankId])
   @@map("statement_period")
 }
 
@@ -90,26 +91,27 @@ model Store {
 model Expense {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   description   String
-  date          DateTime
+  date          DateTime  @db.Date
   amount        Int
   split         Boolean
   personal      Boolean
-  dueDate       DateTime  @map("due_date")
-  userId        String    @map("user_id") @db.Uuid
+  dueDate       DateTime  @map("due_date") @db.Date
+  ownerId       String    @map("owner_id") @db.Uuid
   categoryId    String    @map("category_id") @db.Uuid
   paymentTypeId String    @map("payment_type_id") @db.Uuid
-  bankId        String    @map("bank_id") @db.Uuid
-  storeId       String    @map("store_id") @db.Uuid
+  bankId        String?   @map("bank_id") @db.Uuid
+  storeId       String?   @map("store_id") @db.Uuid
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime? @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation(fields: [ownerId], references: [id])
   category    Category    @relation(fields: [categoryId], references: [id])
   paymentType PaymentType @relation(fields: [paymentTypeId], references: [id])
-  bank        Bank        @relation(fields: [bankId], references: [id])
-  store       Store       @relation(fields: [storeId], references: [id])
+  bank        Bank?       @relation(fields: [bankId], references: [id])
+  store       Store?      @relation(fields: [storeId], references: [id])
 
+  @@unique([description, date])
   @@index([dueDate])
   @@map("expense")
 }

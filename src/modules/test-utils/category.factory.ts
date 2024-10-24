@@ -5,7 +5,7 @@ export const createCategory = (params: Partial<Category> = {}): Category => ({
   id: faker.string.uuid(),
   description: faker.lorem.word(),
   createdAt: new Date(),
-  updatedAt: new Date(),
+  updatedAt: null,
   deletedAt: null,
   ...params
 })

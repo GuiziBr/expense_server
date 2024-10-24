@@ -4,9 +4,9 @@ CREATE TABLE "user" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "avatar" TEXT NOT NULL,
+    "avatar" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -81,7 +81,7 @@ CREATE TABLE "expense" (
     "split" BOOLEAN NOT NULL,
     "personal" BOOLEAN NOT NULL,
     "due_date" TIMESTAMP(3) NOT NULL,
-    "user_id" UUID NOT NULL,
+    "owner_id" UUID NOT NULL,
     "category_id" UUID NOT NULL,
     "payment_type_id" UUID NOT NULL,
     "bank_id" UUID NOT NULL,
@@ -106,13 +106,19 @@ CREATE UNIQUE INDEX "category_description_key" ON "category"("description");
 CREATE UNIQUE INDEX "payment_type_description_key" ON "payment_type"("description");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "statement_period_description_key" ON "statement_period"("description");
+CREATE INDEX "statement_period_user_id_payment_type_id_bank_id_idx" ON "statement_period"("user_id", "payment_type_id", "bank_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "statement_period_user_id_payment_type_id_bank_id_key" ON "statement_period"("user_id", "payment_type_id", "bank_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "store_name_key" ON "store"("name");
 
 -- CreateIndex
 CREATE INDEX "expense_due_date_idx" ON "expense"("due_date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "expense_description_date_key" ON "expense"("description", "date");
 
 -- AddForeignKey
 ALTER TABLE "statement_period" ADD CONSTRAINT "statement_period_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -124,7 +130,7 @@ ALTER TABLE "statement_period" ADD CONSTRAINT "statement_period_payment_type_id_
 ALTER TABLE "statement_period" ADD CONSTRAINT "statement_period_bank_id_fkey" FOREIGN KEY ("bank_id") REFERENCES "bank"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "expense" ADD CONSTRAINT "expense_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "expense" ADD CONSTRAINT "expense_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "expense" ADD CONSTRAINT "expense_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

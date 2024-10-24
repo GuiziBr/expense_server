@@ -6,8 +6,8 @@ export class StorePresenter {
     return {
       id: store.id,
       name: store.name,
-      createdAt: store.createdAt,
-      updatedAt: store.updatedAt
+      created_at: store.createdAt,
+      updated_at: store.updatedAt
     }
   }
 }

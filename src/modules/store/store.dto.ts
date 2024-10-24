@@ -1,7 +1,11 @@
-import { Store } from '@/domains/store.domain'
 import { z } from 'zod'
 
-export interface StoreDTO extends Omit<Store, 'deletedAt'> {}
+export interface StoreDTO {
+  id: string
+  name: string
+  created_at: Date
+  updated_at: Date | null
+}
 
 export const listStoresSchema = z.object({
   offset: z.coerce.number().min(0).default(0),

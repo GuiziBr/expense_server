@@ -1,7 +1,11 @@
-import { Category } from '@/domains/category.domain'
 import { z } from 'zod'
 
-export interface CategoryDTO extends Omit<Category, 'deletedAt'> {}
+export interface CategoryDTO {
+  id: string
+  description: string
+  created_at: Date
+  updated_at: Date | null
+}
 
 export const listCategoriesSchema = z.object({
   offset: z.coerce.number().min(0).default(0),
