@@ -44,8 +44,8 @@ describe('CategoryController', () => {
       expect(result[0]).toEqual({
         id: fakeCategory.id,
         description: fakeCategory.description,
-        createdAt: fakeCategory.createdAt,
-        updatedAt: fakeCategory.updatedAt
+        created_at: fakeCategory.createdAt,
+        updated_at: fakeCategory.updatedAt
       })
 
       expect(categoryService.getAll).toBeCalledWith(0,10)
@@ -60,8 +60,8 @@ describe('CategoryController', () => {
       expect(result).toEqual({
         id: fakeCategory.id,
         description: fakeCategory.description,
-        createdAt: fakeCategory.createdAt,
-        updatedAt: fakeCategory.updatedAt
+        created_at: fakeCategory.createdAt,
+        updated_at: fakeCategory.updatedAt
       })
 
       expect(categoryService.getById).toBeCalledWith('id')
@@ -77,8 +77,8 @@ describe('CategoryController', () => {
       expect(result).toEqual({
         id: fakeCategory.id,
         description: fakeCategory.description,
-        createdAt: fakeCategory.createdAt,
-        updatedAt: fakeCategory.updatedAt
+        created_at: fakeCategory.createdAt,
+        updated_at: fakeCategory.updatedAt
       })
 
       expect(categoryService.create).toBeCalledWith('description')
@@ -97,8 +97,8 @@ describe('CategoryController', () => {
       expect(result).toEqual({
         id: fakeCategory.id,
         description: fakeCategory.description,
-        createdAt: fakeCategory.createdAt,
-        updatedAt: fakeCategory.updatedAt
+        created_at: fakeCategory.createdAt,
+        updated_at: fakeCategory.updatedAt
       })
 
       expect(categoryService.update).toBeCalledWith(

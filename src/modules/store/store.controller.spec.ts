@@ -44,8 +44,8 @@ describe('StoreController', () => {
       expect(result[0]).toEqual({
         id: fakeStore.id,
         name: fakeStore.name,
-        createdAt: fakeStore.createdAt,
-        updatedAt: fakeStore.updatedAt
+        created_at: fakeStore.createdAt,
+        updated_at: fakeStore.updatedAt
       })
 
       expect(storeService.getAll).toBeCalledWith(0,10)
@@ -60,8 +60,8 @@ describe('StoreController', () => {
       expect(result).toEqual({
         id: fakeStore.id,
         name: fakeStore.name,
-        createdAt: fakeStore.createdAt,
-        updatedAt: fakeStore.updatedAt
+        created_at: fakeStore.createdAt,
+        updated_at: fakeStore.updatedAt
       })
 
       expect(storeService.getById).toBeCalledWith('id')
@@ -77,8 +77,8 @@ describe('StoreController', () => {
       expect(result).toEqual({
         id: fakeStore.id,
         name: fakeStore.name,
-        createdAt: fakeStore.createdAt,
-        updatedAt: fakeStore.updatedAt
+        created_at: fakeStore.createdAt,
+        updated_at: fakeStore.updatedAt
       })
 
       expect(storeService.create).toBeCalledWith('name')
@@ -97,8 +97,8 @@ describe('StoreController', () => {
       expect(result).toEqual({
         id: fakeStore.id,
         name: fakeStore.name,
-        createdAt: fakeStore.createdAt,
-        updatedAt: fakeStore.updatedAt
+        created_at: fakeStore.createdAt,
+        updated_at: fakeStore.updatedAt
       })
 
       expect(storeService.update).toBeCalledWith(

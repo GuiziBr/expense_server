@@ -44,8 +44,8 @@ describe('BankController', () => {
       expect(result[0]).toEqual({
         id: fakeBank.id,
         name: fakeBank.name,
-        createdAt: fakeBank.createdAt,
-        updatedAt: fakeBank.updatedAt
+        created_at: fakeBank.createdAt,
+        updated_at: fakeBank.updatedAt
       })
 
       expect(bankService.getAll).toBeCalledWith(0,10)
@@ -60,8 +60,8 @@ describe('BankController', () => {
       expect(result).toEqual({
         id: fakeBank.id,
         name: fakeBank.name,
-        createdAt: fakeBank.createdAt,
-        updatedAt: fakeBank.updatedAt
+        created_at: fakeBank.createdAt,
+        updated_at: fakeBank.updatedAt
       })
 
       expect(bankService.getById).toBeCalledWith('id')
@@ -77,8 +77,8 @@ describe('BankController', () => {
       expect(result).toEqual({
         id: fakeBank.id,
         name: fakeBank.name,
-        createdAt: fakeBank.createdAt,
-        updatedAt: fakeBank.updatedAt
+        created_at: fakeBank.createdAt,
+        updated_at: fakeBank.updatedAt
       })
 
       expect(bankService.create).toBeCalledWith('name')
@@ -97,8 +97,8 @@ describe('BankController', () => {
       expect(result).toEqual({
         id: fakeBank.id,
         name: fakeBank.name,
-        createdAt: fakeBank.createdAt,
-        updatedAt: fakeBank.updatedAt
+        created_at: fakeBank.createdAt,
+        updated_at: fakeBank.updatedAt
       })
 
       expect(bankService.update).toBeCalledWith(

@@ -44,9 +44,9 @@ describe('PaymentTypeController', () => {
       expect(result[0]).toEqual({
         id: fakePaymentType.id,
         description: fakePaymentType.description,
-        createdAt: fakePaymentType.createdAt,
-        updatedAt: fakePaymentType.updatedAt,
-        hasStatement: fakePaymentType.hasStatement
+        created_at: fakePaymentType.createdAt,
+        updated_at: fakePaymentType.updatedAt,
+        has_statement: fakePaymentType.hasStatement
       })
 
       expect(paymentTypeService.getAll).toBeCalledWith(0,10)
@@ -61,9 +61,9 @@ describe('PaymentTypeController', () => {
       expect(result).toEqual({
         id: fakePaymentType.id,
         description: fakePaymentType.description,
-        createdAt: fakePaymentType.createdAt,
-        updatedAt: fakePaymentType.updatedAt,
-        hasStatement: fakePaymentType.hasStatement
+        created_at: fakePaymentType.createdAt,
+        updated_at: fakePaymentType.updatedAt,
+        has_statement: fakePaymentType.hasStatement
       })
 
       expect(paymentTypeService.getById).toBeCalledWith('id')
@@ -80,9 +80,9 @@ describe('PaymentTypeController', () => {
       expect(result).toEqual({
         id: fakePaymentType.id,
         description: fakePaymentType.description,
-        createdAt: fakePaymentType.createdAt,
-        updatedAt: fakePaymentType.updatedAt,
-        hasStatement: fakePaymentType.hasStatement
+        created_at: fakePaymentType.createdAt,
+        updated_at: fakePaymentType.updatedAt,
+        has_statement: fakePaymentType.hasStatement
       })
 
       expect(paymentTypeService.create).toBeCalledWith(
@@ -105,9 +105,9 @@ describe('PaymentTypeController', () => {
       expect(result).toEqual({
         id: fakePaymentType.id,
         description: fakePaymentType.description,
-        createdAt: fakePaymentType.createdAt,
-        updatedAt: fakePaymentType.updatedAt,
-        hasStatement: fakePaymentType.hasStatement
+        created_at: fakePaymentType.createdAt,
+        updated_at: fakePaymentType.updatedAt,
+        has_statement: fakePaymentType.hasStatement
       })
 
       expect(paymentTypeService.update).toBeCalledWith(
