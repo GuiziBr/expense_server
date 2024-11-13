@@ -112,6 +112,6 @@ model Expense {
   store       Store?      @relation(fields: [storeId], references: [id])
 
   @@unique([description, date])
-  @@index([dueDate])
+  @@index([dueDate], name: "IDX_EXPENSES_DUE_DATE")
   @@map("expense")
 }

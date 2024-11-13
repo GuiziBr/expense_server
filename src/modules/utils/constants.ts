@@ -10,5 +10,21 @@ export const constants = {
   },
   uniqueConstraintMessages: {
     duplicatedExpenses: 'This expense is already registered'
+  },
+  filterColumns: {
+    category: 'categoryId',
+    payment_type: 'paymentTypeId',
+    bank: 'bankId',
+    store: 'storeId'
+  },
+  orderColumns: {
+    description: 'description',
+    amount: 'amount',
+    date: 'date',
+    due_date: 'dueDate',
+    category: ['category.description'], // Order by category description
+    payment_type: ['paymentType.description'], // Order by payment type description
+    bank: ['bank.name'], // Order by bank name
+    store: ['store.name'] // Order by store name
   }
 }

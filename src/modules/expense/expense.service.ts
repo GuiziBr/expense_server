@@ -1,12 +1,17 @@
 import { DatabaseService } from '@/infra/database/database.service'
 import { Injectable, Logger } from '@nestjs/common'
-import { CreateExpenseDTO } from './expense.dto'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from 'date-fns'
-import AppError from '../utils/appError'
 import { PaymentTypeService } from '../payment-type/payment-type.service'
 import { StatementPeriodService } from '../statement-period/statement-period.service'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import AppError from '../utils/appError'
 import { constants } from '../utils/constants'
+import {
+  CreateExpenseDTO,
+  GetExpensesRequest,
+  GetExpensesResponse,
+  OrderByType
+} from './expense.dto'
 
 @Injectable()
 export class ExpenseService {
@@ -20,6 +25,22 @@ export class ExpenseService {
 
   private calculateNetAmount(amount: number, personal: boolean, split: boolean): number {
     return personal ? amount : (split ? Math.round(amount / 2): amount)
+  }
+
+  private getOrderByClause(
+    orderBy?: string,
+    orderType: OrderByType = 'asc'
+  ): Record<string, OrderByType> | Record<string, Record<string, OrderByType>> {
+    const orderByColumn = constants.orderColumns[orderBy] || constants.orderColumns.date
+
+    const orderByClause = typeof orderByColumn === 'string'
+      ? { [orderByColumn]: orderType }
+      : {
+        [orderByColumn[0].split('.')[0]]: {
+          [orderByColumn[0].split('.')[1]]: orderType
+        }
+      }
+    return orderByClause
   }
 
   private async calculateDueDate(
@@ -120,5 +141,95 @@ export class ExpenseService {
       throw new AppError('Internal server error', 500)
 
     }
+  }
+
+  async getPersonalExpenses({
+    ownerId,
+    startDate,
+    endDate,
+    offset,
+    limit,
+    orderBy,
+    orderType,
+    filterBy,
+    filterValue
+  }: GetExpensesRequest): Promise<GetExpensesResponse> {
+    const whereClause = {
+      OR: [
+        { AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
+        { AND: [{ NOT: { ownerId }}, { personal: false }] }
+      ],
+      dueDate: {
+        lte: endDate,
+        ...(startDate ? { gte: startDate } : {})
+      }
+    }
+
+    if (filterBy && filterValue) {
+      whereClause[constants.filterColumns[filterBy]] = filterValue
+    }
+
+    const orderByClause = this.getOrderByClause(orderBy, orderType)
+
+    const [expenses, totalCount] = await Promise.all([
+      this.databaseService.expense.findMany({
+        where: whereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: orderByClause,
+        skip: offset,
+        take: limit
+      }),
+      this.databaseService.expense.count({ where: whereClause })
+    ])
+
+    return { expenses, totalCount }
+  }
+
+  async getSharedExpenses({
+    startDate,
+    endDate,
+    offset,
+    limit,
+    orderBy,
+    orderType,
+    filterBy,
+    filterValue
+  }: GetExpensesRequest): Promise<GetExpensesResponse> {
+    const whereClause = {
+      personal: false,
+      dueDate: {
+        lte: endDate,
+        ...(startDate ? { gte: startDate } : {})
+      }
+    }
+
+    if (filterBy && filterValue) {
+      whereClause[constants.filterColumns[filterBy]] = filterValue
+    }
+
+    const orderByClause = this.getOrderByClause(orderBy, orderType)
+
+    const [expenses, totalCount] = await Promise.all([
+      this.databaseService.expense.findMany({
+        where: whereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: orderByClause,
+        skip: offset,
+        take: limit
+      }),
+      this.databaseService.expense.count({ where: whereClause })
+    ])
+
+    return { expenses, totalCount }
   }
 }

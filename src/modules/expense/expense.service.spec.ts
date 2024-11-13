@@ -10,7 +10,7 @@ import { createExpense } from '../test-utils/expense.factory'
 import { createPaymentType } from '../test-utils/payment-type.factory'
 import { createStatementPeriod } from '../test-utils/statement-period.factory'
 import { constants } from '../utils/constants'
-import { CreateExpenseDTO } from './expense.dto'
+import { CreateExpenseDTO, GetExpensesRequest } from './expense.dto'
 import { ExpenseService } from './expense.service'
 
 const createPayload = (
@@ -51,7 +51,9 @@ describe('ExpenseService', () => {
           provide: DatabaseService,
           useValue: {
             expense: {
-              create: vi.fn().mockResolvedValue(fakeExpense)
+              create: vi.fn().mockResolvedValue(fakeExpense),
+              findMany: vi.fn().mockResolvedValue([fakeExpense]),
+              count: vi.fn().mockResolvedValue(1)
             }
           }
         },
@@ -411,6 +413,193 @@ describe('ExpenseService', () => {
         .toBeCalledWith('user_id', 'bank-id', 'payment-type-id')
 
       expect(loggerSpy).toBeCalledWith('Error - P2002 - creating expense')
+    })
+  })
+
+  describe('getPersonalExpenses', () => {
+    it('should return personal expenses with no start date', async () => {
+      const expensesRequest = {
+        ownerId: 'user_id',
+        endDate: new Date(),
+        offset: 0,
+        limit: 10,
+        orderBy: 'amount',
+        orderType: 'asc',
+        filterBy: 'category',
+        filterValue: 'category_id'
+      } as GetExpensesRequest
+
+      const result = await expenseService.getPersonalExpenses(expensesRequest)
+
+      expect(result).toEqual({
+        expenses: [fakeExpense],
+        totalCount: 1
+      })
+
+      const expectedWhereClause = {
+        OR: [
+          {
+            AND: [
+              { ownerId: expensesRequest.ownerId },
+              { OR: [{ personal: true }, { split: true }] }
+            ]
+          },
+          { AND: [{ NOT: { ownerId: expensesRequest.ownerId }}, { personal: false }] }
+        ],
+        dueDate: { lte: expensesRequest.endDate },
+        categoryId: expensesRequest.filterValue
+      }
+
+      expect(databaseService.expense.findMany).toBeCalledWith({
+        where: expectedWhereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: { amount: expensesRequest.orderType },
+        skip: expensesRequest.offset,
+        take: expensesRequest.limit
+      })
+
+      expect(databaseService.expense.count).toBeCalledWith({
+        where: expectedWhereClause
+      })
+    })
+
+    it('should return personal expenses with start date and no filter', async () => {
+      const expensesRequest = {
+        ownerId: 'user_id',
+        startDate: new Date(),
+        endDate: new Date(),
+        offset: 0,
+        limit: 10,
+        orderBy: 'payment_type',
+        orderType: 'asc'
+      } as GetExpensesRequest
+
+      const result = await expenseService.getPersonalExpenses(expensesRequest)
+
+      expect(result).toEqual({
+        expenses: [fakeExpense],
+        totalCount: 1
+      })
+
+      const expectedWhereClause = {
+        OR: [
+          {
+            AND: [
+              { ownerId: expensesRequest.ownerId },
+              { OR: [{ personal: true }, { split: true }] }
+            ]
+          },
+          { AND: [{ NOT: { ownerId: expensesRequest.ownerId }}, { personal: false }] }
+        ],
+        dueDate: { lte: expensesRequest.endDate, gte: expensesRequest.startDate },
+        categoryId: expensesRequest.filterValue
+      }
+
+      expect(databaseService.expense.findMany).toBeCalledWith({
+        where: expectedWhereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: { paymentType: { description: expensesRequest.orderType }},
+        skip: expensesRequest.offset,
+        take: expensesRequest.limit
+      })
+
+      expect(databaseService.expense.count).toBeCalledWith({
+        where: expectedWhereClause
+      })
+    })
+  })
+
+  describe('getSharedExpenses', () => {
+    it('should return shared expenses with no start date', async () => {
+      const expensesRequest = {
+        endDate: new Date(),
+        offset: 0,
+        limit: 10,
+        orderBy: 'amount',
+        orderType: 'asc',
+        filterBy: 'category',
+        filterValue: 'category_id'
+      } as GetExpensesRequest
+
+      const result = await expenseService.getSharedExpenses(expensesRequest)
+
+      expect(result).toEqual({
+        expenses: [fakeExpense],
+        totalCount: 1
+      })
+
+      const expectedWhereClause = {
+        personal: false,
+        dueDate: { lte: expensesRequest.endDate },
+        categoryId: expensesRequest.filterValue
+      }
+
+      expect(databaseService.expense.findMany).toBeCalledWith({
+        where: expectedWhereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: { amount: expensesRequest.orderType },
+        skip: expensesRequest.offset,
+        take: expensesRequest.limit
+      })
+
+      expect(databaseService.expense.count).toBeCalledWith({
+        where: expectedWhereClause
+      })
+    })
+
+    it('should return shared expenses with start date and no filter', async () => {
+      const expensesRequest = {
+        startDate: new Date(),
+        endDate: new Date(),
+        offset: 0,
+        limit: 10,
+        orderBy: 'payment_type',
+        orderType: 'asc'
+      } as GetExpensesRequest
+
+      const result = await expenseService.getSharedExpenses(expensesRequest)
+
+      expect(result).toEqual({
+        expenses: [fakeExpense],
+        totalCount: 1
+      })
+
+      const expectedWhereClause = {
+        personal: false,
+        dueDate: { lte: expensesRequest.endDate, gte: expensesRequest.startDate }
+      }
+
+      expect(databaseService.expense.findMany).toBeCalledWith({
+        where: expectedWhereClause,
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true
+        },
+        orderBy: { paymentType: { description: expensesRequest.orderType }},
+        skip: expensesRequest.offset,
+        take: expensesRequest.limit
+      })
+
+      expect(databaseService.expense.count).toBeCalledWith({
+        where: expectedWhereClause
+      })
     })
   })
 })

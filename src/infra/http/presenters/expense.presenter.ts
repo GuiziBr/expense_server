@@ -17,7 +17,6 @@ export class ExpensePresenter {
       bank_id: expense.bankId,
       store_id: expense.storeId,
       created_at: expense.createdAt,
-      updated_at: expense.updatedAt,
       category: {
         description: expense.category.description
       },
@@ -34,6 +33,23 @@ export class ExpensePresenter {
           name: expense.store.name
         }
       }
+    }
+  }
+
+  static toPersonalExpenseDTO(
+    expense: Expense
+  ): ExpenseDTO {
+    return ExpensePresenter.toExpenseDTO(expense)
+  }
+
+  static toSharedExpenseDTO(
+    expense: Expense,
+    ownerId: string
+  ):  ExpenseDTO & { type: 'income' | 'outcome'}   {
+    const formattedExpense = this.toExpenseDTO(expense)
+    return {
+      ...formattedExpense,
+      type: expense.ownerId === ownerId ? 'income' : 'outcome'
     }
   }
 }
