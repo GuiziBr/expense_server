@@ -12,6 +12,7 @@ import {
   GetExpensesResponse,
   OrderByType
 } from './expense.dto'
+import { Expense } from '@/domains/expense.domain'
 
 @Injectable()
 export class ExpenseService {
@@ -178,7 +179,8 @@ export class ExpenseService {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: orderByClause,
         skip: offset,
@@ -221,7 +223,8 @@ export class ExpenseService {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: orderByClause,
         skip: offset,
@@ -231,5 +234,29 @@ export class ExpenseService {
     ])
 
     return { expenses, totalCount }
+  }
+
+  async getExpensesByDateRange(
+    personal: boolean,
+    startDate: Date,
+    endDate: Date
+  ): Promise<Expense[]> {
+    return this.databaseService.expense.findMany({
+      where: {
+        personal,
+        dueDate: {
+          lte: endDate,
+          gte: startDate
+        },
+        paymentType: { deletedAt: null }
+      },
+      include: {
+        category: true,
+        paymentType: true,
+        bank: true,
+        store: true,
+        user: true
+      }
+    })
   }
 }

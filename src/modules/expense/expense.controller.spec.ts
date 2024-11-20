@@ -64,7 +64,6 @@ describe('ExpenseController', () => {
         personal: fakeExpense.personal,
         split: fakeExpense.split,
         created_at: fakeExpense.createdAt,
-        updated_at: fakeExpense.updatedAt,
         category: {
           description: fakeExpense.category.description
         },
@@ -118,7 +117,6 @@ describe('ExpenseController', () => {
         personal: fakeExpense.personal,
         split: fakeExpense.split,
         created_at: fakeExpense.createdAt,
-        updated_at: fakeExpense.updatedAt,
         category: {
           description: fakeExpense.category.description
         },
@@ -170,7 +168,6 @@ describe('ExpenseController', () => {
         personal: fakeExpense.personal,
         split: fakeExpense.split,
         created_at: fakeExpense.createdAt,
-        updated_at: fakeExpense.updatedAt,
         category: {
           description: fakeExpense.category.description
         },

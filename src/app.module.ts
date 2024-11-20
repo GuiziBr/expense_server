@@ -11,6 +11,7 @@ import { PaymentTypeModule } from './modules/payment-type/payment-type.module'
 import { StatementPeriodModule } from './modules/statement-period/statement-period.module'
 import { StoreModule } from './modules/store/store.module'
 import { UserModule } from './modules/user/user.module'
+import { BalanceModule } from './modules/balance/balance.module'
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { UserModule } from './modules/user/user.module'
     CategoryModule,
     StoreModule,
     StatementPeriodModule,
-    ExpenseModule
+    ExpenseModule,
+    BalanceModule
   ]
 })
 

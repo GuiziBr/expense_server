@@ -456,7 +456,8 @@ describe('ExpenseService', () => {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: { amount: expensesRequest.orderType },
         skip: expensesRequest.offset,
@@ -506,7 +507,8 @@ describe('ExpenseService', () => {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: { paymentType: { description: expensesRequest.orderType }},
         skip: expensesRequest.offset,
@@ -550,7 +552,8 @@ describe('ExpenseService', () => {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: { amount: expensesRequest.orderType },
         skip: expensesRequest.offset,
@@ -590,7 +593,8 @@ describe('ExpenseService', () => {
           category: true,
           paymentType: true,
           bank: true,
-          store: true
+          store: true,
+          user: true
         },
         orderBy: { paymentType: { description: expensesRequest.orderType }},
         skip: expensesRequest.offset,
@@ -599,6 +603,35 @@ describe('ExpenseService', () => {
 
       expect(databaseService.expense.count).toBeCalledWith({
         where: expectedWhereClause
+      })
+    })
+  })
+
+  describe('getExpensesByDateRange', () => {
+    it('should return expenses by date range', async () => {
+      const startDate = new Date()
+      const endDate = new Date()
+
+      await expenseService.getExpensesByDateRange(
+        false, startDate, endDate
+      )
+
+      expect(databaseService.expense.findMany).toBeCalledWith({
+        where: {
+          personal: false,
+          dueDate: {
+            lte: endDate,
+            gte: startDate
+          },
+          paymentType: { deletedAt: null }
+        },
+        include: {
+          category: true,
+          paymentType: true,
+          bank: true,
+          store: true,
+          user: true
+        }
       })
     })
   })

@@ -6,7 +6,8 @@ import { PaymentTypeService } from './payment-type.service'
 @Module({
   imports: [InfraModule],
   controllers: [PaymentTypeController],
-  providers: [PaymentTypeService]
+  providers: [PaymentTypeService],
+  exports: [PaymentTypeService]
 })
 
 export class PaymentTypeModule {}

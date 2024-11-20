@@ -10,7 +10,8 @@ import { StatementPeriodService } from '../statement-period/statement-period.ser
 @Module({
   imports: [InfraModule, PaymentTypeModule, StatementPeriodModule],
   controllers: [ExpenseController],
-  providers: [ExpenseService, PaymentTypeService, StatementPeriodService]
+  providers: [ExpenseService, PaymentTypeService, StatementPeriodService],
+  exports: [ExpenseService]
 })
 
 export class ExpenseModule {}

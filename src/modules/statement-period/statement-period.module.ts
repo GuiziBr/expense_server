@@ -4,7 +4,8 @@ import { StatementPeriodService } from './statement-period.service'
 
 @Module({
   imports: [InfraModule],
-  providers: [StatementPeriodService]
+  providers: [StatementPeriodService],
+  exports: [StatementPeriodService]
 })
 
 export class StatementPeriodModule {}
