@@ -25,7 +25,8 @@ export class ExpenseService {
   ) {}
 
   private calculateNetAmount(amount: number, personal: boolean, split: boolean): number {
-    return personal ? amount : (split ? Math.round(amount / 2): amount)
+    const amountInCents = amount * 100
+    return personal ? amountInCents : (split ? Math.round(amountInCents / 2): amount)
   }
 
   private getOrderByClause(
