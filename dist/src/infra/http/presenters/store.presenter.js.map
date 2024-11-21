@@ -1,0 +1,1 @@
+{"version":3,"file":"store.presenter.js","sourceRoot":"","sources":["../../../../../src/infra/http/presenters/store.presenter.ts"],"names":[],"mappings":";;;AAGA,MAAa,cAAc;IACzB,MAAM,CAAC,MAAM,CAAC,KAAY;QACxB,OAAO;YACL,EAAE,EAAE,KAAK,CAAC,EAAE;YACZ,IAAI,EAAE,KAAK,CAAC,IAAI;YAChB,UAAU,EAAE,KAAK,CAAC,SAAS;YAC3B,UAAU,EAAE,KAAK,CAAC,SAAS;SAC5B,CAAA;IACH,CAAC;CACF;AATD,wCASC"}
