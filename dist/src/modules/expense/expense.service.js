@@ -27,7 +27,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         this.logger = new common_1.Logger(ExpenseService_1.name);
     }
     calculateNetAmount(amount, personal, split) {
-        return personal ? amount : (split ? Math.round(amount / 2) : amount);
+        const amountInCents = amount * 100;
+        return personal ? amountInCents : (split ? Math.round(amountInCents / 2) : amount);
     }
     getOrderByClause(orderBy, orderType = 'asc') {
         const orderByColumn = constants_1.constants.orderColumns[orderBy] || constants_1.constants.orderColumns.date;
