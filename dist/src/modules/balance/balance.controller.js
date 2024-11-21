@@ -34,7 +34,7 @@ let BalanceController = class BalanceController {
     }
     async getConsolidatedBalance({ userId }, params) {
         const monthValue = Number(params.month) - 1;
-        const yearValue = Number(params.year) - 1;
+        const yearValue = Number(params.year);
         const consolidatedBalance = await this.balanceService.getConsolidatedBalance({
             userId,
             month: monthValue,
