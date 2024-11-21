@@ -28,7 +28,9 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
     }
     calculateNetAmount(amount, personal, split) {
         const amountInCents = amount * 100;
-        return personal ? amountInCents : (split ? Math.round(amountInCents / 2) : amount);
+        return personal
+            ? amountInCents
+            : (split ? Math.round(amountInCents / 2) : amountInCents);
     }
     getOrderByClause(orderBy, orderType = 'asc') {
         const orderByColumn = constants_1.constants.orderColumns[orderBy] || constants_1.constants.orderColumns.date;

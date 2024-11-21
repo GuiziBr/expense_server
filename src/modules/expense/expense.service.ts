@@ -26,7 +26,9 @@ export class ExpenseService {
 
   private calculateNetAmount(amount: number, personal: boolean, split: boolean): number {
     const amountInCents = amount * 100
-    return personal ? amountInCents : (split ? Math.round(amountInCents / 2): amount)
+    return personal
+      ? amountInCents
+      : (split ? Math.round(amountInCents / 2): amountInCents)
   }
 
   private getOrderByClause(
@@ -88,7 +90,6 @@ export class ExpenseService {
 
     try {
       const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split)
-
       const dueDate = await this.calculateDueDate(
         data.date,
         data.payment_type_id,
