@@ -6,8 +6,6 @@ const config_1 = require("@nestjs/config");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         exposedHeaders: ['X-Total-Count']
     });
     const configService = app.get(config_1.ConfigService);
