@@ -83,9 +83,15 @@ export class BankService {
 				}
 			}
 
-			const reactivatedBank = await this.reactivateBank(id, sameNameBank.id)
+			const [, renamedBank] = await this.databaseService.$transaction([
+				this.databaseService.bank.delete({ where: { id: sameNameBank.id } }),
+				this.databaseService.bank.update({
+					where: { id },
+					data: { name, deletedAt: null }
+				})
+			])
 
-			return reactivatedBank
+			return renamedBank
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw error
@@ -112,27 +118,6 @@ export class BankService {
 			}
 			this.logger.error(
 				`Error - ${error.message || error} - deleting bank ${id}`
-			)
-			throw new AppError("Internal server error", 500)
-		}
-	}
-
-	private async reactivateBank(
-		bankIdToDelete: string,
-		bankIdToRestore: string
-	): Promise<Bank> {
-		try {
-			const [, reactivatedBank] = await Promise.all([
-				this.delete(bankIdToDelete),
-				this.databaseService.bank.update({
-					where: { id: bankIdToRestore },
-					data: { deletedAt: null }
-				})
-			])
-			return reactivatedBank
-		} catch (error) {
-			this.logger.error(
-				`Error - ${error.message || error} - reactivating bank ${bankIdToDelete}`
 			)
 			throw new AppError("Internal server error", 500)
 		}
