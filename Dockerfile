@@ -1,8 +1,8 @@
-FROM node:20.17.0-alpine AS base
+FROM node:24-alpine AS base
 
 WORKDIR /server
 
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 
 COPY package*.json ./server
 
