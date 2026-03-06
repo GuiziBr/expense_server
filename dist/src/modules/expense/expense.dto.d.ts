@@ -64,27 +64,27 @@ export declare const queryExpenseSchema: z.ZodObject<{
     endDate: z.ZodOptional<z.ZodDefault<z.ZodDate>>;
     offset: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
     limit: z.ZodOptional<z.ZodNumber>;
-    orderBy: z.ZodOptional<z.ZodEnum<["description", "amount", "date", "dueDate", "category", "paymentType", "bank", "store"]>>;
+    orderBy: z.ZodOptional<z.ZodEnum<["description", "amount", "date", "dueDate", "category", "payment_type", "bank", "store"]>>;
     orderType: z.ZodOptional<z.ZodDefault<z.ZodOptional<z.ZodEnum<["asc", "desc"]>>>>;
-    filterBy: z.ZodOptional<z.ZodEnum<["category", "paymentType", "bank", "store"]>>;
+    filterBy: z.ZodOptional<z.ZodEnum<["category", "payment_type", "bank", "store"]>>;
     filterValue: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    orderBy?: "bank" | "category" | "paymentType" | "store" | "description" | "amount" | "date" | "dueDate";
+    orderBy?: "bank" | "category" | "store" | "description" | "amount" | "date" | "dueDate" | "payment_type";
     offset?: number;
     limit?: number;
     startDate?: Date;
     endDate?: Date;
     orderType?: "asc" | "desc";
-    filterBy?: "bank" | "category" | "paymentType" | "store";
+    filterBy?: "bank" | "category" | "store" | "payment_type";
     filterValue?: string;
 }, {
-    orderBy?: "bank" | "category" | "paymentType" | "store" | "description" | "amount" | "date" | "dueDate";
+    orderBy?: "bank" | "category" | "store" | "description" | "amount" | "date" | "dueDate" | "payment_type";
     offset?: number;
     limit?: number;
     startDate?: Date;
     endDate?: Date;
     orderType?: "asc" | "desc";
-    filterBy?: "bank" | "category" | "paymentType" | "store";
+    filterBy?: "bank" | "category" | "store" | "payment_type";
     filterValue?: string;
 }>;
 export type QueryExpenseDTO = z.infer<typeof queryExpenseSchema>;

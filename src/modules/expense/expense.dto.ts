@@ -55,12 +55,12 @@ export const queryExpenseSchema = z.object({
     'date',
     'dueDate',
     'category',
-    'paymentType',
+    'payment_type',
     'bank',
     'store'
   ]).optional(),
   orderType: z.enum(['asc', 'desc']).optional().default('asc').optional(),
-  filterBy: z.enum(['category', 'paymentType', 'bank', 'store']).optional(),
+  filterBy: z.enum(['category', 'payment_type', 'bank', 'store']).optional(),
   filterValue: z.string().optional()
 
 })

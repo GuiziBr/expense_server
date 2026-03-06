@@ -24,12 +24,12 @@ exports.queryExpenseSchema = zod_1.z.object({
         'date',
         'dueDate',
         'category',
-        'paymentType',
+        'payment_type',
         'bank',
         'store'
     ]).optional(),
     orderType: zod_1.z.enum(['asc', 'desc']).optional().default('asc').optional(),
-    filterBy: zod_1.z.enum(['category', 'paymentType', 'bank', 'store']).optional(),
+    filterBy: zod_1.z.enum(['category', 'payment_type', 'bank', 'store']).optional(),
     filterValue: zod_1.z.string().optional()
 });
 //# sourceMappingURL=expense.dto.js.map

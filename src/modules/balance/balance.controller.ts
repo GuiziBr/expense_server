@@ -41,7 +41,7 @@ export class BalanceController {
     ) params: QueryConsolidatedBalanceDTO
   ): Promise<any> {
     const monthValue = Number(params.month) - 1
-    const yearValue = Number(params.year) - 1
+    const yearValue = Number(params.year)
     const consolidatedBalance = await this.balanceService.getConsolidatedBalance({
       userId,
       month: monthValue,
