@@ -99,6 +99,13 @@ export class BankService {
 			if (error instanceof AppError) {
 				throw error
 			}
+			if (
+				error instanceof PrismaClientKnownRequestError &&
+				error.code === constants.UNIQUE_CONSTRAINT_VIOLATION
+			) {
+				this.logger.error(`Bank with name "${name}" already exists`)
+				throw new AppError("There is already a bank with same name", 400)
+			}
 			this.logger.error(
 				`Error - ${error.message || error} - updating bank ${id}`
 			)

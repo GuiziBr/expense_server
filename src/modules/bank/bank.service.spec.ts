@@ -3,6 +3,8 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
 import AppError from "@/modules/utils/appError"
 import { createBank } from "../test-utils/bank.factory"
+import { createPrismaError } from "../test-utils/errors.factory"
+import { constants } from "../utils/constants"
 import { BankService } from "./bank.service"
 
 describe("BankService", () => {
@@ -216,6 +218,21 @@ describe("BankService", () => {
 				where: { id: fakeBank.id },
 				data: { name: "updated-bank", deletedAt: null }
 			})
+		})
+
+		it("should throw bank already exists exception on concurrent write", async () => {
+			vi.spyOn(databaseService.bank, "findUnique")
+				.mockResolvedValueOnce(fakeBank)
+				.mockResolvedValueOnce(null)
+			vi.spyOn(databaseService.bank, "update").mockRejectedValue(
+				createPrismaError(constants.UNIQUE_CONSTRAINT_VIOLATION)
+			)
+
+			await expect(
+				bankService.update(fakeBank.id, "updated-bank")
+			).rejects.toThrow(AppError)
+
+			expect(loggerSpy).toBeCalledWith('Bank with name "updated-bank" already exists')
 		})
 
 		it("should throw internal server error exception", async () => {
