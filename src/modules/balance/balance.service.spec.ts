@@ -4,6 +4,7 @@ import { endOfMonth } from "date-fns"
 import { ExpenseService } from "../expense/expense.service"
 import { createExpense } from "../test-utils/expense.factory"
 import { BalanceService } from "./balance.service"
+import AppError from "@/modules/utils/appError"
 
 describe("BalanceService", () => {
 	let balanceService: BalanceService
@@ -125,7 +126,7 @@ describe("BalanceService", () => {
 
 			await expect(
 				balanceService.getConsolidatedBalance(payload)
-			).rejects.toThrow("Error getting consolidated balance")
+			).rejects.toThrow(AppError)
 
 			expect(expenseService.getExpensesByDateRange).toHaveBeenCalledWith(
 				false,

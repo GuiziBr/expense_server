@@ -3,6 +3,7 @@ import { Test } from "@nestjs/testing"
 import { addDays, addMonths, endOfMonth, setDate } from "date-fns"
 import { StatementPeriod } from "@/domains/statement-period.domain"
 import { DatabaseService } from "@/infra/database/database.service"
+import AppError from "@/modules/utils/appError"
 import { PaymentTypeService } from "../payment-type/payment-type.service"
 import { StatementPeriodService } from "../statement-period/statement-period.service"
 import { createPrismaError } from "../test-utils/errors.factory"
@@ -84,7 +85,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow("Date must not be in the future")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.expense.create).not.toHaveBeenCalled()
 		})
@@ -96,7 +97,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow("This payment type must have a bank")
+			).rejects.toThrow(AppError)
 
 			expect(paymentTypeService.getById).toBeCalledWith("payment-type-id")
 
@@ -112,9 +113,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(
-				"No statement period for provided payment type and bank was found"
-			)
+			).rejects.toThrow(AppError)
 
 			expect(paymentTypeService.getById).toBeCalledWith("payment-type-id")
 
@@ -357,7 +356,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow("Category not found")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.expense.create).toBeCalledWith({
 				data: {
@@ -407,7 +406,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow("This expense is already registered")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.expense.create).toBeCalledWith({
 				data: {

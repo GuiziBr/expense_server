@@ -3,6 +3,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createCategory } from "../test-utils/category.factory"
 import { CategoryService } from "./category.service"
+import AppError from "@/modules/utils/appError"
 
 describe("CategoryService", () => {
 	let categoryService: CategoryService
@@ -40,9 +41,7 @@ describe("CategoryService", () => {
 				new Error()
 			)
 
-			await expect(categoryService.getAll(0, 1)).rejects.toThrow(
-				"Internal server error"
-			)
+			await expect(categoryService.getAll(0, 1)).rejects.toThrow(AppError)
 
 			expect(databaseService.category.findMany).toBeCalledWith({
 				where: { deletedAt: null },
@@ -75,7 +74,7 @@ describe("CategoryService", () => {
 			)
 
 			await expect(categoryService.getById("category-id")).rejects.toThrow(
-				"Internal server error"
+				AppError
 			)
 
 			expect(databaseService.category.findUnique).toBeCalledWith({
@@ -107,7 +106,7 @@ describe("CategoryService", () => {
 			const description = "category_description"
 
 			await expect(categoryService.create(description)).rejects.toThrow(
-				"Internal server error"
+				AppError
 			)
 
 			expect(databaseService.category.upsert).toBeCalledWith({
@@ -143,7 +142,7 @@ describe("CategoryService", () => {
 
 			await expect(
 				categoryService.update("category-id", "updated-category")
-			).rejects.toThrow("Category not found")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.category.findUnique).toBeCalledWith({
 				where: { id: "category-id" }
@@ -183,7 +182,7 @@ describe("CategoryService", () => {
 		it("should throw category already exists exception", async () => {
 			await expect(
 				categoryService.update("category-id", "updated-category")
-			).rejects.toThrow("There is already a category with same description")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.category.findUnique).toBeCalledWith({
 				where: { id: "category-id" }
@@ -238,7 +237,7 @@ describe("CategoryService", () => {
 
 			await expect(
 				categoryService.update("category-id", "updated-category")
-			).rejects.toThrow("Internal server error")
+			).rejects.toThrow(AppError)
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating category category-id"

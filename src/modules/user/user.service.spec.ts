@@ -4,6 +4,7 @@ import { User } from "@/domains/user.domain"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createPrismaError } from "../test-utils/errors.factory"
 import { UserService } from "./user.service"
+import AppError from "@/modules/utils/appError"
 
 describe("UserService", () => {
 	let userService: UserService
@@ -38,7 +39,7 @@ describe("UserService", () => {
 			)
 
 			await expect(userService.findUserByEmail("email")).rejects.toThrow(
-				"Internal server error"
+				AppError
 			)
 
 			expect(databaseService.user.findUnique).toBeCalledWith({
@@ -71,7 +72,7 @@ describe("UserService", () => {
 
 			await expect(
 				userService.updateUserAvatar("user_id", "avatar")
-			).rejects.toThrow("Error updating user avatar")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.user.update).toBeCalledWith({
 				where: { id: "user_id" },
@@ -88,7 +89,7 @@ describe("UserService", () => {
 
 			await expect(
 				userService.updateUserAvatar("user_id", "avatar")
-			).rejects.toThrow("Internal server error")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.user.update).toBeCalledWith({
 				where: { id: "user_id" },

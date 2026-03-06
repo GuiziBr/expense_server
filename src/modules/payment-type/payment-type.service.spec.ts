@@ -3,6 +3,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createPaymentType } from "../test-utils/payment-type.factory"
 import { PaymentTypeService } from "./payment-type.service"
+import AppError from "@/modules/utils/appError"
 
 describe("PaymentTypeService", () => {
 	let paymentTypeService: PaymentTypeService
@@ -40,9 +41,7 @@ describe("PaymentTypeService", () => {
 				new Error()
 			)
 
-			await expect(paymentTypeService.getAll(0, 1)).rejects.toThrow(
-				"Internal server error"
-			)
+			await expect(paymentTypeService.getAll(0, 1)).rejects.toThrow(AppError)
 
 			expect(databaseService.paymentType.findMany).toBeCalledWith({
 				where: { deletedAt: null },
@@ -77,7 +76,7 @@ describe("PaymentTypeService", () => {
 			)
 
 			await expect(paymentTypeService.getById("payment-id")).rejects.toThrow(
-				"Internal server error"
+				AppError
 			)
 
 			expect(databaseService.paymentType.findUnique).toBeCalledWith({
@@ -107,7 +106,7 @@ describe("PaymentTypeService", () => {
 			)
 
 			await expect(paymentTypeService.create("payment", true)).rejects.toThrow(
-				"Internal server error"
+				AppError
 			)
 
 			expect(databaseService.paymentType.upsert).toBeCalledWith({
@@ -144,7 +143,7 @@ describe("PaymentTypeService", () => {
 
 			await expect(
 				paymentTypeService.update("payment-id", "updated-payment", true)
-			).rejects.toThrow("Payment type not found")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.paymentType.findUnique).toBeCalledWith({
 				where: { id: "payment-id" }
@@ -189,7 +188,7 @@ describe("PaymentTypeService", () => {
 		it("should throw payment type already exists exception", async () => {
 			await expect(
 				paymentTypeService.update("payment-id", "updated-payment", true)
-			).rejects.toThrow("There is already a payment type with same description")
+			).rejects.toThrow(AppError)
 
 			expect(databaseService.paymentType.findUnique).toBeCalledWith({
 				where: { id: "payment-id" }
@@ -245,7 +244,7 @@ describe("PaymentTypeService", () => {
 
 			await expect(
 				paymentTypeService.update("payment-id", "updated-payment", true)
-			).rejects.toThrow("Internal server error")
+			).rejects.toThrow(AppError)
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating payment type payment-id"

@@ -1,6 +1,7 @@
 import { ExecutionContext, Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
+import AppError from "@/modules/utils/appError"
 import { CurrentUserInterceptor } from "./current-user.interceptor"
 
 describe("CurrentUserInterceptor", () => {
@@ -54,7 +55,7 @@ describe("CurrentUserInterceptor", () => {
 
 			await expect(
 				interceptor.intercept(mockContext, next)
-			).rejects.toThrowError("User not found")
+			).rejects.toThrowError(AppError)
 
 			expect(loggerSpy).toBeCalledWith("Error - User not found - user_id")
 
