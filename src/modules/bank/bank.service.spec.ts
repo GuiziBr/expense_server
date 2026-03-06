@@ -1,9 +1,9 @@
 import { Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
+import AppError from "@/modules/utils/appError"
 import { createBank } from "../test-utils/bank.factory"
 import { BankService } from "./bank.service"
-import AppError from "@/modules/utils/appError"
 
 describe("BankService", () => {
 	let bankService: BankService
@@ -191,9 +191,9 @@ describe("BankService", () => {
 				updatedAt: new Date()
 			})
 
-			vi.spyOn(databaseService.bank, "findUnique").mockResolvedValue(
-				deletedBank
-			)
+			vi.spyOn(databaseService.bank, "findUnique")
+				.mockResolvedValueOnce(fakeBank)
+				.mockResolvedValueOnce(deletedBank)
 
 			const result = await bankService.update(fakeBank.id, "updated-bank")
 
@@ -207,8 +207,9 @@ describe("BankService", () => {
 				where: { name: "updated-bank" }
 			})
 
-			expect(databaseService.bank.delete).toBeCalledWith({
-				where: { id: deletedBank.id }
+			expect(databaseService.bank.update).toBeCalledWith({
+				where: { id: deletedBank.id },
+				data: { name: `${deletedBank.name}_${deletedBank.id}` }
 			})
 
 			expect(databaseService.bank.update).toBeCalledWith({

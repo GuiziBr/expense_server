@@ -84,7 +84,10 @@ export class BankService {
 			}
 
 			const [, renamedBank] = await this.databaseService.$transaction([
-				this.databaseService.bank.delete({ where: { id: sameNameBank.id } }),
+				this.databaseService.bank.update({
+					where: { id: sameNameBank.id },
+					data: { name: `${sameNameBank.name}_${sameNameBank.id}` }
+				}),
 				this.databaseService.bank.update({
 					where: { id },
 					data: { name, deletedAt: null }
