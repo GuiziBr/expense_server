@@ -45,10 +45,7 @@ export interface ExpenseDTO {
 
 export const queryExpenseSchema = z.object({
 	startDate: z.coerce.date().optional(),
-	endDate: z.coerce
-		.date()
-		.default(() => new Date())
-		.optional(),
+	endDate: z.coerce.date().default(() => new Date()),
 	offset: z.coerce.number().min(0).default(0).optional(),
 	limit: z.coerce.number().min(1).optional(),
 	orderBy: z
@@ -63,7 +60,7 @@ export const queryExpenseSchema = z.object({
 			"store"
 		])
 		.optional(),
-	orderType: z.enum(["asc", "desc"]).optional().default("asc").optional(),
+	orderType: z.enum(["asc", "desc"]).default("asc"),
 	filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
 	filterValue: z.string().optional()
 })
