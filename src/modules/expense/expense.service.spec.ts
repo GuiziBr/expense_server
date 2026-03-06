@@ -178,7 +178,7 @@ describe("ExpenseService", () => {
 					ownerId: "user_id",
 					description: payload.description,
 					date: expenseDate,
-					amount: Math.round(payload.amount * 100 / 2),
+					amount: Math.round((payload.amount * 100) / 2),
 					categoryId: payload.category_id,
 					personal: false,
 					split: true,
@@ -197,7 +197,6 @@ describe("ExpenseService", () => {
 			})
 		})
 
-		// eslint-disable-next-line max-len
 		it("should create neither personal nor split expense with no statement for next month", async () => {
 			const expenseDate = new Date()
 
