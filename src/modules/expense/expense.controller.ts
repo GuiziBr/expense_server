@@ -43,7 +43,7 @@ export class ExpenseController {
     @Request() { userId },
     @Query(new ZodValidationPipe(queryExpenseSchema)) query: QueryExpenseDTO,
     @Response({ passthrough: true }) res: Res
-  ): Promise<any> {
+  ): Promise<ExpenseDTO[]> {
     const { expenses, totalCount } = await this.expenseService.getPersonalExpenses({
       ownerId: userId,
       startDate: query.startDate,
@@ -65,7 +65,7 @@ export class ExpenseController {
     @Request() { userId },
     @Query(new ZodValidationPipe(queryExpenseSchema)) query: QueryExpenseDTO,
     @Response({ passthrough: true }) res: Res
-  ): Promise<any> {
+  ): Promise<(ExpenseDTO & { type: 'income' | 'outcome' })[]> {
     const { expenses, totalCount } = await this.expenseService.getSharedExpenses({
       ownerId: userId,
       startDate: query.startDate,
