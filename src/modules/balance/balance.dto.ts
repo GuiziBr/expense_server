@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { GetExpensesRequest } from '../expense/expense.dto'
-import { ConsolidatedReport, ReportCategory, ReportPayment } from '@/domains/balance.domain'
+import {
+  ConsolidatedReport,
+  ReportCategory,
+  ReportPayment
+} from '@/domains/balance.domain'
 
 export const queryBalanceSchema = z.object({
   startDate: z.coerce.date(),
