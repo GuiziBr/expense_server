@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     root: './',
     environment: 'node',
+    restoreMocks: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html']
