@@ -1,16 +1,19 @@
-import { InfraModule } from '@/infra/infra.module'
-import { Module } from '@nestjs/common'
-import { ExpenseModule } from '../expense/expense.module'
-import { ExpenseService } from '../expense/expense.service'
-import { PaymentTypeModule } from '../payment-type/payment-type.module'
-import { StatementPeriodModule } from '../statement-period/statement-period.module'
-import { BalanceController } from './balance.controller'
-import { BalanceService } from './balance.service'
+import { Module } from "@nestjs/common"
+import { InfraModule } from "@/infra/infra.module"
+import { ExpenseModule } from "../expense/expense.module"
+import { PaymentTypeModule } from "../payment-type/payment-type.module"
+import { StatementPeriodModule } from "../statement-period/statement-period.module"
+import { BalanceController } from "./balance.controller"
+import { BalanceService } from "./balance.service"
 
 @Module({
-  imports: [InfraModule, ExpenseModule, PaymentTypeModule, StatementPeriodModule],
-  controllers: [BalanceController],
-  providers: [ExpenseService, BalanceService]
+	imports: [
+		InfraModule,
+		ExpenseModule,
+		PaymentTypeModule,
+		StatementPeriodModule
+	],
+	controllers: [BalanceController],
+	providers: [BalanceService]
 })
-
-export class BalanceModule { }
+export class BalanceModule {}
