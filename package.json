@@ -20,7 +20,7 @@
 		"docker:up": "docker compose up",
 		"docker:migrate:dev": "docker compose exec server npx prisma migrate dev",
 		"docker:migrate:deploy": "docker compose exec server npx prisma migrate deploy",
-		"seed": "docker compose exec server npx prisma db seed",
+		"docker:seed": "docker compose exec server npx prisma db seed",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:cov": "vitest run --coverage",

@@ -1,20 +1,20 @@
 [
-  {
-    "id": "b140b163-1342-40c8-a5f3-68039f01d13f",
-    "name": "Ricardo Guizi",
-    "email": "guizi189@gmail.com",
-    "password": "$2a$08$LxDuGMi.CF/Hq.BxbgQLuek/Otz89fC2lHCz6SQsf1AhOieJhHgS.",
-    "created_at": "2021-01-06 19:20:18.327",
-    "updated_at": "2021-01-06 19:20:18.327",
-    "avatar": ""
-  },
-  {
-    "id": "eb1a09d9-53c7-4795-a605-6b6dc63b1990",
-    "name": "Julia Luz",
-    "email": "juliamoreira.luz@gmail.com",
-    "password": "$2a$08$V8jXUnRaUhrXOkctdYWB5.YmfCcanvUFVfaXPKQ7zYi4ZuVWyDkAG",
-    "created_at": "2021-01-06 21:58:10.378",
-    "updated_at": "2021-01-06 21:58:10.378",
-    "avatar": ""
-  }
+	{
+		"id": "b140b163-1342-40c8-a5f3-68039f01d13f",
+		"name": "Test User",
+		"email": "test@test.com",
+		"password": "$2b$08$rnlnWw3sS6ywZ5hN8KDlYeNuDOQdUJJmYfu2O6SsgkQcywhYI1Dt2",
+		"created_at": "2021-01-06 19:20:18.327",
+		"updated_at": "2021-01-06 19:20:18.327",
+		"avatar": ""
+	},
+	{
+		"id": "eb1a09d9-53c7-4795-a605-6b6dc63b1990",
+		"name": "Test User 2",
+		"email": "test2@test.com",
+		"password": "$2b$08$rnlnWw3sS6ywZ5hN8KDlYeNuDOQdUJJmYfu2O6SsgkQcywhYI1Dt2",
+		"created_at": "2021-01-06 21:58:10.378",
+		"updated_at": "2021-01-06 21:58:10.378",
+		"avatar": ""
+	}
 ]
