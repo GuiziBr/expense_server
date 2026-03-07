@@ -64,7 +64,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting balance`);
-            throw new appError_1.default('Error getting balance', 500);
+            throw new appError_1.default("Error getting balance", 500);
         }
     }
     async getConsolidatedBalance({ year, month, userId }) {
@@ -76,13 +76,12 @@ let BalanceService = BalanceService_1 = class BalanceService {
                 const ownerIndex = acc.findIndex(({ ownerId }) => ownerId === expense.ownerId);
                 if (ownerIndex >= 0) {
                     const owner = acc[ownerIndex];
-                    const paymentTypeIndex = owner
-                        .payments
-                        ?.findIndex(({ id }) => id === expense.paymentTypeId);
+                    const paymentTypeIndex = owner.payments?.findIndex(({ id }) => id === expense.paymentTypeId);
                     if (paymentTypeIndex >= 0) {
                         const bankIndex = owner.payments[paymentTypeIndex].banks.findIndex((bank) => bank.id === expense.bankId);
                         if (bankIndex >= 0) {
-                            owner.payments[paymentTypeIndex].banks[bankIndex].total += expense.amount;
+                            owner.payments[paymentTypeIndex].banks[bankIndex].total +=
+                                expense.amount;
                         }
                         else {
                             owner.payments[paymentTypeIndex].banks.push(this.getBank(expense.bank, expense.amount));
@@ -126,7 +125,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting consolidated balance`);
-            throw new appError_1.default('Error getting consolidated balance', 500);
+            throw new appError_1.default("Error getting consolidated balance", 500);
         }
     }
 };

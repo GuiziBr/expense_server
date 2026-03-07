@@ -1,4 +1,4 @@
-import { DatabaseService } from '@/infra/database/database.service';
+import { DatabaseService } from "@/infra/database/database.service";
 export declare class HealthService {
     private readonly databaseService;
     private readonly logger;

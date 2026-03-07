@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export interface BankDTO {
     id: string;
     name: string;

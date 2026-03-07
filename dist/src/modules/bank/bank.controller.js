@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankController = void 0;
+const common_1 = require("@nestjs/common");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
 const bank_presenter_1 = require("../../infra/http/presenters/bank.presenter");
-const common_1 = require("@nestjs/common");
 const bank_dto_1 = require("./bank.dto");
 const bank_service_1 = require("./bank.service");
 let BankController = class BankController {
@@ -60,7 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BankController.prototype, "listBanks", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(bank_dto_1.bankByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -74,7 +74,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BankController.prototype, "createBank", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(bank_dto_1.bankByIdSchema))),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(bank_dto_1.createBankSchema))),
     __metadata("design:type", Function),
@@ -83,14 +83,14 @@ __decorate([
 ], BankController.prototype, "updateBank", null);
 __decorate([
     (0, common_1.HttpCode)(204),
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(bank_dto_1.bankByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BankController.prototype, "deleteBank", null);
 exports.BankController = BankController = __decorate([
-    (0, common_1.Controller)('banks'),
+    (0, common_1.Controller)("banks"),
     __metadata("design:paramtypes", [bank_service_1.BankService])
 ], BankController);
 //# sourceMappingURL=bank.controller.js.map

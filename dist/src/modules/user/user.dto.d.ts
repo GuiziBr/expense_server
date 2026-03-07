@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export declare const updateUserAvatarSchema: z.ZodObject<{
     avatar: z.ZodString;
 }, "strip", z.ZodTypeAny, {

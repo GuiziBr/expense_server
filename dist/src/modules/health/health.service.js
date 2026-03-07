@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var HealthService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HealthService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
+const database_service_1 = require("../../infra/database/database.service");
 let HealthService = HealthService_1 = class HealthService {
     constructor(databaseService) {
         this.databaseService = databaseService;
@@ -25,7 +25,7 @@ let HealthService = HealthService_1 = class HealthService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - checking health`);
-            throw new common_1.ServiceUnavailableException('Server unavailable');
+            throw new common_1.ServiceUnavailableException("Server unavailable");
         }
     }
 };

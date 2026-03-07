@@ -1,5 +1,5 @@
-import { BankByIdDTO, BankDTO, CreateBankDTO, ListBankDTO } from './bank.dto';
-import { BankService } from './bank.service';
+import { BankByIdDTO, BankDTO, CreateBankDTO, ListBankDTO } from "./bank.dto";
+import { BankService } from "./bank.service";
 export declare class BankController {
     private readonly bankService;
     constructor(bankService: BankService);

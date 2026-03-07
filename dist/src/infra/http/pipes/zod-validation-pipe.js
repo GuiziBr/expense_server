@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZodValidationPipe = void 0;
-const appError_1 = require("../../../modules/utils/appError");
 const common_1 = require("@nestjs/common");
 const zod_1 = require("zod");
 const zod_validation_error_1 = require("zod-validation-error");
+const appError_1 = require("../../../modules/utils/appError");
 class ZodValidationPipe {
     constructor(schema) {
         this.schema = schema;
@@ -19,7 +19,7 @@ class ZodValidationPipe {
                 const message = (0, zod_validation_error_1.fromZodError)(error)?.details[0]?.message;
                 throw new appError_1.default(`${param} ${message}`);
             }
-            throw new common_1.BadRequestException('Validation Failed');
+            throw new common_1.BadRequestException("Validation Failed");
         }
     }
 }

@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoreController = void 0;
+const common_1 = require("@nestjs/common");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
 const store_presenter_1 = require("../../infra/http/presenters/store.presenter");
-const common_1 = require("@nestjs/common");
 const store_dto_1 = require("./store.dto");
 const store_service_1 = require("./store.service");
 let StoreController = class StoreController {
@@ -60,7 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "listStores", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(store_dto_1.storeByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -74,7 +74,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "createStore", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(store_dto_1.storeByIdSchema))),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(store_dto_1.createStoreSchema))),
     __metadata("design:type", Function),
@@ -83,14 +83,14 @@ __decorate([
 ], StoreController.prototype, "updateStore", null);
 __decorate([
     (0, common_1.HttpCode)(204),
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(store_dto_1.storeByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "deleteStore", null);
 exports.StoreController = StoreController = __decorate([
-    (0, common_1.Controller)('stores'),
+    (0, common_1.Controller)("stores"),
     __metadata("design:paramtypes", [store_service_1.StoreService])
 ], StoreController);
 //# sourceMappingURL=store.controller.js.map

@@ -7,14 +7,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseModule = void 0;
-const infra_module_1 = require("../../infra/infra.module");
 const common_1 = require("@nestjs/common");
+const infra_module_1 = require("../../infra/infra.module");
 const payment_type_module_1 = require("../payment-type/payment-type.module");
 const payment_type_service_1 = require("../payment-type/payment-type.service");
-const expense_controller_1 = require("./expense.controller");
-const expense_service_1 = require("./expense.service");
 const statement_period_module_1 = require("../statement-period/statement-period.module");
 const statement_period_service_1 = require("../statement-period/statement-period.service");
+const expense_controller_1 = require("./expense.controller");
+const expense_service_1 = require("./expense.service");
 let ExpenseModule = class ExpenseModule {
 };
 exports.ExpenseModule = ExpenseModule;

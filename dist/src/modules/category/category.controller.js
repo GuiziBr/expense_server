@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoryController = void 0;
+const common_1 = require("@nestjs/common");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
 const category_presenter_1 = require("../../infra/http/presenters/category.presenter");
-const common_1 = require("@nestjs/common");
 const category_dto_1 = require("./category.dto");
 const category_service_1 = require("./category.service");
 let CategoryController = class CategoryController {
@@ -60,7 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "listCategories", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(category_dto_1.categoryByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -74,7 +74,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "createCategory", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(category_dto_1.categoryByIdSchema))),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(category_dto_1.createCategorySchema))),
     __metadata("design:type", Function),
@@ -83,14 +83,14 @@ __decorate([
 ], CategoryController.prototype, "updateCategory", null);
 __decorate([
     (0, common_1.HttpCode)(204),
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(category_dto_1.categoryByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "deleteCategory", null);
 exports.CategoryController = CategoryController = __decorate([
-    (0, common_1.Controller)('categories'),
+    (0, common_1.Controller)("categories"),
     __metadata("design:paramtypes", [category_service_1.CategoryService])
 ], CategoryController);
 //# sourceMappingURL=category.controller.js.map

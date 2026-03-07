@@ -1,5 +1,5 @@
-import { CreatePaymentTypeDTO, ListPaymentTypesDTO, PaymentTypeByIdDTO, PaymentTypeDTO } from './payment-type.dto';
-import { PaymentTypeService } from './payment-type.service';
+import { CreatePaymentTypeDTO, ListPaymentTypesDTO, PaymentTypeByIdDTO, PaymentTypeDTO } from "./payment-type.dto";
+import { PaymentTypeService } from "./payment-type.service";
 export declare class PaymentTypeController {
     private readonly paymentTypeService;
     constructor(paymentTypeService: PaymentTypeService);

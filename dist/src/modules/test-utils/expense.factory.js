@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createExpense = void 0;
 const faker_1 = require("@faker-js/faker");
+const bank_factory_1 = require("./bank.factory");
 const category_factory_1 = require("./category.factory");
 const payment_type_factory_1 = require("./payment-type.factory");
-const bank_factory_1 = require("./bank.factory");
 const store_factory_1 = require("./store.factory");
 const createExpense = (params = {}) => {
     const category = (0, category_factory_1.createCategory)();

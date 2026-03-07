@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
+const common_1 = require("@nestjs/common");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
 const authenticated_user_presenter_1 = require("../../infra/http/presenters/authenticated-user.presenter");
-const common_1 = require("@nestjs/common");
 const auth_dto_1 = require("./auth.dto");
 const auth_service_1 = require("./auth.service");
 const public_decorator_1 = require("./public.decorator");
@@ -39,7 +39,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signIn", null);
 exports.AuthController = AuthController = __decorate([
-    (0, common_1.Controller)('sessions'),
+    (0, common_1.Controller)("sessions"),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

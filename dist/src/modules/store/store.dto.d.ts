@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export interface StoreDTO {
     id: string;
     name: string;

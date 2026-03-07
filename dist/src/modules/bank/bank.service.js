@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var BankService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BankService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
+const database_service_1 = require("../../infra/database/database.service");
 const appError_1 = require("../utils/appError");
 const constants_1 = require("../utils/constants");
 let BankService = BankService_1 = class BankService {
@@ -27,23 +27,25 @@ let BankService = BankService_1 = class BankService {
                 where: { deletedAt: null },
                 skip: offset,
                 take: limit,
-                orderBy: { name: 'asc' }
+                orderBy: { name: "asc" }
             });
             return banks;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all banks`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async getById(id) {
         try {
-            const bank = await this.databaseService.bank.findUnique({ where: { id, deletedAt: null } });
+            const bank = await this.databaseService.bank.findUnique({
+                where: { id, deletedAt: null }
+            });
             return bank;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting bank by id ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async create(name) {
@@ -57,7 +59,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating bank ${name}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async update(id, name) {
@@ -68,9 +70,9 @@ let BankService = BankService_1 = class BankService {
             ]);
             if (!bank) {
                 this.logger.error(`Bank ${id} not found`);
-                throw new appError_1.default('Bank not found', 404);
+                throw new appError_1.default("Bank not found", 404);
             }
-            if ((bank && !sameNameBank) || (sameNameBank?.id === id)) {
+            if ((bank && !sameNameBank) || sameNameBank?.id === id) {
                 const updatedBank = await this.databaseService.bank.update({
                     where: { id },
                     data: { name, deletedAt: null }
@@ -80,18 +82,32 @@ let BankService = BankService_1 = class BankService {
             if (sameNameBank) {
                 if (!sameNameBank?.deletedAt) {
                     this.logger.error(`Bank with name "${name}" already exists`);
-                    throw new appError_1.default('There is already a bank with same name', 400);
+                    throw new appError_1.default("There is already a bank with same name", 400);
                 }
             }
-            const reactivatedBank = await this.reactivateBank(id, sameNameBank.id);
-            return reactivatedBank;
+            const [, renamedBank] = await this.databaseService.$transaction([
+                this.databaseService.bank.update({
+                    where: { id: sameNameBank.id },
+                    data: { name: `${sameNameBank.name}_${sameNameBank.id}` }
+                }),
+                this.databaseService.bank.update({
+                    where: { id },
+                    data: { name, deletedAt: null }
+                })
+            ]);
+            return renamedBank;
         }
         catch (error) {
             if (error instanceof appError_1.default) {
                 throw error;
             }
+            if (error instanceof library_1.PrismaClientKnownRequestError &&
+                error.code === constants_1.constants.UNIQUE_CONSTRAINT_VIOLATION) {
+                this.logger.error(`Bank with name "${name}" already exists`);
+                throw new appError_1.default("There is already a bank with same name", 400);
+            }
             this.logger.error(`Error - ${error.message || error} - updating bank ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async delete(id) {
@@ -102,28 +118,12 @@ let BankService = BankService_1 = class BankService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError
-                && error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof library_1.PrismaClientKnownRequestError &&
+                error.code === constants_1.constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting bank ${id}`);
-            throw new appError_1.default('Internal server error', 500);
-        }
-    }
-    async reactivateBank(bankIdToDelete, bankIdToRestore) {
-        try {
-            const [, reactivatedBank] = await Promise.all([
-                this.delete(bankIdToDelete),
-                this.databaseService.bank.update({
-                    where: { id: bankIdToRestore },
-                    data: { deletedAt: null }
-                })
-            ]);
-            return reactivatedBank;
-        }
-        catch (error) {
-            this.logger.error(`Error - ${error.message || error} - reactivating bank ${bankIdToDelete}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
 };

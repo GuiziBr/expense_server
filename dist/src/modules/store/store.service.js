@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var StoreService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StoreService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
+const database_service_1 = require("../../infra/database/database.service");
 const appError_1 = require("../utils/appError");
 const constants_1 = require("../utils/constants");
 let StoreService = StoreService_1 = class StoreService {
@@ -27,23 +27,25 @@ let StoreService = StoreService_1 = class StoreService {
                 where: { deletedAt: null },
                 skip: offset,
                 take: limit,
-                orderBy: { name: 'asc' }
+                orderBy: { name: "asc" }
             });
             return stores;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all stores`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async getById(id) {
         try {
-            const store = await this.databaseService.store.findUnique({ where: { id, deletedAt: null } });
+            const store = await this.databaseService.store.findUnique({
+                where: { id, deletedAt: null }
+            });
             return store;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting store by id ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async create(name) {
@@ -57,7 +59,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating store ${name}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async update(id, name) {
@@ -68,9 +70,9 @@ let StoreService = StoreService_1 = class StoreService {
             ]);
             if (!store) {
                 this.logger.error(`Store ${id} not found`);
-                throw new appError_1.default('Store not found', 404);
+                throw new appError_1.default("Store not found", 404);
             }
-            if ((store && !sameNameStore) || (sameNameStore?.id === id)) {
+            if ((store && !sameNameStore) || sameNameStore?.id === id) {
                 const updatedStore = await this.databaseService.store.update({
                     where: { id },
                     data: { name, deletedAt: null }
@@ -80,7 +82,7 @@ let StoreService = StoreService_1 = class StoreService {
             if (sameNameStore) {
                 if (!sameNameStore?.deletedAt) {
                     this.logger.error(`Store with name "${name}" already exists`);
-                    throw new appError_1.default('There is already a store with same name', 400);
+                    throw new appError_1.default("There is already a store with same name", 400);
                 }
             }
             const reactivatedStore = await this.reactivateStore(id, sameNameStore.id);
@@ -91,7 +93,7 @@ let StoreService = StoreService_1 = class StoreService {
                 throw error;
             }
             this.logger.error(`Error - ${error.message || error} - updating store ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async delete(id) {
@@ -102,12 +104,12 @@ let StoreService = StoreService_1 = class StoreService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError
-                && error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof library_1.PrismaClientKnownRequestError &&
+                error.code === constants_1.constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting store ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async reactivateStore(storeIdToDelete, storeIdToRestore) {
@@ -123,7 +125,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - reactivating store ${storeIdToDelete}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
 };
