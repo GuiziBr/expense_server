@@ -5,6 +5,9 @@
 	"author": "",
 	"private": true,
 	"license": "UNLICENSED",
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
 	"scripts": {
 		"build": "nest build",
 		"format": "biome format --write .",
@@ -14,6 +17,10 @@
 		"start:prod": "node dist/main",
 		"lint": "npx @biomejs/biome lint --write",
 		"migrate": "npx prisma migrate dev",
+		"docker:up": "docker compose up",
+		"docker:migrate:dev": "docker compose exec server npx prisma migrate dev",
+		"docker:migrate:deploy": "docker compose exec server npx prisma migrate deploy",
+		"docker:seed": "docker compose exec server npx prisma db seed",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:cov": "vitest run --coverage",

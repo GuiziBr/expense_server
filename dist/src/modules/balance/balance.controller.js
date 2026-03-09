@@ -13,12 +13,12 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BalanceController = void 0;
+const common_1 = require("@nestjs/common");
 const current_user_interceptor_1 = require("../../infra/auth/current-user.interceptor");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
-const common_1 = require("@nestjs/common");
+const balance_presenter_1 = require("../../infra/http/presenters/balance.presenter");
 const balance_dto_1 = require("./balance.dto");
 const balance_service_1 = require("./balance.service");
-const balance_presenter_1 = require("../../infra/http/presenters/balance.presenter");
 let BalanceController = class BalanceController {
     constructor(balanceService) {
         this.balanceService = balanceService;
@@ -55,7 +55,7 @@ __decorate([
 ], BalanceController.prototype, "getBalance", null);
 __decorate([
     (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
-    (0, common_1.Get)('/consolidated/:year/:month'),
+    (0, common_1.Get)("/consolidated/:year/:month"),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(balance_dto_1.queryConsolidatedBalanceSchema))),
     __metadata("design:type", Function),
@@ -63,7 +63,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getConsolidatedBalance", null);
 exports.BalanceController = BalanceController = __decorate([
-    (0, common_1.Controller)('balance'),
+    (0, common_1.Controller)("balance"),
     __metadata("design:paramtypes", [balance_service_1.BalanceService])
 ], BalanceController);
 //# sourceMappingURL=balance.controller.js.map

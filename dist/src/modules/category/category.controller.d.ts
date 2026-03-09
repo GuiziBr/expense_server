@@ -1,5 +1,5 @@
-import { CategoryByIdDTO, CategoryDTO, CreateCategoryDTO, ListCategoryDTO } from './category.dto';
-import { CategoryService } from './category.service';
+import { CategoryByIdDTO, CategoryDTO, CreateCategoryDTO, ListCategoryDTO } from "./category.dto";
+import { CategoryService } from "./category.service";
 export declare class CategoryController {
     private readonly categoryService;
     constructor(categoryService: CategoryService);

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export declare const envSchema: z.ZodObject<{
     DATABASE_URL: z.ZodString;
     PORT: z.ZodDefault<z.ZodNumber>;

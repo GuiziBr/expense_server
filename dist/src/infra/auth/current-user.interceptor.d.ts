@@ -1,5 +1,5 @@
-import { CallHandler, ExecutionContext } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
+import { CallHandler, ExecutionContext } from "@nestjs/common";
+import { DatabaseService } from "../database/database.service";
 export declare class CurrentUserInterceptor {
     private readonly databaseService;
     private readonly logger;

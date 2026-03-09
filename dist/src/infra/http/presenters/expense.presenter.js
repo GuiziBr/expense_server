@@ -23,26 +23,26 @@ class ExpensePresenter {
             payment_type: {
                 description: expense.paymentType.description
             },
-            ...expense.bank && {
+            ...(expense.bank && {
                 bank: {
                     name: expense.bank.name
                 }
-            },
-            ...expense.store && {
+            }),
+            ...(expense.store && {
                 store: {
                     name: expense.store.name
                 }
-            }
+            })
         };
     }
     static toPersonalExpenseDTO(expense) {
         return ExpensePresenter.toExpenseDTO(expense);
     }
     static toSharedExpenseDTO(expense, ownerId) {
-        const formattedExpense = this.toExpenseDTO(expense);
+        const formattedExpense = ExpensePresenter.toExpenseDTO(expense);
         return {
             ...formattedExpense,
-            type: expense.ownerId === ownerId ? 'income' : 'outcome'
+            type: expense.ownerId === ownerId ? "income" : "outcome"
         };
     }
 }

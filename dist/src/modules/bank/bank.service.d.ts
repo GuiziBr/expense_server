@@ -1,5 +1,5 @@
-import { Bank } from '@/domains/bank.domain';
-import { DatabaseService } from '@/infra/database/database.service';
+import { Bank } from "@/domains/bank.domain";
+import { DatabaseService } from "@/infra/database/database.service";
 export declare class BankService {
     private readonly databaseService;
     private readonly logger;
@@ -9,5 +9,4 @@ export declare class BankService {
     create(name: string): Promise<Bank>;
     update(id: string, name: string): Promise<Bank>;
     delete(id: string): Promise<void>;
-    private reactivateBank;
 }

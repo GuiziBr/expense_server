@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
+const common_1 = require("@nestjs/common");
 const current_user_interceptor_1 = require("../../infra/auth/current-user.interceptor");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
-const common_1 = require("@nestjs/common");
 const user_dto_1 = require("./user.dto");
 const user_service_1 = require("./user.service");
 let UserController = class UserController {
@@ -30,7 +30,7 @@ exports.UserController = UserController;
 __decorate([
     (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
     (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(user_dto_1.updateUserAvatarSchema)),
-    (0, common_1.Patch)('avatar'),
+    (0, common_1.Patch)("avatar"),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -38,7 +38,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateAvatar", null);
 exports.UserController = UserController = __decorate([
-    (0, common_1.Controller)('users'),
+    (0, common_1.Controller)("users"),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

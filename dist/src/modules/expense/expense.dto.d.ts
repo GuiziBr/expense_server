@@ -1,5 +1,5 @@
-import { Expense } from '@/domains/expense.domain';
-import { z } from 'zod';
+import { z } from "zod";
+import { Expense } from "@/domains/expense.domain";
 export declare const createExpenseSchema: z.ZodObject<{
     description: z.ZodString;
     date: z.ZodDate;
@@ -61,11 +61,11 @@ export interface ExpenseDTO {
 }
 export declare const queryExpenseSchema: z.ZodObject<{
     startDate: z.ZodOptional<z.ZodDate>;
-    endDate: z.ZodOptional<z.ZodDefault<z.ZodDate>>;
+    endDate: z.ZodDefault<z.ZodDate>;
     offset: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
     limit: z.ZodOptional<z.ZodNumber>;
     orderBy: z.ZodOptional<z.ZodEnum<["description", "amount", "date", "dueDate", "category", "payment_type", "bank", "store"]>>;
-    orderType: z.ZodOptional<z.ZodDefault<z.ZodOptional<z.ZodEnum<["asc", "desc"]>>>>;
+    orderType: z.ZodDefault<z.ZodEnum<["asc", "desc"]>>;
     filterBy: z.ZodOptional<z.ZodEnum<["category", "payment_type", "bank", "store"]>>;
     filterValue: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
@@ -88,7 +88,7 @@ export declare const queryExpenseSchema: z.ZodObject<{
     filterValue?: string;
 }>;
 export type QueryExpenseDTO = z.infer<typeof queryExpenseSchema>;
-export type OrderByType = 'asc' | 'desc';
+export type OrderByType = "asc" | "desc";
 export interface GetExpensesRequest {
     ownerId: string;
     startDate?: Date;

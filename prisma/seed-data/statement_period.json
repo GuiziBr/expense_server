@@ -1,0 +1,68 @@
+[
+  {
+    "id": "5b97e780-6566-4a34-ae61-2279f3587618",
+    "user_id": "b140b163-1342-40c8-a5f3-68039f01d13f",
+    "bank_id": "b16940e2-ca2a-4c37-9edf-58ecd93bc423",
+    "initial_day": "18",
+    "final_day": "17",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2024-11-21 06:05:19.658101",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "e5f9bd90-8d08-4569-9bc5-eadbdde8e8ba",
+    "user_id": "b140b163-1342-40c8-a5f3-68039f01d13f",
+    "bank_id": "c7ace10e-0257-49d8-89e2-711d45514fa8",
+    "initial_day": "4",
+    "final_day": "4",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2024-11-21 06:05:19.658101",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "e66945cb-9dd3-40dd-a3f5-6111b7f723e8",
+    "user_id": "eb1a09d9-53c7-4795-a605-6b6dc63b1990",
+    "bank_id": "d2ffc344-7eb5-4c61-b4cf-612f69277e3d",
+    "initial_day": "24",
+    "final_day": "23",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2024-11-21 06:05:19.658101",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "eabbab79-0d7b-4dff-ab0a-0f0b97c4560e",
+    "user_id": "b140b163-1342-40c8-a5f3-68039f01d13f",
+    "bank_id": "5df366c1-e484-4f28-af5f-4f68d9e1b429",
+    "initial_day": "23",
+    "final_day": "22",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2025-09-25 00:20:23.597767",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "f29c3e8c-a227-4a62-b9a6-82e2ba45bc4d",
+    "user_id": "eb1a09d9-53c7-4795-a605-6b6dc63b1990",
+    "bank_id": "fbc40646-37a0-46a0-86c2-fe3c66643b97",
+    "initial_day": "11",
+    "final_day": "11",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2024-11-21 06:05:19.658101",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "f6e6eb59-c6e5-4f99-8841-6923c7fa9bb3",
+    "user_id": "eb1a09d9-53c7-4795-a605-6b6dc63b1990",
+    "bank_id": "b16940e2-ca2a-4c37-9edf-58ecd93bc423",
+    "initial_day": "16",
+    "final_day": "15",
+    "payment_type_id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+    "created_at": "2024-11-21 06:05:19.658101",
+    "updated_at": null,
+    "deleted_at": null
+  }
+]

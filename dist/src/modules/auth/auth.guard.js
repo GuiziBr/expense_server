@@ -36,9 +36,9 @@ let AuthGuard = class AuthGuard {
         }
         try {
             const payload = await this.jwtService.verifyAsync(token, {
-                secret: this.configService.get('JWT_SECRET', { infer: true })
+                secret: this.configService.get("JWT_SECRET", { infer: true })
             });
-            request['user'] = payload;
+            request.user = payload;
         }
         catch {
             throw new common_1.UnauthorizedException();
@@ -46,8 +46,8 @@ let AuthGuard = class AuthGuard {
         return true;
     }
     extractTokenFromHeader(request) {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        return type === 'Bearer' ? token : undefined;
+        const [type, token] = request.headers.authorization?.split(" ") ?? [];
+        return type === "Bearer" ? token : undefined;
     }
 };
 exports.AuthGuard = AuthGuard;
