@@ -1,5 +1,5 @@
-import { CreateStoreDTO, ListStoreDTO, StoreByIdDTO, StoreDTO } from './store.dto';
-import { StoreService } from './store.service';
+import { CreateStoreDTO, ListStoreDTO, StoreByIdDTO, StoreDTO } from "./store.dto";
+import { StoreService } from "./store.service";
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);

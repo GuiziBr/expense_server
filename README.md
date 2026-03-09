@@ -14,9 +14,8 @@ This is the backend server for an expense tracking application. It is a NestJS-b
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/) (v20 or higher)
+- [Node.js](https://nodejs.org/en/) (v24 or higher)
 - [Docker](https://www.docker.com/)
-- [pnpm](https://pnpm.io/) (optional)
 
 ### Installation
 
@@ -41,16 +40,22 @@ This is the backend server for an expense tracking application. It is a NestJS-b
     JWT_SECRET="your-secret-key"
     ```
 
-4.  Start the database:
+4.  Start the Docker containers:
 
     ```bash
-    docker-compose up -d
+    npm run docker:up
     ```
 
 5.  Run database migrations:
 
     ```bash
-    npm run migrate
+    npm run docker:migrate:dev
+    ```
+
+6.  Seed the database (optional):
+
+    ```bash
+    npm run seed
     ```
 
 ### Running the Application
@@ -81,19 +86,42 @@ For detailed information about the API, please refer to the code.
 
 ## Scripts
 
+### Application
+
 - `npm run build`: Build the application.
-- `npm run format`: Format the code.
 - `npm run start`: Start the application.
 - `npm run start:dev`: Start the application in watch mode.
 - `npm run start:debug`: Start the application in debug mode.
 - `npm run start:prod`: Start the application in production mode.
+
+### Docker
+
+- `npm run docker:up`: Start Docker containers.
+- `npm run docker:migrate:dev`: Run development migrations inside the container.
+- `npm run docker:migrate:deploy`: Deploy migrations inside the container.
+- `npm run docker:seed`: Seed the database with fixture data inside the container.
+
+### Code Quality
+
 - `npm run lint`: Lint the code.
-- `npm run migrate`: Run database migrations.
+- `npm run format`: Format the code.
+
+### Testing
+
 - `npm run test`: Run unit tests.
 - `npm run test:watch`: Run unit tests in watch mode.
 - `npm run test:cov`: Run unit tests with coverage.
 - `npm run test:debug`: Run unit tests in debug mode.
 - `npm run test:e2e`: Run end-to-end tests.
+
+## Test Users
+
+After seeding the database, the following users are available:
+
+| Name | Email | Password |
+|------|-------|----------|
+| Test User | test@test.com | pass-test |
+| Test User 2 | test2@test.com | pass-test |
 
 ## Database Schema
 

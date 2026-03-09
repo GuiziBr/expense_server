@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 export interface CategoryDTO {
     id: string;
     description: string;

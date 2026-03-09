@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var StatementPeriodService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatementPeriodService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
+const database_service_1 = require("../../infra/database/database.service");
 const appError_1 = require("../utils/appError");
 let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodService {
     constructor(databaseService) {
@@ -32,7 +32,7 @@ let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodSer
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting statement period`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
 };

@@ -11,7 +11,7 @@ class BalancePresenter {
                 categories: consolidatedReport?.requester?.categories || [],
                 total: consolidatedReport?.requesterBalance
             },
-            ...consolidatedReport.partner?.ownerId && {
+            ...(consolidatedReport.partner?.ownerId && {
                 partner: {
                     id: consolidatedReport.partner.ownerId,
                     name: consolidatedReport.partner.ownerName,
@@ -19,7 +19,7 @@ class BalancePresenter {
                     categories: consolidatedReport.partner.categories || [],
                     total: consolidatedReport.partnerBalance
                 }
-            },
+            }),
             balance: consolidatedReport.requesterBalance - consolidatedReport.partnerBalance
         };
     }

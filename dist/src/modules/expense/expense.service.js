@@ -11,10 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ExpenseService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
 const date_fns_1 = require("date-fns");
+const database_service_1 = require("../../infra/database/database.service");
 const payment_type_service_1 = require("../payment-type/payment-type.service");
 const statement_period_service_1 = require("../statement-period/statement-period.service");
 const appError_1 = require("../utils/appError");
@@ -30,15 +30,17 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         const amountInCents = amount * 100;
         return personal
             ? amountInCents
-            : (split ? Math.round(amountInCents / 2) : amountInCents);
+            : split
+                ? Math.round(amountInCents / 2)
+                : amountInCents;
     }
-    getOrderByClause(orderBy, orderType = 'asc') {
+    getOrderByClause(orderBy, orderType = "asc") {
         const orderByColumn = constants_1.constants.orderColumns[orderBy] || constants_1.constants.orderColumns.date;
-        const orderByClause = typeof orderByColumn === 'string'
+        const orderByClause = typeof orderByColumn === "string"
             ? { [orderByColumn]: orderType }
             : {
-                [orderByColumn[0].split('.')[0]]: {
-                    [orderByColumn[0].split('.')[1]]: orderType
+                [orderByColumn[0].split(".")[0]]: {
+                    [orderByColumn[0].split(".")[1]]: orderType
                 }
             };
         return orderByClause;
@@ -49,11 +51,11 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return (0, date_fns_1.addMonths)(transactionDate, 1);
         }
         if (paymentType?.hasStatement && !bankId) {
-            throw new appError_1.default('This payment type must have a bank');
+            throw new appError_1.default("This payment type must have a bank");
         }
         const statementPeriod = await this.statementPeriodService.findByUserAndBank(userId, bankId, paymentTypeId);
         if (!statementPeriod) {
-            throw new appError_1.default('No statement period for provided payment type and bank was found');
+            throw new appError_1.default("No statement period for provided payment type and bank was found");
         }
         const { initialDay, finalDay } = statementPeriod;
         const lastDayOfMonth = (0, date_fns_1.endOfMonth)(transactionDate).getDate();
@@ -65,7 +67,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
     }
     async createExpense(data, userId) {
         if ((0, date_fns_1.isFuture)(data.date))
-            throw new appError_1.default('Date must not be in the future', 400);
+            throw new appError_1.default("Date must not be in the future", 400);
         try {
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id);
@@ -77,7 +79,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     amount: netAmount,
                     categoryId: data.category_id,
                     personal: data.personal || false,
-                    split: data.personal ? false : (data.split || false),
+                    split: data.personal ? false : data.split || false,
                     paymentTypeId: data.payment_type_id,
                     bankId: data.bank_id,
                     storeId: data.store_id,
@@ -87,7 +89,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     category: true,
                     paymentType: true,
                     bank: true,
-                    store: true
+                    store: true,
+                    user: true
                 }
             });
             return expense;
@@ -100,7 +103,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 this.logger.error(`Error - ${error.code || error} - creating expense`);
                 if (error.code === constants_1.constants.FOREIGN_KEY_VIOLATION) {
                     const dbField = error.meta.field_name;
-                    const fieldName = dbField.split('_')[1];
+                    const fieldName = dbField.split("_")[1];
                     const errorMessage = constants_1.constants.foreignKeyMessages[fieldName];
                     throw new appError_1.default(errorMessage, 400);
                 }
@@ -109,7 +112,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 }
             }
             this.logger.error(`Error - ${error.message || error} - creating expense`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {

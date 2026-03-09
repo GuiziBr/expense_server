@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var PaymentTypeService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentTypeService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
+const database_service_1 = require("../../infra/database/database.service");
 const appError_1 = require("../utils/appError");
 const constants_1 = require("../utils/constants");
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
@@ -27,23 +27,25 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
                 where: { deletedAt: null },
                 skip: offset,
                 take: limit,
-                orderBy: { description: 'asc' }
+                orderBy: { description: "asc" }
             });
             return paymentTypes;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all payment types`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async getById(id) {
         try {
-            const paymentType = await this.databaseService.paymentType.findUnique({ where: { id, deletedAt: null } });
+            const paymentType = await this.databaseService.paymentType.findUnique({
+                where: { id, deletedAt: null }
+            });
             return paymentType;
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting payment type by id ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async create(description, hasStatement) {
@@ -57,7 +59,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating payment type ${description}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async update(id, description, hasStatement) {
@@ -70,10 +72,10 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             ]);
             if (!paymentType) {
                 this.logger.error(`Payment type ${id} not found`);
-                throw new appError_1.default('Payment type not found', 404);
+                throw new appError_1.default("Payment type not found", 404);
             }
-            if ((paymentType && !sameDescriptionPaymentType)
-                || (sameDescriptionPaymentType?.id === id)) {
+            if ((paymentType && !sameDescriptionPaymentType) ||
+                sameDescriptionPaymentType?.id === id) {
                 const updatedPaymentType = await this.databaseService.paymentType.update({
                     where: { id },
                     data: { description, hasStatement, deletedAt: null }
@@ -83,7 +85,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             if (sameDescriptionPaymentType) {
                 if (!sameDescriptionPaymentType?.deletedAt) {
                     this.logger.error(`Payment type with description "${description}" already exists`);
-                    throw new appError_1.default('There is already a payment type with same description', 400);
+                    throw new appError_1.default("There is already a payment type with same description", 400);
                 }
                 const reactivatedPaymentType = await this.reactivatePaymentType(id, sameDescriptionPaymentType.id);
                 return reactivatedPaymentType;
@@ -94,7 +96,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
                 throw error;
             }
             this.logger.error(`Error - ${error.message || error} - updating payment type ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async delete(id) {
@@ -105,12 +107,12 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError
-                && error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof library_1.PrismaClientKnownRequestError &&
+                error.code === constants_1.constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting payment type ${id}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async reactivatePaymentType(paymentTypeIdToDelete, paymentTypeIdToRestore) {
@@ -126,7 +128,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
 };

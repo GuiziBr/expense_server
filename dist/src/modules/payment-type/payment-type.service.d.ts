@@ -1,5 +1,5 @@
-import { PaymentType } from '@/domains/payment-type.domain';
-import { DatabaseService } from '@/infra/database/database.service';
+import { PaymentType } from "@/domains/payment-type.domain";
+import { DatabaseService } from "@/infra/database/database.service";
 export declare class PaymentTypeService {
     private readonly databaseService;
     private readonly logger;

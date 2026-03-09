@@ -1,5 +1,5 @@
-import { User } from '@/domains/user.domain';
-import { DatabaseService } from '@/infra/database/database.service';
+import { User } from "@/domains/user.domain";
+import { DatabaseService } from "@/infra/database/database.service";
 export declare class UserService {
     private readonly databaseService;
     private readonly logger;

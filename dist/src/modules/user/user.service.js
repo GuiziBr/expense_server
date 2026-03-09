@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var UserService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
-const database_service_1 = require("../../infra/database/database.service");
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
+const database_service_1 = require("../../infra/database/database.service");
 const appError_1 = require("../utils/appError");
 let UserService = UserService_1 = class UserService {
     constructor(databaseService) {
@@ -22,24 +22,29 @@ let UserService = UserService_1 = class UserService {
     }
     async findUserByEmail(email) {
         try {
-            const user = await this.databaseService.user.findUnique({ where: { email } });
+            const user = await this.databaseService.user.findUnique({
+                where: { email }
+            });
             return user;
         }
         catch (error) {
             this.logger.error(`Error - ${error} - finding user by email ${email}`);
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
     async updateUserAvatar(userId, avatar) {
         try {
-            await this.databaseService.user.update({ where: { id: userId }, data: { avatar } });
+            await this.databaseService.user.update({
+                where: { id: userId },
+                data: { avatar }
+            });
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - updating user avatar ${userId}`);
             if (error instanceof library_1.PrismaClientKnownRequestError) {
-                throw new appError_1.default('Error updating user avatar', 400);
+                throw new appError_1.default("Error updating user avatar", 400);
             }
-            throw new appError_1.default('Internal server error', 500);
+            throw new appError_1.default("Internal server error", 500);
         }
     }
 };

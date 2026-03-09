@@ -1,5 +1,5 @@
-import { Category } from '@/domains/category.domain';
-import { DatabaseService } from '@/infra/database/database.service';
+import { Category } from "@/domains/category.domain";
+import { DatabaseService } from "@/infra/database/database.service";
 export declare class CategoryService {
     private readonly databaseService;
     private readonly logger;

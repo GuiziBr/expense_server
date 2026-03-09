@@ -11,8 +11,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var CurrentUserInterceptor_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CurrentUserInterceptor = void 0;
-const appError_1 = require("../../modules/utils/appError");
 const common_1 = require("@nestjs/common");
+const appError_1 = require("../../modules/utils/appError");
 const database_service_1 = require("../database/database.service");
 let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterceptor {
     constructor(databaseService) {
@@ -27,7 +27,7 @@ let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterce
         });
         if (!currentUser) {
             this.logger.error(`Error - User not found - ${sub}`);
-            throw new appError_1.default('User not found', 404);
+            throw new appError_1.default("User not found", 404);
         }
         request.userId = currentUser.id;
         return next.handle();

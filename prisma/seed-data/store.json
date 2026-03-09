@@ -1,0 +1,149 @@
+[
+  {
+    "id": "093ca780-f385-4c95-8bea-1c71eb9ea71f",
+    "name": "Restaurants",
+    "created_at": "2022-07-17 19:15:03.474",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "0a1d0804-0a42-4484-bf34-ea2e3c6d335f",
+    "name": "Rexall",
+    "created_at": "2023-06-20 16:29:34.184875",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "1fc1be3e-7f13-431d-97ba-3dafae86e9f2",
+    "name": "Winners",
+    "created_at": "2022-08-22 23:50:45.561",
+    "updated_at": "2023-02-27 05:12:35.34588",
+    "deleted_at": "2023-02-27 05:12:35.344"
+  },
+  {
+    "id": "201dd80c-b5df-4db4-a0af-fb2835cc7145",
+    "name": "Gas Station",
+    "created_at": "2023-09-19 20:02:20.964201",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "22a84085-50ca-4f37-938b-6cfe845a15f9",
+    "name": "Dolorama",
+    "created_at": "2022-07-06 04:27:36.744",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "3de39adc-40eb-4223-9472-5f69df27208f",
+    "name": "Compass",
+    "created_at": "2022-07-06 04:27:01.665",
+    "updated_at": "2023-02-27 05:11:42.152958",
+    "deleted_at": "2023-02-27 05:11:42.151"
+  },
+  {
+    "id": "652872e1-19e9-49a9-80d7-a9436fc75d86",
+    "name": "Best Buy",
+    "created_at": "2022-07-06 04:27:12.417",
+    "updated_at": "2023-02-27 05:11:32.854038",
+    "deleted_at": "2023-02-27 05:11:32.851"
+  },
+  {
+    "id": "6bf747c3-1630-4014-a4fb-bb360d6ab0b8",
+    "name": "Wallmart",
+    "created_at": "2022-07-06 04:27:17.002",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "821efa9e-55be-4a52-80fb-69733ab5c682",
+    "name": "Groceries",
+    "created_at": "2022-07-24 21:53:17.284",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "872c3a47-0b0d-482f-859a-621d29a7f659",
+    "name": "Outlet",
+    "created_at": "2022-07-06 04:27:07.595",
+    "updated_at": "2022-08-12 05:40:10.462",
+    "deleted_at": null
+  },
+  {
+    "id": "aff3dd26-34fc-4b64-9e8d-523f68057687",
+    "name": "Fresh Slice",
+    "created_at": "2022-07-18 17:32:08.955",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "b00190fd-491a-4ff1-9d33-0788ebf67df8",
+    "name": "Tim Hortons",
+    "created_at": "2022-08-16 05:42:27.362",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "be26d4b2-bafb-41ba-b70c-7999a4528e62",
+    "name": "Liquor Store",
+    "created_at": "2022-07-24 00:16:37.042",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "bf23203d-c589-42bc-9aee-595d1a7ebcd0",
+    "name": "T&T",
+    "created_at": "2022-07-06 04:27:28.519",
+    "updated_at": "2022-08-07 22:33:28.653",
+    "deleted_at": "2022-08-07 22:33:28.651"
+  },
+  {
+    "id": "c26cdd5e-34c3-4cff-bdef-303efa0fab9d",
+    "name": "Ikea",
+    "created_at": "2022-07-06 04:27:24.138",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "c776b978-8baa-46b7-b2e2-765dc621c0ae",
+    "name": "Street Parking",
+    "created_at": "2023-09-19 20:00:04.862075",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "c8881575-9bb9-4542-a4fc-d2768e906edf",
+    "name": "Costco",
+    "created_at": "2022-08-07 00:44:59.179",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "d6c58c98-7133-488e-b84e-1834be14875b",
+    "name": "Superstore",
+    "created_at": "2022-07-06 04:27:33.521",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "d8e080da-1a81-40e7-b75e-362ac20bb9d5",
+    "name": "Amazon",
+    "created_at": "2022-07-06 04:26:57.999",
+    "updated_at": "2026-03-05 22:53:11.771",
+    "deleted_at": null
+  },
+  {
+    "id": "e1704c88-e569-477d-86a7-36cd4c071ab3",
+    "name": "Save On Foods",
+    "created_at": "2022-07-06 04:27:20.924",
+    "updated_at": null,
+    "deleted_at": null
+  },
+  {
+    "id": "ed4c809f-7abd-4750-9ac9-ffc241fcde3f",
+    "name": "Others",
+    "created_at": "2022-08-22 23:50:53.165",
+    "updated_at": null,
+    "deleted_at": null
+  }
+]

@@ -13,9 +13,9 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentTypeController = void 0;
+const common_1 = require("@nestjs/common");
 const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
 const paymentType_presenter_1 = require("../../infra/http/presenters/paymentType.presenter");
-const common_1 = require("@nestjs/common");
 const payment_type_dto_1 = require("./payment-type.dto");
 const payment_type_service_1 = require("./payment-type.service");
 let PaymentTypeController = class PaymentTypeController {
@@ -60,7 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PaymentTypeController.prototype, "listPaymentTypes", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(payment_type_dto_1.paymentTypeByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -74,7 +74,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PaymentTypeController.prototype, "createPaymentType", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(payment_type_dto_1.paymentTypeByIdSchema))),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(payment_type_dto_1.createPaymentTypeSchema))),
     __metadata("design:type", Function),
@@ -83,14 +83,14 @@ __decorate([
 ], PaymentTypeController.prototype, "updatePaymentType", null);
 __decorate([
     (0, common_1.HttpCode)(204),
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(payment_type_dto_1.paymentTypeByIdSchema))),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PaymentTypeController.prototype, "deletePaymentType", null);
 exports.PaymentTypeController = PaymentTypeController = __decorate([
-    (0, common_1.Controller)('paymentType'),
+    (0, common_1.Controller)("paymentType"),
     __metadata("design:paramtypes", [payment_type_service_1.PaymentTypeService])
 ], PaymentTypeController);
 //# sourceMappingURL=payment-type.controller.js.map

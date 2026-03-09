@@ -5,7 +5,7 @@ const zod_1 = require("zod");
 exports.queryBalanceSchema = zod_1.z.object({
     startDate: zod_1.z.coerce.date(),
     endDate: zod_1.z.coerce.date(),
-    filterBy: zod_1.z.enum(['category', 'paymentType', 'bank', 'store']).optional(),
+    filterBy: zod_1.z.enum(["category", "paymentType", "bank", "store"]).optional(),
     filterValue: zod_1.z.string().optional().optional()
 });
 exports.queryConsolidatedBalanceSchema = zod_1.z.object({

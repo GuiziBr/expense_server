@@ -1,5 +1,5 @@
-import { ExpenseService } from '../expense/expense.service';
-import { GetBalanceRequest, GetBalanceResponse, GetConsolidateBalanceRequest, GetConsolidatedBalanceResponse } from './balance.dto';
+import { ExpenseService } from "../expense/expense.service";
+import { GetBalanceRequest, GetBalanceResponse, GetConsolidateBalanceRequest, GetConsolidatedBalanceResponse } from "./balance.dto";
 export declare class BalanceService {
     private readonly expensesService;
     private readonly logger;

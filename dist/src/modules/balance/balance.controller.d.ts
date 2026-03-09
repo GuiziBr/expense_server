@@ -1,5 +1,5 @@
-import { GetBalanceResponse, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from './balance.dto';
-import { BalanceService } from './balance.service';
+import { ConsolidatedBalanceDTO, GetBalanceResponse, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from "./balance.dto";
+import { BalanceService } from "./balance.service";
 export declare class BalanceController {
     private readonly balanceService;
     constructor(balanceService: BalanceService);
@@ -8,5 +8,5 @@ export declare class BalanceController {
     }, query: QueryBalanceDTO): Promise<GetBalanceResponse>;
     getConsolidatedBalance({ userId }: {
         userId: any;
-    }, params: QueryConsolidatedBalanceDTO): Promise<any>;
+    }, params: QueryConsolidatedBalanceDTO): Promise<ConsolidatedBalanceDTO>;
 }
