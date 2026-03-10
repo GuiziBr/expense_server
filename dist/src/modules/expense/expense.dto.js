@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryExpenseSchema = exports.createExpenseSchema = void 0;
+exports.queryExpenseSchema = exports.expenseByIdSchema = exports.createExpenseSchema = void 0;
 const zod_1 = require("zod");
 exports.createExpenseSchema = zod_1.z.object({
     description: zod_1.z.string(),
@@ -12,6 +12,9 @@ exports.createExpenseSchema = zod_1.z.object({
     store_id: zod_1.z.string().optional(),
     personal: zod_1.z.boolean(),
     split: zod_1.z.boolean()
+});
+exports.expenseByIdSchema = zod_1.z.object({
+    id: zod_1.z.string().uuid()
 });
 exports.queryExpenseSchema = zod_1.z.object({
     startDate: zod_1.z.coerce.date().optional(),
