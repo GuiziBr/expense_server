@@ -43,6 +43,12 @@ export interface ExpenseDTO {
 	created_at: Date
 }
 
+export const expenseByIdSchema = z.object({
+	id: z.string().uuid()
+})
+
+export type ExpenseByIdDTO = z.infer<typeof expenseByIdSchema>
+
 export const queryExpenseSchema = z.object({
 	startDate: z.coerce.date().optional(),
 	endDate: z.coerce.date().default(() => new Date()),

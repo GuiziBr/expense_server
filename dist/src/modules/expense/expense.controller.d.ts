@@ -1,5 +1,5 @@
 import { Response as Res } from "express";
-import { CreateExpenseDTO, ExpenseDTO, QueryExpenseDTO } from "./expense.dto";
+import { CreateExpenseDTO, ExpenseByIdDTO, ExpenseDTO, QueryExpenseDTO } from "./expense.dto";
 import { ExpenseService } from "./expense.service";
 export declare class ExpenseController {
     private readonly expenseService;
@@ -10,6 +10,9 @@ export declare class ExpenseController {
     getPersonalExpenses({ userId }: {
         userId: any;
     }, query: QueryExpenseDTO, res: Res): Promise<ExpenseDTO[]>;
+    deleteExpense({ userId }: {
+        userId: any;
+    }, params: ExpenseByIdDTO): Promise<void>;
     getSharedExpenses({ userId }: {
         userId: any;
     }, query: QueryExpenseDTO, res: Res): Promise<(ExpenseDTO & {

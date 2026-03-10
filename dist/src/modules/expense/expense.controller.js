@@ -42,6 +42,9 @@ let ExpenseController = class ExpenseController {
         res.setHeader("X-Total-Count", totalCount);
         return expenses.map(expense_presenter_1.ExpensePresenter.toPersonalExpenseDTO);
     }
+    async deleteExpense({ userId }, params) {
+        return this.expenseService.deleteExpense(params.id, userId);
+    }
     async getSharedExpenses({ userId }, query, res) {
         const { expenses, totalCount } = await this.expenseService.getSharedExpenses({
             ownerId: userId,
@@ -78,6 +81,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ExpenseController.prototype, "getPersonalExpenses", null);
+__decorate([
+    (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
+    (0, common_1.HttpCode)(204),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(expense_dto_1.expenseByIdSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ExpenseController.prototype, "deleteExpense", null);
 __decorate([
     (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
     (0, common_1.Get)("/shared"),

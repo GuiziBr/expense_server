@@ -24,7 +24,8 @@ describe("ExpenseController", () => {
 							.mockResolvedValue({ expenses: [fakeExpense], totalCount: 1 }),
 						getSharedExpenses: vi
 							.fn()
-							.mockResolvedValue({ expenses: [fakeExpense], totalCount: 1 })
+							.mockResolvedValue({ expenses: [fakeExpense], totalCount: 1 }),
+						deleteExpense: vi.fn().mockResolvedValue(undefined)
 					}
 				}
 			]
@@ -136,6 +137,20 @@ describe("ExpenseController", () => {
 				owner_id: fakeExpense.ownerId,
 				due_date: fakeExpense.dueDate
 			})
+		})
+	})
+
+	describe("deleteExpense", () => {
+		it("should call deleteExpense with id and userId", async () => {
+			await expenseController.deleteExpense(
+				{ userId: "userId" },
+				{ id: fakeExpense.id }
+			)
+
+			expect(expenseService.deleteExpense).toBeCalledWith(
+				fakeExpense.id,
+				"userId"
+			)
 		})
 	})
 

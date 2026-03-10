@@ -175,6 +175,38 @@ export class ExpenseService {
 		}
 	}
 
+	async deleteExpense(id: string, userId: string): Promise<void> {
+		const expense = await this.databaseService.expense.findFirst({
+			where: { id, deletedAt: null }
+		})
+
+		if (!expense) {
+			throw new AppError("Expense not found", 404)
+		}
+
+		if (expense.ownerId !== userId) {
+			throw new AppError("Unauthorized", 403)
+		}
+
+		try {
+			await this.databaseService.expense.update({
+				where: { id },
+				data: { deletedAt: new Date() }
+			})
+		} catch (error) {
+			if (
+				error instanceof PrismaClientKnownRequestError &&
+				error.code === constants.RECORD_NOT_FOUND
+			) {
+				return
+			}
+			this.logger.error(
+				`Error - ${error.message || error} - deleting expense ${id}`
+			)
+			throw new AppError("Internal server error", 500)
+		}
+	}
+
 	async getPersonalExpenses({
 		ownerId,
 		startDate,
@@ -187,6 +219,7 @@ export class ExpenseService {
 		filterValue
 	}: GetExpensesRequest): Promise<GetExpensesResponse> {
 		const whereClause = {
+			deletedAt: null,
 			OR: [
 				{ AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
 				{ AND: [{ NOT: { ownerId } }, { personal: false }] }
@@ -234,6 +267,7 @@ export class ExpenseService {
 		filterValue
 	}: GetExpensesRequest): Promise<GetExpensesResponse> {
 		const whereClause = {
+			deletedAt: null,
 			personal: false,
 			dueDate: {
 				lte: endDate,
@@ -274,6 +308,7 @@ export class ExpenseService {
 	): Promise<Expense[]> {
 		return this.databaseService.expense.findMany({
 			where: {
+				deletedAt: null,
 				personal,
 				dueDate: {
 					lte: endDate,

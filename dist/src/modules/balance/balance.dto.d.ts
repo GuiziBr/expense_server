@@ -9,12 +9,12 @@ export declare const queryBalanceSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     startDate?: Date;
     endDate?: Date;
-    filterBy?: "bank" | "category" | "paymentType" | "store";
+    filterBy?: "category" | "bank" | "store" | "paymentType";
     filterValue?: string;
 }, {
     startDate?: Date;
     endDate?: Date;
-    filterBy?: "bank" | "category" | "paymentType" | "store";
+    filterBy?: "category" | "bank" | "store" | "paymentType";
     filterValue?: string;
 }>;
 export type QueryBalanceDTO = z.infer<typeof queryBalanceSchema>;
