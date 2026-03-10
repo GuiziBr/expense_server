@@ -50,8 +50,10 @@ describe("ExpenseService", () => {
 					useValue: {
 						expense: {
 							create: vi.fn().mockResolvedValue(fakeExpense),
+							findFirst: vi.fn().mockResolvedValue(fakeExpense),
 							findMany: vi.fn().mockResolvedValue([fakeExpense]),
-							count: vi.fn().mockResolvedValue(1)
+							count: vi.fn().mockResolvedValue(1),
+							update: vi.fn().mockResolvedValue(undefined)
 						}
 					}
 				},
@@ -464,6 +466,7 @@ describe("ExpenseService", () => {
 			})
 
 			const expectedWhereClause = {
+				deletedAt: null,
 				OR: [
 					{
 						AND: [
@@ -520,6 +523,7 @@ describe("ExpenseService", () => {
 			})
 
 			const expectedWhereClause = {
+				deletedAt: null,
 				OR: [
 					{
 						AND: [
@@ -581,6 +585,7 @@ describe("ExpenseService", () => {
 			})
 
 			const expectedWhereClause = {
+				deletedAt: null,
 				personal: false,
 				dueDate: { lte: expensesRequest.endDate },
 				categoryId: expensesRequest.filterValue
@@ -623,6 +628,7 @@ describe("ExpenseService", () => {
 			})
 
 			const expectedWhereClause = {
+				deletedAt: null,
 				personal: false,
 				dueDate: {
 					lte: expensesRequest.endDate,
@@ -659,6 +665,7 @@ describe("ExpenseService", () => {
 
 			expect(databaseService.expense.findMany).toBeCalledWith({
 				where: {
+					deletedAt: null,
 					personal: false,
 					dueDate: {
 						lte: endDate,
@@ -674,6 +681,63 @@ describe("ExpenseService", () => {
 					user: true
 				}
 			})
+		})
+	})
+
+	describe("deleteExpense", () => {
+		it("should soft delete expense when user is the owner", async () => {
+			await expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
+
+			expect(databaseService.expense.findFirst).toBeCalledWith({
+				where: { id: fakeExpense.id, deletedAt: null }
+			})
+
+			expect(databaseService.expense.update).toBeCalledWith({
+				where: { id: fakeExpense.id },
+				data: { deletedAt: expect.any(Date) }
+			})
+		})
+
+		it("should throw 404 if expense not found", async () => {
+			vi.spyOn(databaseService.expense, "findFirst").mockResolvedValue(null)
+
+			await expect(
+				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Expense not found", 404))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
+		it("should throw 403 if user is not the owner", async () => {
+			await expect(
+				expenseService.deleteExpense(fakeExpense.id, "other-user-id")
+			).rejects.toThrow(new AppError("Unauthorized", 403))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
+		it("should return without error if prisma record not found on update", async () => {
+			const prismaError = createPrismaError(constants.RECORD_NOT_FOUND, {})
+
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
+			).resolves.toBeUndefined()
+		})
+
+		it("should throw 500 on unknown error during update", async () => {
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(
+				new Error("DB connection lost")
+			)
+
+			await expect(
+				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Internal server error", 500))
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - DB connection lost - deleting expense ${fakeExpense.id}`
+			)
 		})
 	})
 })

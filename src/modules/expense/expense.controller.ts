@@ -1,7 +1,10 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
+	HttpCode,
+	Param,
 	Post,
 	Query,
 	Request,
@@ -15,6 +18,8 @@ import { ExpensePresenter } from "@/infra/http/presenters/expense.presenter"
 import {
 	CreateExpenseDTO,
 	createExpenseSchema,
+	ExpenseByIdDTO,
+	expenseByIdSchema,
 	ExpenseDTO,
 	QueryExpenseDTO,
 	queryExpenseSchema
@@ -56,6 +61,16 @@ export class ExpenseController {
 			})
 		res.setHeader("X-Total-Count", totalCount)
 		return expenses.map(ExpensePresenter.toPersonalExpenseDTO)
+	}
+
+	@UseInterceptors(CurrentUserInterceptor)
+	@HttpCode(204)
+	@Delete(":id")
+	async deleteExpense(
+		@Request() { userId },
+		@Param(new ZodValidationPipe(expenseByIdSchema)) params: ExpenseByIdDTO
+	): Promise<void> {
+		return this.expenseService.deleteExpense(params.id, userId)
 	}
 
 	@UseInterceptors(CurrentUserInterceptor)
