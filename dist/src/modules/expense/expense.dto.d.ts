@@ -11,25 +11,25 @@ export declare const createExpenseSchema: z.ZodObject<{
     personal: z.ZodBoolean;
     split: z.ZodBoolean;
 }, "strip", z.ZodTypeAny, {
-    split?: boolean;
     description?: string;
-    amount?: number;
     date?: Date;
+    amount?: number;
     category_id?: string;
     payment_type_id?: string;
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    split?: boolean;
 }, {
-    split?: boolean;
     description?: string;
-    amount?: number;
     date?: Date;
+    amount?: number;
     category_id?: string;
     payment_type_id?: string;
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    split?: boolean;
 }>;
 export type CreateExpenseDTO = z.infer<typeof createExpenseSchema>;
 export interface ExpenseDTO {
@@ -59,6 +59,14 @@ export interface ExpenseDTO {
     owner_id: string;
     created_at: Date;
 }
+export declare const expenseByIdSchema: z.ZodObject<{
+    id: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    id?: string;
+}, {
+    id?: string;
+}>;
+export type ExpenseByIdDTO = z.infer<typeof expenseByIdSchema>;
 export declare const queryExpenseSchema: z.ZodObject<{
     startDate: z.ZodOptional<z.ZodDate>;
     endDate: z.ZodDefault<z.ZodDate>;
@@ -69,22 +77,22 @@ export declare const queryExpenseSchema: z.ZodObject<{
     filterBy: z.ZodOptional<z.ZodEnum<["category", "payment_type", "bank", "store"]>>;
     filterValue: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    orderBy?: "bank" | "category" | "store" | "description" | "amount" | "date" | "dueDate" | "payment_type";
-    offset?: number;
-    limit?: number;
     startDate?: Date;
     endDate?: Date;
+    offset?: number;
+    limit?: number;
+    orderBy?: "description" | "date" | "amount" | "dueDate" | "category" | "payment_type" | "bank" | "store";
     orderType?: "asc" | "desc";
-    filterBy?: "bank" | "category" | "store" | "payment_type";
+    filterBy?: "category" | "payment_type" | "bank" | "store";
     filterValue?: string;
 }, {
-    orderBy?: "bank" | "category" | "store" | "description" | "amount" | "date" | "dueDate" | "payment_type";
-    offset?: number;
-    limit?: number;
     startDate?: Date;
     endDate?: Date;
+    offset?: number;
+    limit?: number;
+    orderBy?: "description" | "date" | "amount" | "dueDate" | "category" | "payment_type" | "bank" | "store";
     orderType?: "asc" | "desc";
-    filterBy?: "bank" | "category" | "store" | "payment_type";
+    filterBy?: "category" | "payment_type" | "bank" | "store";
     filterValue?: string;
 }>;
 export type QueryExpenseDTO = z.infer<typeof queryExpenseSchema>;

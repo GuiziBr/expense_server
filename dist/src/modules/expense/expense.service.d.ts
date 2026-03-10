@@ -13,6 +13,7 @@ export declare class ExpenseService {
     private getOrderByClause;
     private calculateDueDate;
     createExpense(data: CreateExpenseDTO, userId: string): Promise<Expense>;
+    deleteExpense(id: string, userId: string): Promise<void>;
     getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     getExpensesByDateRange(personal: boolean, startDate: Date, endDate: Date): Promise<Expense[]>;
