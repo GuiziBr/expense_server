@@ -81,8 +81,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     personal: data.personal || false,
                     split: data.personal ? false : data.split || false,
                     paymentTypeId: data.payment_type_id,
-                    bankId: data.bank_id,
-                    storeId: data.store_id,
+                    bankId: data.bank_id ?? null,
+                    storeId: data.store_id ?? null,
                     dueDate
                 },
                 include: {
@@ -116,43 +116,52 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         }
     }
     async updateExpense(id, data, userId) {
-        const expense = await this.databaseService.expense.findFirst({
-            where: { id, deletedAt: null }
-        });
-        if (!expense) {
-            throw new appError_1.default("Expense not found", 404);
-        }
-        if (expense.ownerId !== userId) {
-            throw new appError_1.default("Unauthorized", 403);
-        }
-        if ((0, date_fns_1.isFuture)(data.date)) {
-            throw new appError_1.default("Date must not be in the future", 400);
-        }
         try {
+            const expense = await this.databaseService.expense.findFirst({
+                where: { id, deletedAt: null }
+            });
+            if (!expense) {
+                throw new appError_1.default("Expense not found", 404);
+            }
+            if (expense.ownerId !== userId) {
+                throw new appError_1.default("Unauthorized", 403);
+            }
+            if ((0, date_fns_1.isFuture)(data.date)) {
+                throw new appError_1.default("Date must not be in the future", 400);
+            }
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id);
-            return await this.databaseService.expense.update({
-                where: { id },
-                data: {
-                    description: data.description,
-                    date: data.date,
-                    amount: netAmount,
-                    categoryId: data.category_id,
-                    personal: data.personal || false,
-                    split: data.personal ? false : data.split || false,
-                    paymentTypeId: data.payment_type_id,
-                    bankId: data.bank_id,
-                    storeId: data.store_id,
-                    dueDate
-                },
-                include: {
-                    category: true,
-                    paymentType: true,
-                    bank: true,
-                    store: true,
-                    user: true
+            const updateExpense = await this.databaseService.$transaction(async (tx) => {
+                const current = await tx.expense.findFirst({
+                    where: { id, deletedAt: null }
+                });
+                if (!current) {
+                    throw new appError_1.default("Expense not found", 404);
                 }
+                return tx.expense.update({
+                    where: { id },
+                    data: {
+                        description: data.description,
+                        date: data.date,
+                        amount: netAmount,
+                        categoryId: data.category_id,
+                        personal: data.personal || false,
+                        split: data.personal ? false : data.split || false,
+                        paymentTypeId: data.payment_type_id,
+                        bankId: data.bank_id ?? null,
+                        storeId: data.store_id ?? null,
+                        dueDate
+                    },
+                    include: {
+                        category: true,
+                        paymentType: true,
+                        bank: true,
+                        store: true,
+                        user: true
+                    }
+                });
             });
+            return updateExpense;
         }
         catch (error) {
             if (error instanceof appError_1.default) {

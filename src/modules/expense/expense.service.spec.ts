@@ -42,19 +42,24 @@ describe("ExpenseService", () => {
 	})
 
 	beforeEach(async () => {
+		const expenseMock = {
+			create: vi.fn().mockResolvedValue(fakeExpense),
+			findFirst: vi.fn().mockResolvedValue(fakeExpense),
+			findMany: vi.fn().mockResolvedValue([fakeExpense]),
+			count: vi.fn().mockResolvedValue(1),
+			update: vi.fn().mockResolvedValue(undefined)
+		}
+
 		const module = await Test.createTestingModule({
 			providers: [
 				ExpenseService,
 				{
 					provide: DatabaseService,
 					useValue: {
-						expense: {
-							create: vi.fn().mockResolvedValue(fakeExpense),
-							findFirst: vi.fn().mockResolvedValue(fakeExpense),
-							findMany: vi.fn().mockResolvedValue([fakeExpense]),
-							count: vi.fn().mockResolvedValue(1),
-							update: vi.fn().mockResolvedValue(undefined)
-						}
+						$transaction: vi
+							.fn()
+							.mockImplementation((fn) => fn({ expense: expenseMock })),
+						expense: expenseMock
 					}
 				},
 				{
@@ -785,6 +790,22 @@ describe("ExpenseService", () => {
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
 
+		it("should throw 404 if expense is deleted between pre-check and transaction", async () => {
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "findFirst")
+				.mockResolvedValueOnce(fakeExpense)
+				.mockResolvedValueOnce(null)
+
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Expense not found", 404))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
 		it("should update personal expense with no statement period", async () => {
 			const expenseDate = new Date()
 			const expectedDueDate = addMonths(expenseDate, 1)
@@ -847,6 +868,51 @@ describe("ExpenseService", () => {
 					paymentTypeId: payload.payment_type_id,
 					bankId: payload.bank_id,
 					storeId: payload.store_id,
+					dueDate: expectedDueDate
+				},
+				include: {
+					category: true,
+					paymentType: true,
+					bank: true,
+					store: true,
+					user: true
+				}
+			})
+		})
+
+		it("should set bankId and storeId to null when omitted from payload", async () => {
+			const expenseDate = new Date()
+			const expectedDueDate = addMonths(expenseDate, 1)
+			const payload = {
+				description: "updated description",
+				date: expenseDate,
+				amount: 100,
+				category_id: "category-id",
+				payment_type_id: "payment-type-id",
+				personal: false,
+				split: false
+			} as UpdateExpenseDTO
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
+
+			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+
+			expect(databaseService.expense.update).toBeCalledWith({
+				where: { id: fakeExpense.id },
+				data: {
+					description: payload.description,
+					date: expenseDate,
+					amount: payload.amount * 100,
+					categoryId: payload.category_id,
+					personal: false,
+					split: false,
+					paymentTypeId: payload.payment_type_id,
+					bankId: null,
+					storeId: null,
 					dueDate: expectedDueDate
 				},
 				include: {

@@ -135,8 +135,8 @@ export class ExpenseService {
 					personal: data.personal || false,
 					split: data.personal ? false : data.split || false,
 					paymentTypeId: data.payment_type_id,
-					bankId: data.bank_id,
-					storeId: data.store_id,
+					bankId: data.bank_id ?? null,
+					storeId: data.store_id ?? null,
 					dueDate
 				},
 				include: {
@@ -181,23 +181,23 @@ export class ExpenseService {
 		data: UpdateExpenseDTO,
 		userId: string
 	): Promise<Expense> {
-		const expense = await this.databaseService.expense.findFirst({
-			where: { id, deletedAt: null }
-		})
-
-		if (!expense) {
-			throw new AppError("Expense not found", 404)
-		}
-
-		if (expense.ownerId !== userId) {
-			throw new AppError("Unauthorized", 403)
-		}
-
-		if (isFuture(data.date)) {
-			throw new AppError("Date must not be in the future", 400)
-		}
-
 		try {
+			const expense = await this.databaseService.expense.findFirst({
+				where: { id, deletedAt: null }
+			})
+
+			if (!expense) {
+				throw new AppError("Expense not found", 404)
+			}
+
+			if (expense.ownerId !== userId) {
+				throw new AppError("Unauthorized", 403)
+			}
+
+			if (isFuture(data.date)) {
+				throw new AppError("Date must not be in the future", 400)
+			}
+
 			const netAmount = this.calculateNetAmount(
 				data.amount,
 				data.personal,
@@ -210,29 +210,42 @@ export class ExpenseService {
 				data.bank_id
 			)
 
-			const updatedExpense = await this.databaseService.expense.update({
-				where: { id },
-				data: {
-					description: data.description,
-					date: data.date,
-					amount: netAmount,
-					categoryId: data.category_id,
-					personal: data.personal || false,
-					split: data.personal ? false : data.split || false,
-					paymentTypeId: data.payment_type_id,
-					bankId: data.bank_id,
-					storeId: data.store_id,
-					dueDate
-				},
-				include: {
-					category: true,
-					paymentType: true,
-					bank: true,
-					store: true,
-					user: true
+			const updateExpense = await this.databaseService.$transaction(
+				async (tx) => {
+					const current = await tx.expense.findFirst({
+						where: { id, deletedAt: null }
+					})
+
+					if (!current) {
+						throw new AppError("Expense not found", 404)
+					}
+
+					return tx.expense.update({
+						where: { id },
+						data: {
+							description: data.description,
+							date: data.date,
+							amount: netAmount,
+							categoryId: data.category_id,
+							personal: data.personal || false,
+							split: data.personal ? false : data.split || false,
+							paymentTypeId: data.payment_type_id,
+							bankId: data.bank_id ?? null,
+							storeId: data.store_id ?? null,
+							dueDate
+						},
+						include: {
+							category: true,
+							paymentType: true,
+							bank: true,
+							store: true,
+							user: true
+						}
+					})
 				}
-			})
-			return updatedExpense
+			)
+
+			return updateExpense
 		} catch (error) {
 			if (error instanceof AppError) {
 				throw error
