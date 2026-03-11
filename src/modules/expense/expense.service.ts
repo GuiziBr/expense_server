@@ -18,7 +18,8 @@ import {
 	CreateExpenseDTO,
 	GetExpensesRequest,
 	GetExpensesResponse,
-	OrderByType
+	OrderByType,
+	UpdateExpenseDTO
 } from "./expense.dto"
 
 @Injectable()
@@ -134,8 +135,8 @@ export class ExpenseService {
 					personal: data.personal || false,
 					split: data.personal ? false : data.split || false,
 					paymentTypeId: data.payment_type_id,
-					bankId: data.bank_id,
-					storeId: data.store_id,
+					bankId: data.bank_id ?? null,
+					storeId: data.store_id ?? null,
 					dueDate
 				},
 				include: {
@@ -171,6 +172,105 @@ export class ExpenseService {
 			}
 
 			this.logger.error(`Error - ${error.message || error} - creating expense`)
+			throw new AppError("Internal server error", 500)
+		}
+	}
+
+	async updateExpense(
+		id: string,
+		data: UpdateExpenseDTO,
+		userId: string
+	): Promise<Expense> {
+		try {
+			const expense = await this.databaseService.expense.findFirst({
+				where: { id, deletedAt: null }
+			})
+
+			if (!expense) {
+				throw new AppError("Expense not found", 404)
+			}
+
+			if (expense.ownerId !== userId) {
+				throw new AppError("Unauthorized", 403)
+			}
+
+			if (isFuture(data.date)) {
+				throw new AppError("Date must not be in the future", 400)
+			}
+
+			const netAmount = this.calculateNetAmount(
+				data.amount,
+				data.personal,
+				data.split
+			)
+			const dueDate = await this.calculateDueDate(
+				data.date,
+				data.payment_type_id,
+				userId,
+				data.bank_id
+			)
+
+			const updateExpense = await this.databaseService.$transaction(
+				async (tx) => {
+					const current = await tx.expense.findFirst({
+						where: { id, deletedAt: null }
+					})
+
+					if (!current) {
+						throw new AppError("Expense not found", 404)
+					}
+
+					return tx.expense.update({
+						where: { id },
+						data: {
+							description: data.description,
+							date: data.date,
+							amount: netAmount,
+							categoryId: data.category_id,
+							personal: data.personal || false,
+							split: data.personal ? false : data.split || false,
+							paymentTypeId: data.payment_type_id,
+							bankId: data.bank_id ?? null,
+							storeId: data.store_id ?? null,
+							dueDate
+						},
+						include: {
+							category: true,
+							paymentType: true,
+							bank: true,
+							store: true,
+							user: true
+						}
+					})
+				}
+			)
+
+			return updateExpense
+		} catch (error) {
+			if (error instanceof AppError) {
+				throw error
+			}
+
+			if (error instanceof PrismaClientKnownRequestError) {
+				this.logger.error(`Error - ${error.code || error} - updating expense`)
+				if (error.code === constants.FOREIGN_KEY_VIOLATION) {
+					const dbField = error.meta.field_name as string
+					const fieldName = dbField.split("_")[1]
+					const errorMessage = constants.foreignKeyMessages[fieldName]
+
+					throw new AppError(errorMessage, 400)
+				}
+				if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
+					throw new AppError(
+						constants.uniqueConstraintMessages.duplicatedExpenses,
+						400
+					)
+				}
+			}
+
+			this.logger.error(
+				`Error - ${error.message || error} - updating expense ${id}`
+			)
 			throw new AppError("Internal server error", 500)
 		}
 	}

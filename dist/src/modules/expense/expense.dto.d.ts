@@ -96,6 +96,38 @@ export declare const queryExpenseSchema: z.ZodObject<{
     filterValue?: string;
 }>;
 export type QueryExpenseDTO = z.infer<typeof queryExpenseSchema>;
+export declare const updateExpenseSchema: z.ZodObject<{
+    description: z.ZodString;
+    date: z.ZodDate;
+    amount: z.ZodNumber;
+    category_id: z.ZodString;
+    payment_type_id: z.ZodString;
+    bank_id: z.ZodOptional<z.ZodString>;
+    store_id: z.ZodOptional<z.ZodString>;
+    personal: z.ZodBoolean;
+    split: z.ZodBoolean;
+}, "strip", z.ZodTypeAny, {
+    description?: string;
+    date?: Date;
+    amount?: number;
+    category_id?: string;
+    payment_type_id?: string;
+    bank_id?: string;
+    store_id?: string;
+    personal?: boolean;
+    split?: boolean;
+}, {
+    description?: string;
+    date?: Date;
+    amount?: number;
+    category_id?: string;
+    payment_type_id?: string;
+    bank_id?: string;
+    store_id?: string;
+    personal?: boolean;
+    split?: boolean;
+}>;
+export type UpdateExpenseDTO = CreateExpenseDTO;
 export type OrderByType = "asc" | "desc";
 export interface GetExpensesRequest {
     ownerId: string;

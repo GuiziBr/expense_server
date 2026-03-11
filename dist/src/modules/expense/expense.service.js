@@ -81,8 +81,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     personal: data.personal || false,
                     split: data.personal ? false : data.split || false,
                     paymentTypeId: data.payment_type_id,
-                    bankId: data.bank_id,
-                    storeId: data.store_id,
+                    bankId: data.bank_id ?? null,
+                    storeId: data.store_id ?? null,
                     dueDate
                 },
                 include: {
@@ -112,6 +112,74 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 }
             }
             this.logger.error(`Error - ${error.message || error} - creating expense`);
+            throw new appError_1.default("Internal server error", 500);
+        }
+    }
+    async updateExpense(id, data, userId) {
+        try {
+            const expense = await this.databaseService.expense.findFirst({
+                where: { id, deletedAt: null }
+            });
+            if (!expense) {
+                throw new appError_1.default("Expense not found", 404);
+            }
+            if (expense.ownerId !== userId) {
+                throw new appError_1.default("Unauthorized", 403);
+            }
+            if ((0, date_fns_1.isFuture)(data.date)) {
+                throw new appError_1.default("Date must not be in the future", 400);
+            }
+            const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
+            const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id);
+            const updateExpense = await this.databaseService.$transaction(async (tx) => {
+                const current = await tx.expense.findFirst({
+                    where: { id, deletedAt: null }
+                });
+                if (!current) {
+                    throw new appError_1.default("Expense not found", 404);
+                }
+                return tx.expense.update({
+                    where: { id },
+                    data: {
+                        description: data.description,
+                        date: data.date,
+                        amount: netAmount,
+                        categoryId: data.category_id,
+                        personal: data.personal || false,
+                        split: data.personal ? false : data.split || false,
+                        paymentTypeId: data.payment_type_id,
+                        bankId: data.bank_id ?? null,
+                        storeId: data.store_id ?? null,
+                        dueDate
+                    },
+                    include: {
+                        category: true,
+                        paymentType: true,
+                        bank: true,
+                        store: true,
+                        user: true
+                    }
+                });
+            });
+            return updateExpense;
+        }
+        catch (error) {
+            if (error instanceof appError_1.default) {
+                throw error;
+            }
+            if (error instanceof library_1.PrismaClientKnownRequestError) {
+                this.logger.error(`Error - ${error.code || error} - updating expense`);
+                if (error.code === constants_1.constants.FOREIGN_KEY_VIOLATION) {
+                    const dbField = error.meta.field_name;
+                    const fieldName = dbField.split("_")[1];
+                    const errorMessage = constants_1.constants.foreignKeyMessages[fieldName];
+                    throw new appError_1.default(errorMessage, 400);
+                }
+                if (error.code === constants_1.constants.UNIQUE_CONSTRAINT_VIOLATION) {
+                    throw new appError_1.default(constants_1.constants.uniqueConstraintMessages.duplicatedExpenses, 400);
+                }
+            }
+            this.logger.error(`Error - ${error.message || error} - updating expense ${id}`);
             throw new appError_1.default("Internal server error", 500);
         }
     }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryExpenseSchema = exports.expenseByIdSchema = exports.createExpenseSchema = void 0;
+exports.updateExpenseSchema = exports.queryExpenseSchema = exports.expenseByIdSchema = exports.createExpenseSchema = void 0;
 const zod_1 = require("zod");
 exports.createExpenseSchema = zod_1.z.object({
     description: zod_1.z.string(),
@@ -37,4 +37,5 @@ exports.queryExpenseSchema = zod_1.z.object({
     filterBy: zod_1.z.enum(["category", "payment_type", "bank", "store"]).optional(),
     filterValue: zod_1.z.string().optional()
 });
+exports.updateExpenseSchema = exports.createExpenseSchema;
 //# sourceMappingURL=expense.dto.js.map
