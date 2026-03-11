@@ -6,6 +6,7 @@ import {
 	HttpCode,
 	Param,
 	Post,
+	Put,
 	Query,
 	Request,
 	Response,
@@ -19,10 +20,12 @@ import {
 	CreateExpenseDTO,
 	createExpenseSchema,
 	ExpenseByIdDTO,
-	expenseByIdSchema,
 	ExpenseDTO,
+	expenseByIdSchema,
 	QueryExpenseDTO,
-	queryExpenseSchema
+	queryExpenseSchema,
+	UpdateExpenseDTO,
+	updateExpenseSchema
 } from "./expense.dto"
 import { ExpenseService } from "./expense.service"
 
@@ -61,6 +64,21 @@ export class ExpenseController {
 			})
 		res.setHeader("X-Total-Count", totalCount)
 		return expenses.map(ExpensePresenter.toPersonalExpenseDTO)
+	}
+
+	@UseInterceptors(CurrentUserInterceptor)
+	@Put(":id")
+	async updateExpense(
+		@Request() { userId },
+		@Param(new ZodValidationPipe(expenseByIdSchema)) params: ExpenseByIdDTO,
+		@Body(new ZodValidationPipe(updateExpenseSchema)) body: UpdateExpenseDTO
+	): Promise<ExpenseDTO> {
+		const expense = await this.expenseService.updateExpense(
+			params.id,
+			body,
+			userId
+		)
+		return ExpensePresenter.toExpenseDTO(expense)
 	}
 
 	@UseInterceptors(CurrentUserInterceptor)

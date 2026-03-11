@@ -25,7 +25,8 @@ describe("ExpenseController", () => {
 						getSharedExpenses: vi
 							.fn()
 							.mockResolvedValue({ expenses: [fakeExpense], totalCount: 1 }),
-						deleteExpense: vi.fn().mockResolvedValue(undefined)
+						deleteExpense: vi.fn().mockResolvedValue(undefined),
+						updateExpense: vi.fn().mockResolvedValue(fakeExpense)
 					}
 				}
 			]
@@ -149,6 +150,62 @@ describe("ExpenseController", () => {
 
 			expect(expenseService.deleteExpense).toBeCalledWith(
 				fakeExpense.id,
+				"userId"
+			)
+		})
+	})
+
+	describe("updateExpense", () => {
+		it("should call updateExpense and return expense DTO", async () => {
+			const body = {
+				description: "updated description",
+				date: new Date(),
+				amount: 100,
+				category_id: "category_id",
+				payment_type_id: "payment_type_id",
+				bank_id: "bank_id",
+				store_id: "store_id",
+				personal: false,
+				split: false
+			}
+
+			const result = await expenseController.updateExpense(
+				{ userId: "userId" },
+				{ id: fakeExpense.id },
+				body
+			)
+
+			expect(result).toEqual({
+				id: fakeExpense.id,
+				description: fakeExpense.description,
+				date: fakeExpense.date,
+				amount: fakeExpense.amount,
+				category_id: fakeExpense.categoryId,
+				payment_type_id: fakeExpense.paymentTypeId,
+				bank_id: fakeExpense.bankId,
+				store_id: fakeExpense.storeId,
+				personal: fakeExpense.personal,
+				split: fakeExpense.split,
+				created_at: fakeExpense.createdAt,
+				category: {
+					description: fakeExpense.category.description
+				},
+				payment_type: {
+					description: fakeExpense.paymentType.description
+				},
+				bank: {
+					name: fakeExpense.bank.name
+				},
+				store: {
+					name: fakeExpense.store.name
+				},
+				owner_id: fakeExpense.ownerId,
+				due_date: fakeExpense.dueDate
+			})
+
+			expect(expenseService.updateExpense).toBeCalledWith(
+				fakeExpense.id,
+				body,
 				"userId"
 			)
 		})

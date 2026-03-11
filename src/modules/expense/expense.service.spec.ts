@@ -11,7 +11,7 @@ import { createExpense } from "../test-utils/expense.factory"
 import { createPaymentType } from "../test-utils/payment-type.factory"
 import { createStatementPeriod } from "../test-utils/statement-period.factory"
 import { constants } from "../utils/constants"
-import { CreateExpenseDTO, GetExpensesRequest } from "./expense.dto"
+import { CreateExpenseDTO, GetExpensesRequest, UpdateExpenseDTO } from "./expense.dto"
 import { ExpenseService } from "./expense.service"
 
 const createPayload = (expenseDate: Date, personal: boolean, split: boolean) =>
@@ -737,6 +737,164 @@ describe("ExpenseService", () => {
 
 			expect(loggerSpy).toBeCalledWith(
 				`Error - DB connection lost - deleting expense ${fakeExpense.id}`
+			)
+		})
+	})
+
+	describe("updateExpense", () => {
+		const createUpdatePayload = (
+			expenseDate: Date,
+			personal: boolean,
+			split: boolean
+		) =>
+			({
+				description: "updated description",
+				date: expenseDate,
+				amount: 100,
+				category_id: "category-id",
+				payment_type_id: "payment-type-id",
+				bank_id: "bank-id",
+				store_id: "store-id",
+				personal,
+				split
+			}) as UpdateExpenseDTO
+
+		it("should throw 404 if expense not found", async () => {
+			vi.spyOn(databaseService.expense, "findFirst").mockResolvedValue(null)
+
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Expense not found", 404))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
+		it("should throw 403 if user is not the owner", async () => {
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), "other-user-id")
+			).rejects.toThrow(new AppError("Unauthorized", 403))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
+		it("should throw 400 if date is in the future", async () => {
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(addDays(new Date(), 1), false, false), fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Date must not be in the future", 400))
+
+			expect(databaseService.expense.update).not.toHaveBeenCalled()
+		})
+
+		it("should update personal expense with no statement period", async () => {
+			const expenseDate = new Date()
+			const expectedDueDate = addMonths(expenseDate, 1)
+			const payload = createUpdatePayload(expenseDate, true, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
+
+			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+
+			expect(databaseService.expense.update).toBeCalledWith({
+				where: { id: fakeExpense.id },
+				data: {
+					description: payload.description,
+					date: expenseDate,
+					amount: payload.amount * 100,
+					categoryId: payload.category_id,
+					personal: true,
+					split: false,
+					paymentTypeId: payload.payment_type_id,
+					bankId: payload.bank_id,
+					storeId: payload.store_id,
+					dueDate: expectedDueDate
+				},
+				include: {
+					category: true,
+					paymentType: true,
+					bank: true,
+					store: true,
+					user: true
+				}
+			})
+		})
+
+		it("should update split expense with halved amount", async () => {
+			const expenseDate = new Date()
+			const expectedDueDate = addMonths(expenseDate, 1)
+			const payload = createUpdatePayload(expenseDate, false, true)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
+
+			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+
+			expect(databaseService.expense.update).toBeCalledWith({
+				where: { id: fakeExpense.id },
+				data: {
+					description: payload.description,
+					date: expenseDate,
+					amount: Math.round((payload.amount * 100) / 2),
+					categoryId: payload.category_id,
+					personal: false,
+					split: true,
+					paymentTypeId: payload.payment_type_id,
+					bankId: payload.bank_id,
+					storeId: payload.store_id,
+					dueDate: expectedDueDate
+				},
+				include: {
+					category: true,
+					paymentType: true,
+					bank: true,
+					store: true,
+					user: true
+				}
+			})
+		})
+
+		it("should throw error on foreign key violation", async () => {
+			const prismaError = createPrismaError(constants.FOREIGN_KEY_VIOLATION, {
+				field_name: "error_category_id"
+			})
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+			).rejects.toThrow(AppError)
+
+			expect(loggerSpy).toBeCalledWith("Error - P2003 - updating expense")
+		})
+
+		it("should throw 500 on unknown error during update", async () => {
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(
+				new Error("DB connection lost")
+			)
+
+			await expect(
+				expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+			).rejects.toThrow(new AppError("Internal server error", 500))
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - DB connection lost - updating expense ${fakeExpense.id}`
 			)
 		})
 	})

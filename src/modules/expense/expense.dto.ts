@@ -73,6 +73,9 @@ export const queryExpenseSchema = z.object({
 
 export type QueryExpenseDTO = z.infer<typeof queryExpenseSchema>
 
+export const updateExpenseSchema = createExpenseSchema
+export type UpdateExpenseDTO = CreateExpenseDTO
+
 export type OrderByType = "asc" | "desc"
 
 export interface GetExpensesRequest {
