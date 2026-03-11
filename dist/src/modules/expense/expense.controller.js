@@ -42,6 +42,10 @@ let ExpenseController = class ExpenseController {
         res.setHeader("X-Total-Count", totalCount);
         return expenses.map(expense_presenter_1.ExpensePresenter.toPersonalExpenseDTO);
     }
+    async updateExpense({ userId }, params, body) {
+        const expense = await this.expenseService.updateExpense(params.id, body, userId);
+        return expense_presenter_1.ExpensePresenter.toExpenseDTO(expense);
+    }
     async deleteExpense({ userId }, params) {
         return this.expenseService.deleteExpense(params.id, userId);
     }
@@ -81,6 +85,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ExpenseController.prototype, "getPersonalExpenses", null);
+__decorate([
+    (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
+    (0, common_1.Put)(":id"),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)(new zod_validation_pipe_1.ZodValidationPipe(expense_dto_1.expenseByIdSchema))),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(expense_dto_1.updateExpenseSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ExpenseController.prototype, "updateExpense", null);
 __decorate([
     (0, common_1.UseInterceptors)(current_user_interceptor_1.CurrentUserInterceptor),
     (0, common_1.HttpCode)(204),

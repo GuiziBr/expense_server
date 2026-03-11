@@ -2,7 +2,7 @@ import { Expense } from "@/domains/expense.domain";
 import { DatabaseService } from "@/infra/database/database.service";
 import { PaymentTypeService } from "../payment-type/payment-type.service";
 import { StatementPeriodService } from "../statement-period/statement-period.service";
-import { CreateExpenseDTO, GetExpensesRequest, GetExpensesResponse } from "./expense.dto";
+import { CreateExpenseDTO, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto";
 export declare class ExpenseService {
     private readonly databaseService;
     private readonly paymentTypeService;
@@ -13,6 +13,7 @@ export declare class ExpenseService {
     private getOrderByClause;
     private calculateDueDate;
     createExpense(data: CreateExpenseDTO, userId: string): Promise<Expense>;
+    updateExpense(id: string, data: UpdateExpenseDTO, userId: string): Promise<Expense>;
     deleteExpense(id: string, userId: string): Promise<void>;
     getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
