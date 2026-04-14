@@ -10,6 +10,11 @@ services:
       - POSTGRES_DB=expenses
     volumes:
       - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U admin -d expenses']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   server:
     build:
@@ -22,4 +27,5 @@ services:
       - /server/node_modules
       - /server/node_modules/.prisma
     depends_on:
-      - db
+      db:
+        condition: service_healthy
