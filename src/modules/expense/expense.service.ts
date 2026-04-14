@@ -1,13 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import {
-	addMonths,
-	endOfMonth,
-	getMonth,
-	getYear,
-	isFuture,
-	setDate
-} from "date-fns"
+import { endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns"
 import { Expense } from "@/domains/expense.domain"
 import { DatabaseService } from "@/infra/database/database.service"
 import { PaymentTypeService } from "../payment-type/payment-type.service"
@@ -72,7 +65,7 @@ export class ExpenseService {
 		const paymentType = await this.paymentTypeService.getById(paymentTypeId)
 
 		if (!paymentType?.hasStatement) {
-			return addMonths(transactionDate, 1)
+			return endOfMonth(transactionDate)
 		}
 
 		if (paymentType?.hasStatement && !bankId) {
@@ -171,7 +164,9 @@ export class ExpenseService {
 				}
 			}
 
-			this.logger.error(`Error - ${error.message || error} - creating expense`)
+			this.logger.error(
+				`Error - ${error instanceof Error ? error.message : error} - creating expense`
+			)
 			throw new AppError("Internal server error", 500)
 		}
 	}
@@ -269,7 +264,7 @@ export class ExpenseService {
 			}
 
 			this.logger.error(
-				`Error - ${error.message || error} - updating expense ${id}`
+				`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`
 			)
 			throw new AppError("Internal server error", 500)
 		}
@@ -301,7 +296,7 @@ export class ExpenseService {
 				return
 			}
 			this.logger.error(
-				`Error - ${error.message || error} - deleting expense ${id}`
+				`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`
 			)
 			throw new AppError("Internal server error", 500)
 		}

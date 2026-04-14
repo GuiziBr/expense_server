@@ -232,7 +232,9 @@ describe("BankService", () => {
 				bankService.update(fakeBank.id, "updated-bank")
 			).rejects.toThrow(AppError)
 
-			expect(loggerSpy).toBeCalledWith('Bank with name "updated-bank" already exists')
+			expect(loggerSpy).toBeCalledWith(
+				'Bank with name "updated-bank" already exists'
+			)
 		})
 
 		it("should throw internal server error exception", async () => {
