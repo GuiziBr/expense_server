@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { addDays, addMonths, endOfMonth, setDate } from "date-fns"
+import { addDays, endOfMonth, setDate } from "date-fns"
 import { StatementPeriod } from "@/domains/statement-period.domain"
 import { DatabaseService } from "@/infra/database/database.service"
 import AppError from "@/modules/utils/appError"
@@ -11,7 +11,11 @@ import { createExpense } from "../test-utils/expense.factory"
 import { createPaymentType } from "../test-utils/payment-type.factory"
 import { createStatementPeriod } from "../test-utils/statement-period.factory"
 import { constants } from "../utils/constants"
-import { CreateExpenseDTO, GetExpensesRequest, UpdateExpenseDTO } from "./expense.dto"
+import {
+	CreateExpenseDTO,
+	GetExpensesRequest,
+	UpdateExpenseDTO
+} from "./expense.dto"
 import { ExpenseService } from "./expense.service"
 
 const createPayload = (expenseDate: Date, personal: boolean, split: boolean) =>
@@ -127,10 +131,10 @@ describe("ExpenseService", () => {
 			expect(databaseService.expense.create).not.toHaveBeenCalled()
 		})
 
-		it("should create personal expense with no statement for next month", async () => {
+		it("should create personal expense with no statement for end of current month", async () => {
 			const expenseDate = new Date()
 
-			const expectDueDate = addMonths(expenseDate, 1)
+			const expectDueDate = endOfMonth(expenseDate)
 
 			const payload = createPayload(expenseDate, true, false)
 
@@ -165,10 +169,10 @@ describe("ExpenseService", () => {
 			})
 		})
 
-		it("should create split expense with no statement for next month", async () => {
+		it("should create split expense with no statement for end of current month", async () => {
 			const expenseDate = new Date()
 
-			const expectDueDate = addMonths(expenseDate, 1)
+			const expectDueDate = endOfMonth(expenseDate)
 
 			const payload = createPayload(expenseDate, false, true)
 
@@ -203,10 +207,10 @@ describe("ExpenseService", () => {
 			})
 		})
 
-		it("should create neither personal nor split expense with no statement for next month", async () => {
+		it("should create neither personal nor split expense with no statement for end of current month", async () => {
 			const expenseDate = new Date()
 
-			const expectDueDate = addMonths(expenseDate, 1)
+			const expectDueDate = endOfMonth(expenseDate)
 
 			const payload = createPayload(expenseDate, false, false)
 
@@ -768,7 +772,11 @@ describe("ExpenseService", () => {
 			vi.spyOn(databaseService.expense, "findFirst").mockResolvedValue(null)
 
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), fakeExpense.ownerId)
+				expenseService.updateExpense(
+					fakeExpense.id,
+					createUpdatePayload(new Date(), false, false),
+					fakeExpense.ownerId
+				)
 			).rejects.toThrow(new AppError("Expense not found", 404))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
@@ -776,7 +784,11 @@ describe("ExpenseService", () => {
 
 		it("should throw 403 if user is not the owner", async () => {
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), "other-user-id")
+				expenseService.updateExpense(
+					fakeExpense.id,
+					createUpdatePayload(new Date(), false, false),
+					"other-user-id"
+				)
 			).rejects.toThrow(new AppError("Unauthorized", 403))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
@@ -784,7 +796,11 @@ describe("ExpenseService", () => {
 
 		it("should throw 400 if date is in the future", async () => {
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(addDays(new Date(), 1), false, false), fakeExpense.ownerId)
+				expenseService.updateExpense(
+					fakeExpense.id,
+					createUpdatePayload(addDays(new Date(), 1), false, false),
+					fakeExpense.ownerId
+				)
 			).rejects.toThrow(new AppError("Date must not be in the future", 400))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
@@ -800,7 +816,11 @@ describe("ExpenseService", () => {
 				.mockResolvedValueOnce(null)
 
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, createUpdatePayload(new Date(), false, false), fakeExpense.ownerId)
+				expenseService.updateExpense(
+					fakeExpense.id,
+					createUpdatePayload(new Date(), false, false),
+					fakeExpense.ownerId
+				)
 			).rejects.toThrow(new AppError("Expense not found", 404))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
@@ -808,7 +828,7 @@ describe("ExpenseService", () => {
 
 		it("should update personal expense with no statement period", async () => {
 			const expenseDate = new Date()
-			const expectedDueDate = addMonths(expenseDate, 1)
+			const expectedDueDate = endOfMonth(expenseDate)
 			const payload = createUpdatePayload(expenseDate, true, false)
 
 			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
@@ -817,7 +837,11 @@ describe("ExpenseService", () => {
 			})
 			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
 
-			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+			await expenseService.updateExpense(
+				fakeExpense.id,
+				payload,
+				fakeExpense.ownerId
+			)
 
 			expect(databaseService.expense.update).toBeCalledWith({
 				where: { id: fakeExpense.id },
@@ -845,7 +869,7 @@ describe("ExpenseService", () => {
 
 		it("should update split expense with halved amount", async () => {
 			const expenseDate = new Date()
-			const expectedDueDate = addMonths(expenseDate, 1)
+			const expectedDueDate = endOfMonth(expenseDate)
 			const payload = createUpdatePayload(expenseDate, false, true)
 
 			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
@@ -854,7 +878,11 @@ describe("ExpenseService", () => {
 			})
 			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
 
-			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+			await expenseService.updateExpense(
+				fakeExpense.id,
+				payload,
+				fakeExpense.ownerId
+			)
 
 			expect(databaseService.expense.update).toBeCalledWith({
 				where: { id: fakeExpense.id },
@@ -882,7 +910,7 @@ describe("ExpenseService", () => {
 
 		it("should set bankId and storeId to null when omitted from payload", async () => {
 			const expenseDate = new Date()
-			const expectedDueDate = addMonths(expenseDate, 1)
+			const expectedDueDate = endOfMonth(expenseDate)
 			const payload = {
 				description: "updated description",
 				date: expenseDate,
@@ -899,7 +927,11 @@ describe("ExpenseService", () => {
 			})
 			vi.spyOn(databaseService.expense, "update").mockResolvedValue(fakeExpense)
 
-			await expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+			await expenseService.updateExpense(
+				fakeExpense.id,
+				payload,
+				fakeExpense.ownerId
+			)
 
 			expect(databaseService.expense.update).toBeCalledWith({
 				where: { id: fakeExpense.id },
@@ -938,7 +970,11 @@ describe("ExpenseService", () => {
 			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
 
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
 			).rejects.toThrow(AppError)
 
 			expect(loggerSpy).toBeCalledWith("Error - P2003 - updating expense")
@@ -956,7 +992,11 @@ describe("ExpenseService", () => {
 			)
 
 			await expect(
-				expenseService.updateExpense(fakeExpense.id, payload, fakeExpense.ownerId)
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
 			).rejects.toThrow(new AppError("Internal server error", 500))
 
 			expect(loggerSpy).toBeCalledWith(
