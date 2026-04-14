@@ -48,7 +48,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
     async calculateDueDate(transactionDate, paymentTypeId, userId, bankId) {
         const paymentType = await this.paymentTypeService.getById(paymentTypeId);
         if (!paymentType?.hasStatement) {
-            return (0, date_fns_1.addMonths)(transactionDate, 1);
+            return (0, date_fns_1.endOfMonth)(transactionDate);
         }
         if (paymentType?.hasStatement && !bankId) {
             throw new appError_1.default("This payment type must have a bank");
@@ -111,7 +111,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     throw new appError_1.default(constants_1.constants.uniqueConstraintMessages.duplicatedExpenses, 400);
                 }
             }
-            this.logger.error(`Error - ${error.message || error} - creating expense`);
+            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - creating expense`);
             throw new appError_1.default("Internal server error", 500);
         }
     }
@@ -179,7 +179,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     throw new appError_1.default(constants_1.constants.uniqueConstraintMessages.duplicatedExpenses, 400);
                 }
             }
-            this.logger.error(`Error - ${error.message || error} - updating expense ${id}`);
+            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`);
             throw new appError_1.default("Internal server error", 500);
         }
     }
@@ -204,7 +204,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 error.code === constants_1.constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error.message || error} - deleting expense ${id}`);
+            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`);
             throw new appError_1.default("Internal server error", 500);
         }
     }

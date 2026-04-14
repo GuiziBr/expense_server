@@ -1,121 +1,121 @@
 [
-  {
-    "id": "08d555d3-661b-48a7-a931-5c5dfcb09fa0",
-    "description": "Fun",
-    "created_at": "2024-10-25 03:17:05.509774",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "12f31807-a562-4d80-a993-06ce26a92eff",
-    "description": "Others",
-    "created_at": "2022-07-06 04:26:03.047",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "189755e2-afa7-43db-a945-68b412c98191",
-    "description": "Shopping",
-    "created_at": "2024-10-25 03:16:21.3894",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "293e2372-7950-4871-af58-1ab68a5ede38",
-    "description": "Açougue",
-    "created_at": "2021-02-23 17:53:29.213",
-    "updated_at": "2022-07-06 04:25:14.442",
-    "deleted_at": "2022-07-06 04:25:14.44"
-  },
-  {
-    "id": "3520788b-18de-4e40-b106-8fcf93a381b4",
-    "description": "Parking",
-    "created_at": "2023-09-19 19:59:28.650171",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "57d3385c-c73b-41c3-b2eb-82390dfcfd12",
-    "description": "Restaurant",
-    "created_at": "2022-07-06 04:25:45.348",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "5b85789b-de2e-454d-b91d-540a383948c9",
-    "description": "Beauty",
-    "created_at": "2024-10-18 04:10:46.313257",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "725a42ef-78a7-409f-a81a-5c67bd089d68",
-    "description": "Farmácia",
-    "created_at": "2021-02-23 17:53:29.213",
-    "updated_at": "2022-07-06 04:25:18.216",
-    "deleted_at": "2022-07-06 04:25:18.214"
-  },
-  {
-    "id": "77253bac-86d6-4ee4-a1d1-c877d2ec3abf",
-    "description": "Mercado",
-    "created_at": "2021-02-23 17:53:29.213",
-    "updated_at": "2022-07-06 04:25:20.04",
-    "deleted_at": "2022-07-06 04:25:20.041"
-  },
-  {
-    "id": "a913586d-7f2e-434a-8276-e07fe5c212e5",
-    "description": "Bar",
-    "created_at": "2021-02-23 17:53:29.213",
-    "updated_at": "2023-07-18 19:09:19.955978",
-    "deleted_at": "2023-07-18 19:09:19.95"
-  },
-  {
-    "id": "b269be6c-1b95-432c-9639-ea6f6448ef13",
-    "description": "Baby",
-    "created_at": "2025-04-22 02:38:02.437",
-    "updated_at": "2026-03-05 20:17:32.181",
-    "deleted_at": null
-  },
-  {
-    "id": "bd531c56-0c36-41b5-ad49-381d3f51bf5d",
-    "description": "Grocery",
-    "created_at": "2022-07-06 04:25:55.375",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "c8fcf5d0-b626-489f-9a66-7c76808fe55d",
-    "description": "Coffee",
-    "created_at": "2024-10-21 03:41:28.801201",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "d141197e-10d5-44ff-9614-d8938051db11",
-    "description": "Pharmacy",
-    "created_at": "2022-07-06 04:25:49.31",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "e8e82d00-f26f-41ac-8691-a80c685909ab",
-    "description": "Fuel",
-    "created_at": "2023-09-19 20:02:00.878455",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "ed626a08-aa0c-4472-b3f1-b6fd8f11890c",
-    "description": "Outros",
-    "created_at": "2021-03-20 03:21:18.947",
-    "updated_at": "2022-07-06 04:25:21.33",
-    "deleted_at": "2022-07-06 04:25:21.331"
-  },
-  {
-    "id": "fb6d20f9-e4cd-4163-957f-bc82eddcacaf",
-    "description": "Refeição",
-    "created_at": "2021-02-23 17:53:29.213",
-    "updated_at": "2022-07-06 04:25:22.499",
-    "deleted_at": "2022-07-06 04:25:22.499"
-  }
+	{
+		"id": "08d555d3-661b-48a7-a931-5c5dfcb09fa0",
+		"description": "Fun",
+		"created_at": "2024-10-25 03:17:05.509774",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "12f31807-a562-4d80-a993-06ce26a92eff",
+		"description": "Others",
+		"created_at": "2022-07-06 04:26:03.047",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "189755e2-afa7-43db-a945-68b412c98191",
+		"description": "Shopping",
+		"created_at": "2024-10-25 03:16:21.3894",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "293e2372-7950-4871-af58-1ab68a5ede38",
+		"description": "Açougue",
+		"created_at": "2021-02-23 17:53:29.213",
+		"updated_at": "2022-07-06 04:25:14.442",
+		"deleted_at": "2022-07-06 04:25:14.44"
+	},
+	{
+		"id": "3520788b-18de-4e40-b106-8fcf93a381b4",
+		"description": "Parking",
+		"created_at": "2023-09-19 19:59:28.650171",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "57d3385c-c73b-41c3-b2eb-82390dfcfd12",
+		"description": "Restaurant",
+		"created_at": "2022-07-06 04:25:45.348",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "5b85789b-de2e-454d-b91d-540a383948c9",
+		"description": "Beauty",
+		"created_at": "2024-10-18 04:10:46.313257",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "725a42ef-78a7-409f-a81a-5c67bd089d68",
+		"description": "Farmácia",
+		"created_at": "2021-02-23 17:53:29.213",
+		"updated_at": "2022-07-06 04:25:18.216",
+		"deleted_at": "2022-07-06 04:25:18.214"
+	},
+	{
+		"id": "77253bac-86d6-4ee4-a1d1-c877d2ec3abf",
+		"description": "Mercado",
+		"created_at": "2021-02-23 17:53:29.213",
+		"updated_at": "2022-07-06 04:25:20.04",
+		"deleted_at": "2022-07-06 04:25:20.041"
+	},
+	{
+		"id": "a913586d-7f2e-434a-8276-e07fe5c212e5",
+		"description": "Bar",
+		"created_at": "2021-02-23 17:53:29.213",
+		"updated_at": "2023-07-18 19:09:19.955978",
+		"deleted_at": "2023-07-18 19:09:19.95"
+	},
+	{
+		"id": "b269be6c-1b95-432c-9639-ea6f6448ef13",
+		"description": "Baby",
+		"created_at": "2025-04-22 02:38:02.437",
+		"updated_at": "2026-03-05 20:17:32.181",
+		"deleted_at": null
+	},
+	{
+		"id": "bd531c56-0c36-41b5-ad49-381d3f51bf5d",
+		"description": "Grocery",
+		"created_at": "2022-07-06 04:25:55.375",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "c8fcf5d0-b626-489f-9a66-7c76808fe55d",
+		"description": "Coffee",
+		"created_at": "2024-10-21 03:41:28.801201",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "d141197e-10d5-44ff-9614-d8938051db11",
+		"description": "Pharmacy",
+		"created_at": "2022-07-06 04:25:49.31",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "e8e82d00-f26f-41ac-8691-a80c685909ab",
+		"description": "Fuel",
+		"created_at": "2023-09-19 20:02:00.878455",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "ed626a08-aa0c-4472-b3f1-b6fd8f11890c",
+		"description": "Outros",
+		"created_at": "2021-03-20 03:21:18.947",
+		"updated_at": "2022-07-06 04:25:21.33",
+		"deleted_at": "2022-07-06 04:25:21.331"
+	},
+	{
+		"id": "fb6d20f9-e4cd-4163-957f-bc82eddcacaf",
+		"description": "Refeição",
+		"created_at": "2021-02-23 17:53:29.213",
+		"updated_at": "2022-07-06 04:25:22.499",
+		"deleted_at": "2022-07-06 04:25:22.499"
+	}
 ]

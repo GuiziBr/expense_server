@@ -1,90 +1,90 @@
 [
-  {
-    "id": "263f0031-f31c-432f-b055-24eae9a2b0af",
-    "description": "Bill",
-    "created_at": "2022-07-06 04:26:51.639",
-    "updated_at": null,
-    "deleted_at": null,
-    "hasStatement": false
-  },
-  {
-    "id": "3386e13b-da56-4e25-b573-2fe109b81985",
-    "description": "Vale Refeição",
-    "created_at": "2021-05-20 04:59:07.945",
-    "updated_at": "2021-05-20 04:59:07.945",
-    "deleted_at": "2021-12-22 21:03:46.257",
-    "hasStatement": false
-  },
-  {
-    "id": "34e6311f-3ee8-4a89-9475-b8d0c306f397",
-    "description": "Debit Card",
-    "created_at": "2022-07-06 04:26:29.985",
-    "updated_at": null,
-    "deleted_at": null,
-    "hasStatement": false
-  },
-  {
-    "id": "4e98a39c-a634-4258-9ee5-ac5833e37f34",
-    "description": "Dinheiro",
-    "created_at": "2021-05-20 05:06:16.326",
-    "updated_at": "2022-07-06 04:26:14.502",
-    "deleted_at": "2022-07-06 04:26:14.502",
-    "hasStatement": false
-  },
-  {
-    "id": "5e5e9d1d-d2c9-4a97-bf75-fdf6d0059ad2",
-    "description": "Cash",
-    "created_at": "2022-07-06 04:26:24.815",
-    "updated_at": null,
-    "deleted_at": null,
-    "hasStatement": false
-  },
-  {
-    "id": "77dcd07f-b50b-49f9-8a73-17fb22396d98",
-    "description": "Crédito",
-    "created_at": "2021-05-20 05:06:32.99",
-    "updated_at": "2022-07-06 04:26:13.694",
-    "deleted_at": "2022-07-06 04:26:13.694",
-    "hasStatement": true
-  },
-  {
-    "id": "847cab51-6441-4b71-aebf-e38a6d574aeb",
-    "description": "Vale Alimentação",
-    "created_at": "2021-05-20 05:06:21.929",
-    "updated_at": "2021-05-20 05:06:21.929",
-    "deleted_at": "2021-12-22 21:03:46.257",
-    "hasStatement": false
-  },
-  {
-    "id": "9cb85996-2d65-4bcb-ab72-eda77b8730ba",
-    "description": "Cartão Benefício",
-    "created_at": "2021-12-23 00:07:02.157",
-    "updated_at": "2022-07-06 04:26:12.22",
-    "deleted_at": "2022-07-06 04:26:12.22",
-    "hasStatement": false
-  },
-  {
-    "id": "a7ef6b2c-74bc-41dc-ad9c-8fc148a18880",
-    "description": "Account Debit",
-    "created_at": "2022-07-06 04:26:45.7",
-    "updated_at": "2026-03-05 22:52:59.069",
-    "deleted_at": null,
-    "hasStatement": false
-  },
-  {
-    "id": "d36ef536-6854-450f-b875-b8e71c99ed95",
-    "description": "Credit Card",
-    "created_at": "2022-07-06 04:26:21.949",
-    "updated_at": "2022-07-15 00:20:26.219",
-    "deleted_at": null,
-    "hasStatement": true
-  },
-  {
-    "id": "dd1d91b3-7ce2-4c4e-bbd9-538e57eec10d",
-    "description": "Débito",
-    "created_at": "2021-05-20 05:06:28.333",
-    "updated_at": "2022-07-06 04:26:15.417",
-    "deleted_at": "2022-07-06 04:26:15.417",
-    "hasStatement": false
-  }
+	{
+		"id": "263f0031-f31c-432f-b055-24eae9a2b0af",
+		"description": "Bill",
+		"created_at": "2022-07-06 04:26:51.639",
+		"updated_at": null,
+		"deleted_at": null,
+		"hasStatement": false
+	},
+	{
+		"id": "3386e13b-da56-4e25-b573-2fe109b81985",
+		"description": "Vale Refeição",
+		"created_at": "2021-05-20 04:59:07.945",
+		"updated_at": "2021-05-20 04:59:07.945",
+		"deleted_at": "2021-12-22 21:03:46.257",
+		"hasStatement": false
+	},
+	{
+		"id": "34e6311f-3ee8-4a89-9475-b8d0c306f397",
+		"description": "Debit Card",
+		"created_at": "2022-07-06 04:26:29.985",
+		"updated_at": null,
+		"deleted_at": null,
+		"hasStatement": false
+	},
+	{
+		"id": "4e98a39c-a634-4258-9ee5-ac5833e37f34",
+		"description": "Dinheiro",
+		"created_at": "2021-05-20 05:06:16.326",
+		"updated_at": "2022-07-06 04:26:14.502",
+		"deleted_at": "2022-07-06 04:26:14.502",
+		"hasStatement": false
+	},
+	{
+		"id": "5e5e9d1d-d2c9-4a97-bf75-fdf6d0059ad2",
+		"description": "Cash",
+		"created_at": "2022-07-06 04:26:24.815",
+		"updated_at": null,
+		"deleted_at": null,
+		"hasStatement": false
+	},
+	{
+		"id": "77dcd07f-b50b-49f9-8a73-17fb22396d98",
+		"description": "Crédito",
+		"created_at": "2021-05-20 05:06:32.99",
+		"updated_at": "2022-07-06 04:26:13.694",
+		"deleted_at": "2022-07-06 04:26:13.694",
+		"hasStatement": true
+	},
+	{
+		"id": "847cab51-6441-4b71-aebf-e38a6d574aeb",
+		"description": "Vale Alimentação",
+		"created_at": "2021-05-20 05:06:21.929",
+		"updated_at": "2021-05-20 05:06:21.929",
+		"deleted_at": "2021-12-22 21:03:46.257",
+		"hasStatement": false
+	},
+	{
+		"id": "9cb85996-2d65-4bcb-ab72-eda77b8730ba",
+		"description": "Cartão Benefício",
+		"created_at": "2021-12-23 00:07:02.157",
+		"updated_at": "2022-07-06 04:26:12.22",
+		"deleted_at": "2022-07-06 04:26:12.22",
+		"hasStatement": false
+	},
+	{
+		"id": "a7ef6b2c-74bc-41dc-ad9c-8fc148a18880",
+		"description": "Account Debit",
+		"created_at": "2022-07-06 04:26:45.7",
+		"updated_at": "2026-03-05 22:52:59.069",
+		"deleted_at": null,
+		"hasStatement": false
+	},
+	{
+		"id": "d36ef536-6854-450f-b875-b8e71c99ed95",
+		"description": "Credit Card",
+		"created_at": "2022-07-06 04:26:21.949",
+		"updated_at": "2022-07-15 00:20:26.219",
+		"deleted_at": null,
+		"hasStatement": true
+	},
+	{
+		"id": "dd1d91b3-7ce2-4c4e-bbd9-538e57eec10d",
+		"description": "Débito",
+		"created_at": "2021-05-20 05:06:28.333",
+		"updated_at": "2022-07-06 04:26:15.417",
+		"deleted_at": "2022-07-06 04:26:15.417",
+		"hasStatement": false
+	}
 ]

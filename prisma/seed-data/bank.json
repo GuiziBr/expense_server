@@ -1,37 +1,37 @@
 [
-  {
-    "id": "5df366c1-e484-4f28-af5f-4f68d9e1b429",
-    "name": "Scotiabank",
-    "created_at": "2025-09-25 00:15:43.22",
-    "updated_at": "2025-09-25 00:15:43.22",
-    "deleted_at": null
-  },
-  {
-    "id": "b16940e2-ca2a-4c37-9edf-58ecd93bc423",
-    "name": "CIBC",
-    "created_at": "2022-07-06 04:24:52.89",
-    "updated_at": "2026-03-05 19:19:55.756",
-    "deleted_at": null
-  },
-  {
-    "id": "c7ace10e-0257-49d8-89e2-711d45514fa8",
-    "name": "Neo",
-    "created_at": "2022-07-06 04:24:59.815",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "d2ffc344-7eb5-4c61-b4cf-612f69277e3d",
-    "name": "Costco",
-    "created_at": "2023-11-27 06:13:40.120595",
-    "updated_at": null,
-    "deleted_at": null
-  },
-  {
-    "id": "fbc40646-37a0-46a0-86c2-fe3c66643b97",
-    "name": "Simplii",
-    "created_at": "2022-07-06 04:24:56.325",
-    "updated_at": "2026-03-05 20:08:09.751",
-    "deleted_at": null
-  }
+	{
+		"id": "5df366c1-e484-4f28-af5f-4f68d9e1b429",
+		"name": "Scotiabank",
+		"created_at": "2025-09-25 00:15:43.22",
+		"updated_at": "2025-09-25 00:15:43.22",
+		"deleted_at": null
+	},
+	{
+		"id": "b16940e2-ca2a-4c37-9edf-58ecd93bc423",
+		"name": "CIBC",
+		"created_at": "2022-07-06 04:24:52.89",
+		"updated_at": "2026-03-05 19:19:55.756",
+		"deleted_at": null
+	},
+	{
+		"id": "c7ace10e-0257-49d8-89e2-711d45514fa8",
+		"name": "Neo",
+		"created_at": "2022-07-06 04:24:59.815",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "d2ffc344-7eb5-4c61-b4cf-612f69277e3d",
+		"name": "Costco",
+		"created_at": "2023-11-27 06:13:40.120595",
+		"updated_at": null,
+		"deleted_at": null
+	},
+	{
+		"id": "fbc40646-37a0-46a0-86c2-fe3c66643b97",
+		"name": "Simplii",
+		"created_at": "2022-07-06 04:24:56.325",
+		"updated_at": "2026-03-05 20:08:09.751",
+		"deleted_at": null
+	}
 ]
