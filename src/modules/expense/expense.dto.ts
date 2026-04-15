@@ -10,7 +10,8 @@ export const createExpenseSchema = z.object({
 	bank_id: z.string().optional(),
 	store_id: z.string().optional(),
 	personal: z.boolean(),
-	split: z.boolean()
+	split: z.boolean(),
+	current_month: z.boolean().optional()
 })
 
 export type CreateExpenseDTO = z.infer<typeof createExpenseSchema>

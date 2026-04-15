@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns"
+import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns"
 import { Expense } from "@/domains/expense.domain"
 import { DatabaseService } from "@/infra/database/database.service"
 import { PaymentTypeService } from "../payment-type/payment-type.service"
@@ -60,12 +60,16 @@ export class ExpenseService {
 		transactionDate: Date,
 		paymentTypeId: string,
 		userId: string,
-		bankId?: string
+		bankId?: string,
+		currentMonth?: boolean
 	): Promise<Date> {
 		const paymentType = await this.paymentTypeService.getById(paymentTypeId)
 
 		if (!paymentType?.hasStatement) {
-			return endOfMonth(transactionDate)
+			const referenceDate = currentMonth
+				? transactionDate
+				: addMonths(transactionDate, 1)
+			return endOfMonth(referenceDate)
 		}
 
 		if (paymentType?.hasStatement && !bankId) {
@@ -115,7 +119,8 @@ export class ExpenseService {
 				data.date,
 				data.payment_type_id,
 				userId,
-				data.bank_id
+				data.bank_id,
+				data.current_month
 			)
 
 			const expense = await this.databaseService.expense.create({
@@ -202,7 +207,8 @@ export class ExpenseService {
 				data.date,
 				data.payment_type_id,
 				userId,
-				data.bank_id
+				data.bank_id,
+				data.current_month
 			)
 
 			const updateExpense = await this.databaseService.$transaction(
