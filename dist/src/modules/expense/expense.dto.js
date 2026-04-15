@@ -11,7 +11,8 @@ exports.createExpenseSchema = zod_1.z.object({
     bank_id: zod_1.z.string().optional(),
     store_id: zod_1.z.string().optional(),
     personal: zod_1.z.boolean(),
-    split: zod_1.z.boolean()
+    split: zod_1.z.boolean(),
+    current_month: zod_1.z.boolean().optional()
 });
 exports.expenseByIdSchema = zod_1.z.object({
     id: zod_1.z.string().uuid()
