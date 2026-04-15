@@ -50,7 +50,8 @@ describe("ExpenseController", () => {
 				bank_id: "bank_id",
 				store_id: "store_id",
 				personal: true,
-				split: true
+				split: true,
+				current_month: true
 			}
 
 			const result = await expenseController.createExpense(
@@ -166,7 +167,8 @@ describe("ExpenseController", () => {
 				bank_id: "bank_id",
 				store_id: "store_id",
 				personal: false,
-				split: false
+				split: false,
+				current_month: false
 			}
 
 			const result = await expenseController.updateExpense(

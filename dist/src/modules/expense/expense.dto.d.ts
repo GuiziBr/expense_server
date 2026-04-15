@@ -10,6 +10,7 @@ export declare const createExpenseSchema: z.ZodObject<{
     store_id: z.ZodOptional<z.ZodString>;
     personal: z.ZodBoolean;
     split: z.ZodBoolean;
+    current_month: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     split?: boolean;
     description?: string;
@@ -20,6 +21,7 @@ export declare const createExpenseSchema: z.ZodObject<{
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    current_month?: boolean;
 }, {
     split?: boolean;
     description?: string;
@@ -30,6 +32,7 @@ export declare const createExpenseSchema: z.ZodObject<{
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    current_month?: boolean;
 }>;
 export type CreateExpenseDTO = z.infer<typeof createExpenseSchema>;
 export interface ExpenseDTO {
@@ -106,6 +109,7 @@ export declare const updateExpenseSchema: z.ZodObject<{
     store_id: z.ZodOptional<z.ZodString>;
     personal: z.ZodBoolean;
     split: z.ZodBoolean;
+    current_month: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     split?: boolean;
     description?: string;
@@ -116,6 +120,7 @@ export declare const updateExpenseSchema: z.ZodObject<{
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    current_month?: boolean;
 }, {
     split?: boolean;
     description?: string;
@@ -126,6 +131,7 @@ export declare const updateExpenseSchema: z.ZodObject<{
     bank_id?: string;
     store_id?: string;
     personal?: boolean;
+    current_month?: boolean;
 }>;
 export type UpdateExpenseDTO = CreateExpenseDTO;
 export type OrderByType = "asc" | "desc";

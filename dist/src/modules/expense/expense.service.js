@@ -45,10 +45,13 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             };
         return orderByClause;
     }
-    async calculateDueDate(transactionDate, paymentTypeId, userId, bankId) {
+    async calculateDueDate(transactionDate, paymentTypeId, userId, bankId, currentMonth) {
         const paymentType = await this.paymentTypeService.getById(paymentTypeId);
         if (!paymentType?.hasStatement) {
-            return (0, date_fns_1.endOfMonth)(transactionDate);
+            const referenceDate = currentMonth
+                ? transactionDate
+                : (0, date_fns_1.addMonths)(transactionDate, 1);
+            return (0, date_fns_1.endOfMonth)(referenceDate);
         }
         if (paymentType?.hasStatement && !bankId) {
             throw new appError_1.default("This payment type must have a bank");
@@ -70,7 +73,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             throw new appError_1.default("Date must not be in the future", 400);
         try {
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
-            const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id);
+            const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
             const expense = await this.databaseService.expense.create({
                 data: {
                     ownerId: userId,
@@ -130,7 +133,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 throw new appError_1.default("Date must not be in the future", 400);
             }
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
-            const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id);
+            const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
             const updateExpense = await this.databaseService.$transaction(async (tx) => {
                 const current = await tx.expense.findFirst({
                     where: { id, deletedAt: null }
