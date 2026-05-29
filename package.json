@@ -45,7 +45,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.6",
 		"@faker-js/faker": "^9.0.3",
-		"@nestjs/cli": "^10.0.0",
+		"@nestjs/cli": "^11.0.21",
 		"@nestjs/schematics": "^10.0.0",
 		"@nestjs/testing": "^10.0.0",
 		"@types/bcrypt": "^6.0.0",
