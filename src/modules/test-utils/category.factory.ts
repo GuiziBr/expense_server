@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { Category } from "@/domains/category.domain"
+import { Category } from "../../domains/category.domain.js"
 
 export const createCategory = (params: Partial<Category> = {}): Category => ({
 	id: faker.string.uuid(),

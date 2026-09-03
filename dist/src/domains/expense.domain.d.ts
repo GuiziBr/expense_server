@@ -1,8 +1,8 @@
-import { Bank } from "./bank.domain";
-import { Category } from "./category.domain";
-import { PaymentType } from "./payment-type.domain";
-import { Store } from "./store.domain";
-import { User } from "./user.domain";
+import { Bank } from "./bank.domain.js";
+import { Category } from "./category.domain.js";
+import { PaymentType } from "./payment-type.domain.js";
+import { Store } from "./store.domain.js";
+import { User } from "./user.domain.js";
 export interface Expense {
     id: string;
     description: string;

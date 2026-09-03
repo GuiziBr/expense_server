@@ -1,5 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common"
-import { DatabaseService } from "@/infra/database/database.service"
+import { DatabaseService } from "../../infra/database/database.service.js"
 
 @Injectable()
 export class HealthService {

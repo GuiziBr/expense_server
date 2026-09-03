@@ -1,25 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createExpense = void 0;
-const faker_1 = require("@faker-js/faker");
-const bank_factory_1 = require("./bank.factory");
-const category_factory_1 = require("./category.factory");
-const payment_type_factory_1 = require("./payment-type.factory");
-const store_factory_1 = require("./store.factory");
-const createExpense = (params = {}) => {
-    const category = (0, category_factory_1.createCategory)();
-    const paymentType = (0, payment_type_factory_1.createPaymentType)();
-    const bank = (0, bank_factory_1.createBank)();
-    const store = (0, store_factory_1.createStore)();
+import { faker } from "@faker-js/faker";
+import { createBank } from "./bank.factory.js";
+import { createCategory } from "./category.factory.js";
+import { createPaymentType } from "./payment-type.factory.js";
+import { createStore } from "./store.factory.js";
+export const createExpense = (params = {}) => {
+    const category = createCategory();
+    const paymentType = createPaymentType();
+    const bank = createBank();
+    const store = createStore();
     return {
-        id: faker_1.faker.string.uuid(),
-        description: faker_1.faker.lorem.word(),
+        id: faker.string.uuid(),
+        description: faker.lorem.word(),
         date: new Date(),
-        amount: faker_1.faker.number.float({ min: 1, max: 1000, fractionDigits: 2 }),
+        amount: faker.number.float({ min: 1, max: 1000, fractionDigits: 2 }),
         split: false,
         personal: false,
         dueDate: new Date(),
-        ownerId: faker_1.faker.string.uuid(),
+        ownerId: faker.string.uuid(),
         categoryId: category.id,
         paymentTypeId: paymentType.id,
         bankId: bank.id,
@@ -32,16 +29,15 @@ const createExpense = (params = {}) => {
         bank,
         store,
         user: {
-            id: faker_1.faker.string.uuid(),
-            name: faker_1.faker.lorem.word(),
+            id: faker.string.uuid(),
+            name: faker.lorem.word(),
             createdAt: new Date(),
             updatedAt: null,
-            email: faker_1.faker.internet.email(),
-            password: faker_1.faker.internet.password(),
-            avatar: faker_1.faker.image.avatar()
+            email: faker.internet.email(),
+            password: faker.internet.password(),
+            avatar: faker.image.avatar()
         },
         ...params
     };
 };
-exports.createExpense = createExpense;
 //# sourceMappingURL=expense.factory.js.map

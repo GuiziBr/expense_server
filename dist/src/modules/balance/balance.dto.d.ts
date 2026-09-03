@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ConsolidatedReport, ReportCategory, ReportPayment } from "../../domains/balance.domain";
-import { GetExpensesRequest } from "../expense/expense.dto";
+import { ConsolidatedReport, ReportCategory, ReportPayment } from "../../domains/balance.domain.js";
+import { GetExpensesRequest } from "../expense/expense.dto.js";
 export declare const queryBalanceSchema: z.ZodObject<{
     startDate: z.ZodCoercedDate<unknown>;
     endDate: z.ZodCoercedDate<unknown>;

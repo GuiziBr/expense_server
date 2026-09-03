@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,26 +7,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var ExpenseService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExpenseService = void 0;
-const common_1 = require("@nestjs/common");
-const library_1 = require("@prisma/client/runtime/library");
-const date_fns_1 = require("date-fns");
-const database_service_1 = require("../../infra/database/database.service");
-const payment_type_service_1 = require("../payment-type/payment-type.service");
-const statement_period_service_1 = require("../statement-period/statement-period.service");
-const appError_1 = __importDefault(require("../utils/appError"));
-const constants_1 = require("../utils/constants");
+import { Injectable, Logger } from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns";
+import { DatabaseService } from "../../infra/database/database.service.js";
+import { PaymentTypeService } from "../payment-type/payment-type.service.js";
+import { StatementPeriodService } from "../statement-period/statement-period.service.js";
+import AppError from "../utils/appError.js";
+import { constants } from "../utils/constants.js";
 let ExpenseService = ExpenseService_1 = class ExpenseService {
+    databaseService;
+    paymentTypeService;
+    statementPeriodService;
+    logger = new Logger(ExpenseService_1.name);
     constructor(databaseService, paymentTypeService, statementPeriodService) {
         this.databaseService = databaseService;
         this.paymentTypeService = paymentTypeService;
         this.statementPeriodService = statementPeriodService;
-        this.logger = new common_1.Logger(ExpenseService_1.name);
     }
     calculateNetAmount(amount, personal, split) {
         const amountInCents = amount * 100;
@@ -38,7 +35,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 : amountInCents;
     }
     getOrderByClause(orderBy, orderType = "asc") {
-        const orderByColumn = constants_1.constants.orderColumns[orderBy] || constants_1.constants.orderColumns.date;
+        const orderByColumn = constants.orderColumns[orderBy] || constants.orderColumns.date;
         const orderByClause = typeof orderByColumn === "string"
             ? { [orderByColumn]: orderType }
             : {
@@ -53,27 +50,27 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         if (!paymentType?.hasStatement) {
             const referenceDate = currentMonth
                 ? transactionDate
-                : (0, date_fns_1.addMonths)(transactionDate, 1);
-            return (0, date_fns_1.endOfMonth)(referenceDate);
+                : addMonths(transactionDate, 1);
+            return endOfMonth(referenceDate);
         }
         if (paymentType?.hasStatement && !bankId) {
-            throw new appError_1.default("This payment type must have a bank");
+            throw new AppError("This payment type must have a bank");
         }
         const statementPeriod = await this.statementPeriodService.findByUserAndBank(userId, bankId, paymentTypeId);
         if (!statementPeriod) {
-            throw new appError_1.default("No statement period for provided payment type and bank was found");
+            throw new AppError("No statement period for provided payment type and bank was found");
         }
         const { initialDay, finalDay } = statementPeriod;
-        const lastDayOfMonth = (0, date_fns_1.endOfMonth)(transactionDate).getDate();
-        const transactionNextMonth = (0, date_fns_1.getMonth)(transactionDate) + 1;
-        const statementInitialDate = (0, date_fns_1.setDate)(transactionDate, Number(initialDay));
+        const lastDayOfMonth = endOfMonth(transactionDate).getDate();
+        const transactionNextMonth = getMonth(transactionDate) + 1;
+        const statementInitialDate = setDate(transactionDate, Number(initialDay));
         return transactionDate < statementInitialDate
-            ? (0, date_fns_1.setDate)(transactionDate, Number(lastDayOfMonth))
-            : new Date((0, date_fns_1.getYear)(transactionDate), transactionNextMonth, Number(finalDay) + 1);
+            ? setDate(transactionDate, Number(lastDayOfMonth))
+            : new Date(getYear(transactionDate), transactionNextMonth, Number(finalDay) + 1);
     }
     async createExpense(data, userId) {
-        if ((0, date_fns_1.isFuture)(data.date))
-            throw new appError_1.default("Date must not be in the future", 400);
+        if (isFuture(data.date))
+            throw new AppError("Date must not be in the future", 400);
         try {
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
@@ -102,23 +99,23 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return expense;
         }
         catch (error) {
-            if (error instanceof appError_1.default) {
+            if (error instanceof AppError) {
                 throw error;
             }
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
+            if (error instanceof PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - creating expense`);
-                if (error.code === constants_1.constants.FOREIGN_KEY_VIOLATION) {
+                if (error.code === constants.FOREIGN_KEY_VIOLATION) {
                     const dbField = error.meta.field_name;
                     const fieldName = dbField.split("_")[1];
-                    const errorMessage = constants_1.constants.foreignKeyMessages[fieldName];
-                    throw new appError_1.default(errorMessage, 400);
+                    const errorMessage = constants.foreignKeyMessages[fieldName];
+                    throw new AppError(errorMessage, 400);
                 }
-                if (error.code === constants_1.constants.UNIQUE_CONSTRAINT_VIOLATION) {
-                    throw new appError_1.default(constants_1.constants.uniqueConstraintMessages.duplicatedExpenses, 400);
+                if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
+                    throw new AppError(constants.uniqueConstraintMessages.duplicatedExpenses, 400);
                 }
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - creating expense`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async updateExpense(id, data, userId) {
@@ -127,13 +124,13 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 where: { id, deletedAt: null }
             });
             if (!expense) {
-                throw new appError_1.default("Expense not found", 404);
+                throw new AppError("Expense not found", 404);
             }
             if (expense.ownerId !== userId) {
-                throw new appError_1.default("Unauthorized", 403);
+                throw new AppError("Unauthorized", 403);
             }
-            if ((0, date_fns_1.isFuture)(data.date)) {
-                throw new appError_1.default("Date must not be in the future", 400);
+            if (isFuture(data.date)) {
+                throw new AppError("Date must not be in the future", 400);
             }
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
@@ -142,7 +139,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     where: { id, deletedAt: null }
                 });
                 if (!current) {
-                    throw new appError_1.default("Expense not found", 404);
+                    throw new AppError("Expense not found", 404);
                 }
                 return tx.expense.update({
                     where: { id },
@@ -170,23 +167,23 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return updateExpense;
         }
         catch (error) {
-            if (error instanceof appError_1.default) {
+            if (error instanceof AppError) {
                 throw error;
             }
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
+            if (error instanceof PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - updating expense`);
-                if (error.code === constants_1.constants.FOREIGN_KEY_VIOLATION) {
+                if (error.code === constants.FOREIGN_KEY_VIOLATION) {
                     const dbField = error.meta.field_name;
                     const fieldName = dbField.split("_")[1];
-                    const errorMessage = constants_1.constants.foreignKeyMessages[fieldName];
-                    throw new appError_1.default(errorMessage, 400);
+                    const errorMessage = constants.foreignKeyMessages[fieldName];
+                    throw new AppError(errorMessage, 400);
                 }
-                if (error.code === constants_1.constants.UNIQUE_CONSTRAINT_VIOLATION) {
-                    throw new appError_1.default(constants_1.constants.uniqueConstraintMessages.duplicatedExpenses, 400);
+                if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
+                    throw new AppError(constants.uniqueConstraintMessages.duplicatedExpenses, 400);
                 }
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async deleteExpense(id, userId) {
@@ -194,10 +191,10 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             where: { id, deletedAt: null }
         });
         if (!expense) {
-            throw new appError_1.default("Expense not found", 404);
+            throw new AppError("Expense not found", 404);
         }
         if (expense.ownerId !== userId) {
-            throw new appError_1.default("Unauthorized", 403);
+            throw new AppError("Unauthorized", 403);
         }
         try {
             await this.databaseService.expense.update({
@@ -206,12 +203,12 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError &&
-                error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof PrismaClientKnownRequestError &&
+                error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {
@@ -227,7 +224,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             }
         };
         if (filterBy && filterValue) {
-            whereClause[constants_1.constants.filterColumns[filterBy]] = filterValue;
+            whereClause[constants.filterColumns[filterBy]] = filterValue;
         }
         const orderByClause = this.getOrderByClause(orderBy, orderType);
         const [expenses, totalCount] = await Promise.all([
@@ -258,7 +255,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             }
         };
         if (filterBy && filterValue) {
-            whereClause[constants_1.constants.filterColumns[filterBy]] = filterValue;
+            whereClause[constants.filterColumns[filterBy]] = filterValue;
         }
         const orderByClause = this.getOrderByClause(orderBy, orderType);
         const [expenses, totalCount] = await Promise.all([
@@ -300,11 +297,11 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         });
     }
 };
-exports.ExpenseService = ExpenseService;
-exports.ExpenseService = ExpenseService = ExpenseService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService,
-        payment_type_service_1.PaymentTypeService,
-        statement_period_service_1.StatementPeriodService])
+ExpenseService = ExpenseService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService,
+        PaymentTypeService,
+        StatementPeriodService])
 ], ExpenseService);
+export { ExpenseService };
 //# sourceMappingURL=expense.service.js.map

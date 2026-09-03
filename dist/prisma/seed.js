@@ -1,14 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-const users = require("./seed-data/user.json");
-const banks = require("./seed-data/bank.json");
-const categories = require("./seed-data/category.json");
-const paymentTypes = require("./seed-data/payment_type.json");
-const stores = require("./seed-data/store.json");
-const statementPeriods = require("./seed-data/statement_period.json");
-const expenses = require("./seed-data/expense.json");
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+const seedDataDir = join(dirname(fileURLToPath(import.meta.url)), "seed-data");
+const loadSeedData = (fileName) => JSON.parse(readFileSync(join(seedDataDir, fileName), "utf-8"));
+const users = loadSeedData("user.json");
+const banks = loadSeedData("bank.json");
+const categories = loadSeedData("category.json");
+const paymentTypes = loadSeedData("payment_type.json");
+const stores = loadSeedData("store.json");
+const statementPeriods = loadSeedData("statement_period.json");
+const expenses = loadSeedData("expense.json");
 const toDate = (value) => value ? new Date(value) : null;
 async function main() {
     console.log("Seeding users...");

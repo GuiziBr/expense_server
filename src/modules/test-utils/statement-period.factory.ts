@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { StatementPeriod } from "@/domains/statement-period.domain"
+import { StatementPeriod } from "../../domains/statement-period.domain.js"
 
 export const createStatementPeriod = (
 	params: Partial<StatementPeriod> = {}

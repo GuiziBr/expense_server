@@ -1,5 +1,5 @@
-import { Expense } from "@/domains/expense.domain"
-import { ExpenseDTO } from "@/modules/expense/expense.dto"
+import { Expense } from "../../../domains/expense.domain.js"
+import { ExpenseDTO } from "../../../modules/expense/expense.dto.js"
 
 export class ExpensePresenter {
 	static toExpenseDTO(expense: Expense): ExpenseDTO {

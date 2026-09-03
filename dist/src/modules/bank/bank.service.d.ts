@@ -1,5 +1,5 @@
-import { Bank } from "../../domains/bank.domain";
-import { DatabaseService } from "../../infra/database/database.service";
+import { Bank } from "../../domains/bank.domain.js";
+import { DatabaseService } from "../../infra/database/database.service.js";
 export declare class BankService {
     private readonly databaseService;
     private readonly logger;

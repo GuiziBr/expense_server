@@ -1,5 +1,5 @@
-import { ConsolidatedBalanceDTO, GetBalanceResponse, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from "./balance.dto";
-import { BalanceService } from "./balance.service";
+import { ConsolidatedBalanceDTO, GetBalanceResponse, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from "./balance.dto.js";
+import { BalanceService } from "./balance.service.js";
 export declare class BalanceController {
     private readonly balanceService;
     constructor(balanceService: BalanceService);

@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common"
-import { InfraModule } from "@/infra/infra.module"
-import { ExpenseModule } from "../expense/expense.module"
-import { PaymentTypeModule } from "../payment-type/payment-type.module"
-import { StatementPeriodModule } from "../statement-period/statement-period.module"
-import { BalanceController } from "./balance.controller"
-import { BalanceService } from "./balance.service"
+import { InfraModule } from "../../infra/infra.module.js"
+import { ExpenseModule } from "../expense/expense.module.js"
+import { PaymentTypeModule } from "../payment-type/payment-type.module.js"
+import { StatementPeriodModule } from "../statement-period/statement-period.module.js"
+import { BalanceController } from "./balance.controller.js"
+import { BalanceService } from "./balance.service.js"
 
 @Module({
 	imports: [

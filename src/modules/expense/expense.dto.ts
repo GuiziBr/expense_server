@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { Expense } from "@/domains/expense.domain"
+import { Expense } from "../../domains/expense.domain.js"
 
 export const createExpenseSchema = z.object({
 	description: z.string(),

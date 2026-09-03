@@ -10,8 +10,8 @@ import {
 	Post,
 	Query
 } from "@nestjs/common"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { CategoryPresenter } from "@/infra/http/presenters/category.presenter"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { CategoryPresenter } from "../../infra/http/presenters/category.presenter.js"
 import {
 	CategoryByIdDTO,
 	CategoryDTO,
@@ -20,8 +20,8 @@ import {
 	createCategorySchema,
 	ListCategoryDTO,
 	listCategoriesSchema
-} from "./category.dto"
-import { CategoryService } from "./category.service"
+} from "./category.dto.js"
+import { CategoryService } from "./category.service.js"
 
 @Controller("categories")
 export class CategoryController {

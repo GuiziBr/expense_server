@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,14 +8,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var HealthService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.HealthService = void 0;
-const common_1 = require("@nestjs/common");
-const database_service_1 = require("../../infra/database/database.service");
+import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common";
+import { DatabaseService } from "../../infra/database/database.service.js";
 let HealthService = HealthService_1 = class HealthService {
+    databaseService;
+    logger = new Logger(HealthService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
-        this.logger = new common_1.Logger(HealthService_1.name);
     }
     async isHealthy() {
         try {
@@ -25,13 +23,13 @@ let HealthService = HealthService_1 = class HealthService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - checking health`);
-            throw new common_1.ServiceUnavailableException("Server unavailable");
+            throw new ServiceUnavailableException("Server unavailable");
         }
     }
 };
-exports.HealthService = HealthService;
-exports.HealthService = HealthService = HealthService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService])
+HealthService = HealthService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService])
 ], HealthService);
+export { HealthService };
 //# sourceMappingURL=health.service.js.map

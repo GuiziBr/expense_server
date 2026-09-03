@@ -1,6 +1,6 @@
 import { Response as Res } from "express";
-import { CreateExpenseDTO, ExpenseByIdDTO, ExpenseDTO, QueryExpenseDTO, UpdateExpenseDTO } from "./expense.dto";
-import { ExpenseService } from "./expense.service";
+import { CreateExpenseDTO, ExpenseByIdDTO, ExpenseDTO, QueryExpenseDTO, UpdateExpenseDTO } from "./expense.dto.js";
+import { ExpenseService } from "./expense.service.js";
 export declare class ExpenseController {
     private readonly expenseService;
     constructor(expenseService: ExpenseService);
