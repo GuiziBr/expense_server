@@ -11,7 +11,7 @@ export class ZodValidationPipe implements PipeTransform {
 			return this.schema.parse(value, {})
 		} catch (error) {
 			if (error instanceof ZodError) {
-				const param = fromZodError(error)?.details[0]?.path[0]
+				const param = String(fromZodError(error)?.details[0]?.path[0])
 				const message = fromZodError(error)?.details[0]?.message
 				throw new AppError(`${param} ${message}`)
 			}

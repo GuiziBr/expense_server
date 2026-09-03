@@ -18,7 +18,7 @@ class ZodValidationPipe {
         }
         catch (error) {
             if (error instanceof zod_1.ZodError) {
-                const param = (0, zod_validation_error_1.fromZodError)(error)?.details[0]?.path[0];
+                const param = String((0, zod_validation_error_1.fromZodError)(error)?.details[0]?.path[0]);
                 const message = (0, zod_validation_error_1.fromZodError)(error)?.details[0]?.message;
                 throw new appError_1.default(`${param} ${message}`);
             }
