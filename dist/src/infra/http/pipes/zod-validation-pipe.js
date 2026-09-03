@@ -1,10 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZodValidationPipe = void 0;
 const common_1 = require("@nestjs/common");
 const zod_1 = require("zod");
 const zod_validation_error_1 = require("zod-validation-error");
-const appError_1 = require("../../../modules/utils/appError");
+const appError_1 = __importDefault(require("../../../modules/utils/appError"));
 class ZodValidationPipe {
     constructor(schema) {
         this.schema = schema;

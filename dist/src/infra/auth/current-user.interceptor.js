@@ -8,11 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var CurrentUserInterceptor_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CurrentUserInterceptor = void 0;
 const common_1 = require("@nestjs/common");
-const appError_1 = require("../../modules/utils/appError");
+const appError_1 = __importDefault(require("../../modules/utils/appError"));
 const database_service_1 = require("../database/database.service");
 let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterceptor {
     constructor(databaseService) {
