@@ -6,9 +6,9 @@ import {
 	Request,
 	UseInterceptors
 } from "@nestjs/common"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { BalancePresenter } from "@/infra/http/presenters/balance.presenter"
+import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js"
 import {
 	ConsolidatedBalanceDTO,
 	GetBalanceResponse,
@@ -16,8 +16,8 @@ import {
 	QueryConsolidatedBalanceDTO,
 	queryBalanceSchema,
 	queryConsolidatedBalanceSchema
-} from "./balance.dto"
-import { BalanceService } from "./balance.service"
+} from "./balance.dto.js"
+import { BalanceService } from "./balance.service.js"
 
 @Controller("balance")
 export class BalanceController {

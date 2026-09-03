@@ -1,5 +1,5 @@
-import { PaymentType } from "@/domains/payment-type.domain"
-import { PaymentTypeDTO } from "@/modules/payment-type/payment-type.dto"
+import { PaymentType } from "../../../domains/payment-type.domain.js"
+import { PaymentTypeDTO } from "../../../modules/payment-type/payment-type.dto.js"
 
 export class PaymentTypePresenter {
 	static toHttp({

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BankPresenter = void 0;
-class BankPresenter {
+export class BankPresenter {
     static toHttp(bank) {
         return {
             id: bank.id,
@@ -11,5 +8,4 @@ class BankPresenter {
         };
     }
 }
-exports.BankPresenter = BankPresenter;
 //# sourceMappingURL=bank.presenter.js.map

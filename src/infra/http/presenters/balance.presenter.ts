@@ -1,7 +1,7 @@
 import {
 	ConsolidatedBalanceDTO,
 	GetConsolidatedBalanceResponse
-} from "@/modules/balance/balance.dto"
+} from "../../../modules/balance/balance.dto.js"
 
 export class BalancePresenter {
 	static toConsolidatedBalanceDTO(

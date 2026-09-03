@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
-import { InfraModule } from "@/infra/infra.module"
-import { CategoryController } from "./category.controller"
-import { CategoryService } from "./category.service"
+import { InfraModule } from "../../infra/infra.module.js"
+import { CategoryController } from "./category.controller.js"
+import { CategoryService } from "./category.service.js"
 
 @Module({
 	imports: [InfraModule],

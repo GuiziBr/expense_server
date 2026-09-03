@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,35 +10,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthController = void 0;
-const common_1 = require("@nestjs/common");
-const zod_validation_pipe_1 = require("../../infra/http/pipes/zod-validation-pipe");
-const authenticated_user_presenter_1 = require("../../infra/http/presenters/authenticated-user.presenter");
-const auth_dto_1 = require("./auth.dto");
-const auth_service_1 = require("./auth.service");
-const public_decorator_1 = require("./public.decorator");
+import { Body, Controller, Post, UsePipes } from "@nestjs/common";
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
+import { AuthenticatedUserPresenter } from "../../infra/http/presenters/authenticated-user.presenter.js";
+import { loginSchema } from "./auth.dto.js";
+import { AuthService } from "./auth.service.js";
+import { Public } from "./public.decorator.js";
 let AuthController = class AuthController {
+    authService;
     constructor(authService) {
         this.authService = authService;
     }
     async signIn(body) {
         const authenticatedUser = await this.authService.signIn(body.email, body.password);
-        return authenticated_user_presenter_1.AuthenticatedUserPresenter.toHttp(authenticatedUser);
+        return AuthenticatedUserPresenter.toHttp(authenticatedUser);
     }
 };
-exports.AuthController = AuthController;
 __decorate([
-    (0, public_decorator_1.Public)(),
-    (0, common_1.Post)(),
-    (0, common_1.UsePipes)(new zod_validation_pipe_1.ZodValidationPipe(auth_dto_1.loginSchema)),
-    __param(0, (0, common_1.Body)()),
+    Public(),
+    Post(),
+    UsePipes(new ZodValidationPipe(loginSchema)),
+    __param(0, Body()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signIn", null);
-exports.AuthController = AuthController = __decorate([
-    (0, common_1.Controller)("sessions"),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+AuthController = __decorate([
+    Controller("sessions"),
+    __metadata("design:paramtypes", [AuthService])
 ], AuthController);
+export { AuthController };
 //# sourceMappingURL=auth.controller.js.map

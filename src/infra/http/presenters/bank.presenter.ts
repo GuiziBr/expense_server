@@ -1,5 +1,5 @@
-import { Bank } from "@/domains/bank.domain"
-import { BankDTO } from "@/modules/bank/bank.dto"
+import { Bank } from "../../../domains/bank.domain.js"
+import { BankDTO } from "../../../modules/bank/bank.dto.js"
 
 export class BankPresenter {
 	static toHttp(bank: Bank): BankDTO {

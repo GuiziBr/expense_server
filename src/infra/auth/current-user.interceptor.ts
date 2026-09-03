@@ -4,8 +4,8 @@ import {
 	Injectable,
 	Logger
 } from "@nestjs/common"
-import AppError from "@/modules/utils/appError"
-import { DatabaseService } from "../database/database.service"
+import AppError from "../../modules/utils/appError.js"
+import { DatabaseService } from "../database/database.service.js"
 
 @Injectable()
 export class CurrentUserInterceptor {

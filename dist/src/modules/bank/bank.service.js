@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,21 +7,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var BankService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BankService = void 0;
-const common_1 = require("@nestjs/common");
-const library_1 = require("@prisma/client/runtime/library");
-const database_service_1 = require("../../infra/database/database.service");
-const appError_1 = __importDefault(require("../utils/appError"));
-const constants_1 = require("../utils/constants");
+import { Injectable, Logger } from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { DatabaseService } from "../../infra/database/database.service.js";
+import AppError from "../utils/appError.js";
+import { constants } from "../utils/constants.js";
 let BankService = BankService_1 = class BankService {
+    databaseService;
+    logger = new Logger(BankService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
-        this.logger = new common_1.Logger(BankService_1.name);
     }
     async getAll(offset, limit) {
         try {
@@ -36,7 +31,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all banks`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async getById(id) {
@@ -48,7 +43,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting bank by id ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async create(name) {
@@ -62,7 +57,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating bank ${name}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async update(id, name) {
@@ -73,7 +68,7 @@ let BankService = BankService_1 = class BankService {
             ]);
             if (!bank) {
                 this.logger.error(`Bank ${id} not found`);
-                throw new appError_1.default("Bank not found", 404);
+                throw new AppError("Bank not found", 404);
             }
             if ((bank && !sameNameBank) || sameNameBank?.id === id) {
                 const updatedBank = await this.databaseService.bank.update({
@@ -85,7 +80,7 @@ let BankService = BankService_1 = class BankService {
             if (sameNameBank) {
                 if (!sameNameBank?.deletedAt) {
                     this.logger.error(`Bank with name "${name}" already exists`);
-                    throw new appError_1.default("There is already a bank with same name", 400);
+                    throw new AppError("There is already a bank with same name", 400);
                 }
             }
             const [, renamedBank] = await this.databaseService.$transaction([
@@ -101,16 +96,16 @@ let BankService = BankService_1 = class BankService {
             return renamedBank;
         }
         catch (error) {
-            if (error instanceof appError_1.default) {
+            if (error instanceof AppError) {
                 throw error;
             }
-            if (error instanceof library_1.PrismaClientKnownRequestError &&
-                error.code === constants_1.constants.UNIQUE_CONSTRAINT_VIOLATION) {
+            if (error instanceof PrismaClientKnownRequestError &&
+                error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
                 this.logger.error(`Bank with name "${name}" already exists`);
-                throw new appError_1.default("There is already a bank with same name", 400);
+                throw new AppError("There is already a bank with same name", 400);
             }
             this.logger.error(`Error - ${error.message || error} - updating bank ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async delete(id) {
@@ -121,18 +116,18 @@ let BankService = BankService_1 = class BankService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError &&
-                error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof PrismaClientKnownRequestError &&
+                error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting bank ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
 };
-exports.BankService = BankService;
-exports.BankService = BankService = BankService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService])
+BankService = BankService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService])
 ], BankService);
+export { BankService };
 //# sourceMappingURL=bank.service.js.map

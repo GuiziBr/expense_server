@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { Bank } from "@/domains/bank.domain"
+import { Bank } from "../../domains/bank.domain.js"
 
 export const createBank = (params: Partial<Bank> = {}): Bank => ({
 	id: faker.string.uuid(),

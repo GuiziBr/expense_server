@@ -1,19 +1,19 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns"
-import { Expense } from "@/domains/expense.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import { PaymentTypeService } from "../payment-type/payment-type.service"
-import { StatementPeriodService } from "../statement-period/statement-period.service"
-import AppError from "../utils/appError"
-import { constants } from "../utils/constants"
+import { Expense } from "../../domains/expense.domain.js"
+import { DatabaseService } from "../../infra/database/database.service.js"
+import { PaymentTypeService } from "../payment-type/payment-type.service.js"
+import { StatementPeriodService } from "../statement-period/statement-period.service.js"
+import AppError from "../utils/appError.js"
+import { constants } from "../utils/constants.js"
 import {
 	CreateExpenseDTO,
 	GetExpensesRequest,
 	GetExpensesResponse,
 	OrderByType,
 	UpdateExpenseDTO
-} from "./expense.dto"
+} from "./expense.dto.js"
 
 @Injectable()
 export class ExpenseService {

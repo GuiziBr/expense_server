@@ -1,14 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@nestjs/core");
-const app_module_1 = require("./app.module");
-const env_1 = require("./infra/env");
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module.js";
+import { env } from "./infra/env.js";
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const app = await NestFactory.create(AppModule);
     app.enableCors({
         exposedHeaders: ["X-Total-Count"]
     });
-    await app.listen(env_1.env.PORT);
+    await app.listen(env.PORT);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
