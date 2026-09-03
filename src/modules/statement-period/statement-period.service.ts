@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common"
-import { StatementPeriod } from "@/domains/statement-period.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "../utils/appError"
+import { StatementPeriod } from "../../domains/statement-period.domain.js"
+import { DatabaseService } from "../../infra/database/database.service.js"
+import AppError from "../utils/appError.js"
 
 @Injectable()
 export class StatementPeriodService {

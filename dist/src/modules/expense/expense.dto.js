@@ -1,28 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateExpenseSchema = exports.queryExpenseSchema = exports.expenseByIdSchema = exports.createExpenseSchema = void 0;
-const zod_1 = require("zod");
-exports.createExpenseSchema = zod_1.z.object({
-    description: zod_1.z.string(),
-    date: zod_1.z.coerce.date(),
-    amount: zod_1.z.number(),
-    category_id: zod_1.z.string(),
-    payment_type_id: zod_1.z.string(),
-    bank_id: zod_1.z.string().optional(),
-    store_id: zod_1.z.string().optional(),
-    personal: zod_1.z.boolean(),
-    split: zod_1.z.boolean(),
-    current_month: zod_1.z.boolean().optional()
+import { z } from "zod";
+export const createExpenseSchema = z.object({
+    description: z.string(),
+    date: z.coerce.date(),
+    amount: z.number(),
+    category_id: z.string(),
+    payment_type_id: z.string(),
+    bank_id: z.string().optional(),
+    store_id: z.string().optional(),
+    personal: z.boolean(),
+    split: z.boolean(),
+    current_month: z.boolean().optional()
 });
-exports.expenseByIdSchema = zod_1.z.object({
-    id: zod_1.z.string().uuid()
+export const expenseByIdSchema = z.object({
+    id: z.string().uuid()
 });
-exports.queryExpenseSchema = zod_1.z.object({
-    startDate: zod_1.z.coerce.date().optional(),
-    endDate: zod_1.z.coerce.date().default(() => new Date()),
-    offset: zod_1.z.coerce.number().min(0).default(0).optional(),
-    limit: zod_1.z.coerce.number().min(1).optional(),
-    orderBy: zod_1.z
+export const queryExpenseSchema = z.object({
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().default(() => new Date()),
+    offset: z.coerce.number().min(0).default(0).optional(),
+    limit: z.coerce.number().min(1).optional(),
+    orderBy: z
         .enum([
         "description",
         "amount",
@@ -34,9 +31,9 @@ exports.queryExpenseSchema = zod_1.z.object({
         "store"
     ])
         .optional(),
-    orderType: zod_1.z.enum(["asc", "desc"]).default("asc"),
-    filterBy: zod_1.z.enum(["category", "payment_type", "bank", "store"]).optional(),
-    filterValue: zod_1.z.string().optional()
+    orderType: z.enum(["asc", "desc"]).default("asc"),
+    filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+    filterValue: z.string().optional()
 });
-exports.updateExpenseSchema = exports.createExpenseSchema;
+export const updateExpenseSchema = createExpenseSchema;
 //# sourceMappingURL=expense.dto.js.map

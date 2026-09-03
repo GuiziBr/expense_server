@@ -1,21 +1,22 @@
+import { readFileSync } from "node:fs"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const users: any[] = require("./seed-data/user.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const banks: any[] = require("./seed-data/bank.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const categories: any[] = require("./seed-data/category.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const paymentTypes: any[] = require("./seed-data/payment_type.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const stores: any[] = require("./seed-data/store.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const statementPeriods: any[] = require("./seed-data/statement_period.json")
-// biome-ignore lint/suspicious/noExplicitAny: JSON require
-const expenses: any[] = require("./seed-data/expense.json")
+const seedDataDir = join(dirname(fileURLToPath(import.meta.url)), "seed-data")
+// biome-ignore lint/suspicious/noExplicitAny: JSON data
+const loadSeedData = (fileName: string): any[] =>
+	JSON.parse(readFileSync(join(seedDataDir, fileName), "utf-8"))
+
+const users = loadSeedData("user.json")
+const banks = loadSeedData("bank.json")
+const categories = loadSeedData("category.json")
+const paymentTypes = loadSeedData("payment_type.json")
+const stores = loadSeedData("store.json")
+const statementPeriods = loadSeedData("statement_period.json")
+const expenses = loadSeedData("expense.json")
 
 const toDate = (value: string | null): Date | null =>
 	value ? new Date(value) : null

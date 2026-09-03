@@ -1,42 +1,39 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthModule = void 0;
-const common_1 = require("@nestjs/common");
-const core_1 = require("@nestjs/core");
-const jwt_1 = require("@nestjs/jwt");
-const env_1 = require("../../infra/env");
-const user_module_1 = require("../user/user.module");
-const auth_controller_1 = require("./auth.controller");
-const auth_guard_1 = require("./auth.guard");
-const auth_service_1 = require("./auth.service");
+import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
+import { JwtModule } from "@nestjs/jwt";
+import { env } from "../../infra/env.js";
+import { UserModule } from "../user/user.module.js";
+import { AuthController } from "./auth.controller.js";
+import { AuthGuard } from "./auth.guard.js";
+import { AuthService } from "./auth.service.js";
 let AuthModule = class AuthModule {
 };
-exports.AuthModule = AuthModule;
-exports.AuthModule = AuthModule = __decorate([
-    (0, common_1.Module)({
+AuthModule = __decorate([
+    Module({
         imports: [
-            user_module_1.UserModule,
-            jwt_1.JwtModule.register({
+            UserModule,
+            JwtModule.register({
                 global: true,
-                secret: env_1.env.JWT_SECRET,
+                secret: env.JWT_SECRET,
                 signOptions: { expiresIn: "1d" }
             })
         ],
         providers: [
-            auth_service_1.AuthService,
+            AuthService,
             {
-                provide: core_1.APP_GUARD,
-                useClass: auth_guard_1.AuthGuard
+                provide: APP_GUARD,
+                useClass: AuthGuard
             }
         ],
-        controllers: [auth_controller_1.AuthController],
-        exports: [auth_service_1.AuthService]
+        controllers: [AuthController],
+        exports: [AuthService]
     })
 ], AuthModule);
+export { AuthModule };
 //# sourceMappingURL=auth.module.js.map

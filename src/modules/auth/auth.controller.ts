@@ -1,9 +1,9 @@
 import { Body, Controller, Post, UsePipes } from "@nestjs/common"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { AuthenticatedUserPresenter } from "@/infra/http/presenters/authenticated-user.presenter"
-import { AuthenticatedUserDTO, LoginDTO, loginSchema } from "./auth.dto"
-import { AuthService } from "./auth.service"
-import { Public } from "./public.decorator"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { AuthenticatedUserPresenter } from "../../infra/http/presenters/authenticated-user.presenter.js"
+import { AuthenticatedUserDTO, LoginDTO, loginSchema } from "./auth.dto.js"
+import { AuthService } from "./auth.service.js"
+import { Public } from "./public.decorator.js"
 
 @Controller("sessions")
 export class AuthController {

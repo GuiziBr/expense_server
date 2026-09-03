@@ -1,8 +1,8 @@
-import { Expense } from "../../domains/expense.domain";
-import { DatabaseService } from "../../infra/database/database.service";
-import { PaymentTypeService } from "../payment-type/payment-type.service";
-import { StatementPeriodService } from "../statement-period/statement-period.service";
-import { CreateExpenseDTO, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto";
+import { Expense } from "../../domains/expense.domain.js";
+import { DatabaseService } from "../../infra/database/database.service.js";
+import { PaymentTypeService } from "../payment-type/payment-type.service.js";
+import { StatementPeriodService } from "../statement-period/statement-period.service.js";
+import { CreateExpenseDTO, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto.js";
 export declare class ExpenseService {
     private readonly databaseService;
     private readonly paymentTypeService;

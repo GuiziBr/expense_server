@@ -5,8 +5,9 @@
 	"author": "",
 	"private": true,
 	"license": "UNLICENSED",
+	"type": "module",
 	"prisma": {
-		"seed": "ts-node prisma/seed.ts"
+		"seed": "ts-node --esm prisma/seed.ts"
 	},
 	"scripts": {
 		"build": "nest build",
@@ -14,7 +15,7 @@
 		"start": "nest start",
 		"start:dev": "nest start --watch",
 		"start:debug": "nest start --debug --watch",
-		"start:prod": "node dist/main",
+		"start:prod": "node dist/src/main.js",
 		"lint": "npx @biomejs/biome lint --write",
 		"migrate": "npx prisma migrate dev",
 		"docker:up": "docker compose up",

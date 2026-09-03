@@ -10,8 +10,8 @@ import {
 	Post,
 	Query
 } from "@nestjs/common"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { PaymentTypePresenter } from "@/infra/http/presenters/paymentType.presenter"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { PaymentTypePresenter } from "../../infra/http/presenters/paymentType.presenter.js"
 import {
 	CreatePaymentTypeDTO,
 	createPaymentTypeSchema,
@@ -20,8 +20,8 @@ import {
 	PaymentTypeByIdDTO,
 	PaymentTypeDTO,
 	paymentTypeByIdSchema
-} from "./payment-type.dto"
-import { PaymentTypeService } from "./payment-type.service"
+} from "./payment-type.dto.js"
+import { PaymentTypeService } from "./payment-type.service.js"
 
 @Controller("paymentType")
 export class PaymentTypeController {

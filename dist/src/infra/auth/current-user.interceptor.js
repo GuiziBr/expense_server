@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,19 +7,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var CurrentUserInterceptor_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CurrentUserInterceptor = void 0;
-const common_1 = require("@nestjs/common");
-const appError_1 = __importDefault(require("../../modules/utils/appError"));
-const database_service_1 = require("../database/database.service");
+import { Injectable, Logger } from "@nestjs/common";
+import AppError from "../../modules/utils/appError.js";
+import { DatabaseService } from "../database/database.service.js";
 let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterceptor {
+    databaseService;
+    logger = new Logger(CurrentUserInterceptor_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
-        this.logger = new common_1.Logger(CurrentUserInterceptor_1.name);
     }
     async intercept(context, next) {
         const request = context.switchToHttp().getRequest();
@@ -30,15 +25,15 @@ let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterce
         });
         if (!currentUser) {
             this.logger.error(`Error - User not found - ${sub}`);
-            throw new appError_1.default("User not found", 404);
+            throw new AppError("User not found", 404);
         }
         request.userId = currentUser.id;
         return next.handle();
     }
 };
-exports.CurrentUserInterceptor = CurrentUserInterceptor;
-exports.CurrentUserInterceptor = CurrentUserInterceptor = CurrentUserInterceptor_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService])
+CurrentUserInterceptor = CurrentUserInterceptor_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService])
 ], CurrentUserInterceptor);
+export { CurrentUserInterceptor };
 //# sourceMappingURL=current-user.interceptor.js.map

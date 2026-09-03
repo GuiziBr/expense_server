@@ -1,5 +1,5 @@
-import { Store } from "../../domains/store.domain";
-import { DatabaseService } from "../../infra/database/database.service";
+import { Store } from "../../domains/store.domain.js";
+import { DatabaseService } from "../../infra/database/database.service.js";
 export declare class StoreService {
     private readonly databaseService;
     private readonly logger;

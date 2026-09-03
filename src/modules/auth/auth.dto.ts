@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { User } from "@/domains/user.domain"
+import { User } from "../../domains/user.domain.js"
 
 export const loginSchema = z.object({
 	email: z.string().email(),

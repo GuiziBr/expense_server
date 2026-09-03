@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,21 +7,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var PaymentTypeService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PaymentTypeService = void 0;
-const common_1 = require("@nestjs/common");
-const library_1 = require("@prisma/client/runtime/library");
-const database_service_1 = require("../../infra/database/database.service");
-const appError_1 = __importDefault(require("../utils/appError"));
-const constants_1 = require("../utils/constants");
+import { Injectable, Logger } from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { DatabaseService } from "../../infra/database/database.service.js";
+import AppError from "../utils/appError.js";
+import { constants } from "../utils/constants.js";
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
+    databaseService;
+    logger = new Logger(PaymentTypeService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
-        this.logger = new common_1.Logger(PaymentTypeService_1.name);
     }
     async getAll(offset, limit) {
         try {
@@ -36,7 +31,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all payment types`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async getById(id) {
@@ -48,7 +43,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting payment type by id ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async create(description, hasStatement) {
@@ -62,7 +57,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating payment type ${description}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async update(id, description, hasStatement) {
@@ -75,7 +70,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             ]);
             if (!paymentType) {
                 this.logger.error(`Payment type ${id} not found`);
-                throw new appError_1.default("Payment type not found", 404);
+                throw new AppError("Payment type not found", 404);
             }
             if ((paymentType && !sameDescriptionPaymentType) ||
                 sameDescriptionPaymentType?.id === id) {
@@ -88,18 +83,18 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             if (sameDescriptionPaymentType) {
                 if (!sameDescriptionPaymentType?.deletedAt) {
                     this.logger.error(`Payment type with description "${description}" already exists`);
-                    throw new appError_1.default("There is already a payment type with same description", 400);
+                    throw new AppError("There is already a payment type with same description", 400);
                 }
                 const reactivatedPaymentType = await this.reactivatePaymentType(id, sameDescriptionPaymentType.id);
                 return reactivatedPaymentType;
             }
         }
         catch (error) {
-            if (error instanceof appError_1.default) {
+            if (error instanceof AppError) {
                 throw error;
             }
             this.logger.error(`Error - ${error.message || error} - updating payment type ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async delete(id) {
@@ -110,12 +105,12 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             });
         }
         catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError &&
-                error.code === constants_1.constants.RECORD_NOT_FOUND) {
+            if (error instanceof PrismaClientKnownRequestError &&
+                error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting payment type ${id}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
     async reactivatePaymentType(paymentTypeIdToDelete, paymentTypeIdToRestore) {
@@ -131,13 +126,13 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
 };
-exports.PaymentTypeService = PaymentTypeService;
-exports.PaymentTypeService = PaymentTypeService = PaymentTypeService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService])
+PaymentTypeService = PaymentTypeService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService])
 ], PaymentTypeService);
+export { PaymentTypeService };
 //# sourceMappingURL=payment-type.service.js.map

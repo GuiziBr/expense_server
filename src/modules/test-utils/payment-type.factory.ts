@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import { PaymentType } from "@/domains/payment-type.domain"
+import { PaymentType } from "../../domains/payment-type.domain.js"
 
 export const createPaymentType = (
 	params: Partial<PaymentType> = {}

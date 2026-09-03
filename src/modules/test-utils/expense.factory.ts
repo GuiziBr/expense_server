@@ -1,9 +1,9 @@
 import { faker } from "@faker-js/faker"
-import { Expense } from "@/domains/expense.domain"
-import { createBank } from "./bank.factory"
-import { createCategory } from "./category.factory"
-import { createPaymentType } from "./payment-type.factory"
-import { createStore } from "./store.factory"
+import { Expense } from "../../domains/expense.domain.js"
+import { createBank } from "./bank.factory.js"
+import { createCategory } from "./category.factory.js"
+import { createPaymentType } from "./payment-type.factory.js"
+import { createStore } from "./store.factory.js"
 
 export const createExpense = (params: Partial<Expense> = {}): Expense => {
 	const category = createCategory()

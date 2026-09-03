@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PaymentTypePresenter = void 0;
-class PaymentTypePresenter {
+export class PaymentTypePresenter {
     static toHttp({ id, description, createdAt, updatedAt, hasStatement }) {
         return {
             id,
@@ -12,5 +9,4 @@ class PaymentTypePresenter {
         };
     }
 }
-exports.PaymentTypePresenter = PaymentTypePresenter;
 //# sourceMappingURL=paymentType.presenter.js.map

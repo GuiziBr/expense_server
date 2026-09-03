@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { User } from "@/domains/user.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "../utils/appError"
+import { User } from "../../domains/user.domain.js"
+import { DatabaseService } from "../../infra/database/database.service.js"
+import AppError from "../utils/appError.js"
 
 @Injectable()
 export class UserService {

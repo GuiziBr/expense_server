@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BalancePresenter = void 0;
-class BalancePresenter {
+export class BalancePresenter {
     static toConsolidatedBalanceDTO(consolidatedReport) {
         return {
             requester: {
@@ -24,5 +21,4 @@ class BalancePresenter {
         };
     }
 }
-exports.BalancePresenter = BalancePresenter;
 //# sourceMappingURL=balance.presenter.js.map

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.constants = void 0;
-exports.constants = {
+export const constants = {
     RECORD_NOT_FOUND: "P2025",
     FOREIGN_KEY_VIOLATION: "P2003",
     UNIQUE_CONSTRAINT_VIOLATION: "P2002",
