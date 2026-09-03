@@ -1,22 +1,17 @@
 import { z } from "zod";
-import { ConsolidatedReport, ReportCategory, ReportPayment } from "@/domains/balance.domain";
+import { ConsolidatedReport, ReportCategory, ReportPayment } from "../../domains/balance.domain";
 import { GetExpensesRequest } from "../expense/expense.dto";
 export declare const queryBalanceSchema: z.ZodObject<{
-    startDate: z.ZodDate;
-    endDate: z.ZodDate;
-    filterBy: z.ZodOptional<z.ZodEnum<["category", "paymentType", "bank", "store"]>>;
+    startDate: z.ZodCoercedDate<unknown>;
+    endDate: z.ZodCoercedDate<unknown>;
+    filterBy: z.ZodOptional<z.ZodEnum<{
+        bank: "bank";
+        category: "category";
+        paymentType: "paymentType";
+        store: "store";
+    }>>;
     filterValue: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-}, "strip", z.ZodTypeAny, {
-    startDate?: Date;
-    endDate?: Date;
-    filterBy?: "bank" | "category" | "paymentType" | "store";
-    filterValue?: string;
-}, {
-    startDate?: Date;
-    endDate?: Date;
-    filterBy?: "bank" | "category" | "paymentType" | "store";
-    filterValue?: string;
-}>;
+}, z.core.$strip>;
 export type QueryBalanceDTO = z.infer<typeof queryBalanceSchema>;
 export interface GetBalanceRequest extends GetExpensesRequest {
 }
@@ -29,15 +24,9 @@ export interface GetBalanceResponse {
     };
 }
 export declare const queryConsolidatedBalanceSchema: z.ZodObject<{
-    month: z.ZodNumber;
-    year: z.ZodNumber;
-}, "strip", z.ZodTypeAny, {
-    month?: number;
-    year?: number;
-}, {
-    month?: number;
-    year?: number;
-}>;
+    month: z.ZodCoercedNumber<unknown>;
+    year: z.ZodCoercedNumber<unknown>;
+}, z.core.$strip>;
 export type QueryConsolidatedBalanceDTO = z.infer<typeof queryConsolidatedBalanceSchema>;
 export interface GetConsolidateBalanceRequest {
     userId: string;
