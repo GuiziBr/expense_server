@@ -8,9 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
 const jwt_1 = require("@nestjs/jwt");
+const env_1 = require("../../infra/env");
 const user_module_1 = require("../user/user.module");
 const auth_controller_1 = require("./auth.controller");
 const auth_guard_1 = require("./auth.guard");
@@ -22,15 +22,10 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             user_module_1.UserModule,
-            jwt_1.JwtModule.registerAsync({
-                useFactory: (configService) => {
-                    return {
-                        global: true,
-                        secret: configService.get("JWT_SECRET", { infer: true }),
-                        signOptions: { expiresIn: "1d" }
-                    };
-                },
-                inject: [config_1.ConfigService]
+            jwt_1.JwtModule.register({
+                global: true,
+                secret: env_1.env.JWT_SECRET,
+                signOptions: { expiresIn: "1d" }
             })
         ],
         providers: [

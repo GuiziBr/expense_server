@@ -5,3 +5,4 @@ export declare const envSchema: z.ZodObject<{
     JWT_SECRET: z.ZodString;
 }, z.core.$strip>;
 export type Env = z.infer<typeof envSchema>;
+export declare const env: Env;

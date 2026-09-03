@@ -8,8 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
-const env_1 = require("./infra/env");
 const infra_module_1 = require("./infra/infra.module");
 const auth_module_1 = require("./modules/auth/auth.module");
 const balance_module_1 = require("./modules/balance/balance.module");
@@ -27,10 +25,6 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({
-                validate: (env) => env_1.envSchema.parse(env),
-                isGlobal: true
-            }),
             infra_module_1.InfraModule,
             health_module_1.HealthModule,
             auth_module_1.AuthModule,
