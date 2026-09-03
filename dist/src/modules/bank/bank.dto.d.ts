@@ -6,29 +6,15 @@ export interface BankDTO {
     updated_at: Date | null;
 }
 export declare const listBanksSchema: z.ZodObject<{
-    offset: z.ZodDefault<z.ZodNumber>;
-    limit: z.ZodDefault<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
-    offset?: number;
-    limit?: number;
-}, {
-    offset?: number;
-    limit?: number;
-}>;
+    offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
 export type ListBankDTO = z.infer<typeof listBanksSchema>;
 export declare const bankByIdSchema: z.ZodObject<{
     id: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    id?: string;
-}, {
-    id?: string;
-}>;
+}, z.core.$strip>;
 export type BankByIdDTO = z.infer<typeof bankByIdSchema>;
 export declare const createBankSchema: z.ZodObject<{
     name: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    name?: string;
-}, {
-    name?: string;
-}>;
+}, z.core.$strip>;
 export type CreateBankDTO = z.infer<typeof createBankSchema>;
