@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ConsolidatedReport, ReportCategory, ReportPayment } from "@/domains/balance.domain";
+import { ConsolidatedReport, ReportCategory, ReportPayment } from "../../domains/balance.domain";
 import { GetExpensesRequest } from "../expense/expense.dto";
 export declare const queryBalanceSchema: z.ZodObject<{
     startDate: z.ZodDate;
@@ -32,11 +32,11 @@ export declare const queryConsolidatedBalanceSchema: z.ZodObject<{
     month: z.ZodNumber;
     year: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    month?: number;
     year?: number;
+    month?: number;
 }, {
-    month?: number;
     year?: number;
+    month?: number;
 }>;
 export type QueryConsolidatedBalanceDTO = z.infer<typeof queryConsolidatedBalanceSchema>;
 export interface GetConsolidateBalanceRequest {
