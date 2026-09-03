@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,15 +8,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var StatementPeriodService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.StatementPeriodService = void 0;
-const common_1 = require("@nestjs/common");
-const database_service_1 = require("../../infra/database/database.service");
-const appError_1 = require("../utils/appError");
+import { Injectable, Logger } from "@nestjs/common";
+import { DatabaseService } from "../../infra/database/database.service.js";
+import AppError from "../utils/appError.js";
 let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodService {
+    databaseService;
+    logger = new Logger(StatementPeriodService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
-        this.logger = new common_1.Logger(StatementPeriodService_1.name);
     }
     async findByUserAndBank(userId, bankId, paymentTypeId) {
         try {
@@ -32,13 +30,13 @@ let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodSer
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting statement period`);
-            throw new appError_1.default("Internal server error", 500);
+            throw new AppError("Internal server error", 500);
         }
     }
 };
-exports.StatementPeriodService = StatementPeriodService;
-exports.StatementPeriodService = StatementPeriodService = StatementPeriodService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [database_service_1.DatabaseService])
+StatementPeriodService = StatementPeriodService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [DatabaseService])
 ], StatementPeriodService);
+export { StatementPeriodService };
 //# sourceMappingURL=statement-period.service.js.map

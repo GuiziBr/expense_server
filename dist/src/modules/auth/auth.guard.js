@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,21 +7,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthGuard = void 0;
-const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
-const core_1 = require("@nestjs/core");
-const jwt_1 = require("@nestjs/jwt");
-const public_decorator_1 = require("./public.decorator");
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { JwtService } from "@nestjs/jwt";
+import { env } from "../../infra/env.js";
+import { IS_PUBLIC_KEY } from "./public.decorator.js";
 let AuthGuard = class AuthGuard {
-    constructor(jwtService, configService, reflector) {
+    jwtService;
+    reflector;
+    constructor(jwtService, reflector) {
         this.jwtService = jwtService;
-        this.configService = configService;
         this.reflector = reflector;
     }
     async canActivate(context) {
-        const isPublic = this.reflector.getAllAndOverride(public_decorator_1.IS_PUBLIC_KEY, [
+        const isPublic = this.reflector.getAllAndOverride(IS_PUBLIC_KEY, [
             context.getHandler(),
             context.getClass()
         ]);
@@ -32,16 +30,16 @@ let AuthGuard = class AuthGuard {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
         if (!token) {
-            throw new common_1.UnauthorizedException();
+            throw new UnauthorizedException();
         }
         try {
             const payload = await this.jwtService.verifyAsync(token, {
-                secret: this.configService.get("JWT_SECRET", { infer: true })
+                secret: env.JWT_SECRET
             });
             request.user = payload;
         }
         catch {
-            throw new common_1.UnauthorizedException();
+            throw new UnauthorizedException();
         }
         return true;
     }
@@ -50,11 +48,10 @@ let AuthGuard = class AuthGuard {
         return type === "Bearer" ? token : undefined;
     }
 };
-exports.AuthGuard = AuthGuard;
-exports.AuthGuard = AuthGuard = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService,
-        config_1.ConfigService,
-        core_1.Reflector])
+AuthGuard = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [JwtService,
+        Reflector])
 ], AuthGuard);
+export { AuthGuard };
 //# sourceMappingURL=auth.guard.js.map

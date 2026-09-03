@@ -1,8 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const unplugin_swc_1 = require("unplugin-swc");
-const config_1 = require("vitest/config");
-exports.default = (0, config_1.defineConfig)({
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
+export default defineConfig({
     test: {
         include: ['**/*.e2e-spec.ts'],
         globals: true,
@@ -18,6 +16,6 @@ exports.default = (0, config_1.defineConfig)({
             '@test': './test'
         }
     },
-    plugins: [unplugin_swc_1.default.vite()]
+    plugins: [swc.vite()]
 });
 //# sourceMappingURL=vitest.e2e.config.js.map

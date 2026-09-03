@@ -13,9 +13,9 @@ import {
 	UseInterceptors
 } from "@nestjs/common"
 import { Response as Res } from "express"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { ExpensePresenter } from "@/infra/http/presenters/expense.presenter"
+import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { ExpensePresenter } from "../../infra/http/presenters/expense.presenter.js"
 import {
 	CreateExpenseDTO,
 	createExpenseSchema,
@@ -26,8 +26,8 @@ import {
 	queryExpenseSchema,
 	UpdateExpenseDTO,
 	updateExpenseSchema
-} from "./expense.dto"
-import { ExpenseService } from "./expense.service"
+} from "./expense.dto.js"
+import { ExpenseService } from "./expense.service.js"
 
 @Controller("expenses")
 export class ExpenseController {

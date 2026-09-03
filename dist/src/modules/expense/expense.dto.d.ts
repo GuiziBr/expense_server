@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Expense } from "../../domains/expense.domain";
+import { Expense } from "../../domains/expense.domain.js";
 export declare const createExpenseSchema: z.ZodObject<{
     description: z.ZodString;
     date: z.ZodCoercedDate<unknown>;

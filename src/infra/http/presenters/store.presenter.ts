@@ -1,5 +1,5 @@
-import { Store } from "@/domains/store.domain"
-import { StoreDTO } from "@/modules/store/store.dto"
+import { Store } from "../../../domains/store.domain.js"
+import { StoreDTO } from "../../../modules/store/store.dto.js"
 
 export class StorePresenter {
 	static toHttp(store: Store): StoreDTO {

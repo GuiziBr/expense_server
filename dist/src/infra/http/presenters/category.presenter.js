@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CategoryPresenter = void 0;
-class CategoryPresenter {
+export class CategoryPresenter {
     static toHttp(category) {
         return {
             id: category.id,
@@ -11,5 +8,4 @@ class CategoryPresenter {
         };
     }
 }
-exports.CategoryPresenter = CategoryPresenter;
 //# sourceMappingURL=category.presenter.js.map

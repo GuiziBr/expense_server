@@ -1,9 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
-import { Category } from "@/domains/category.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "../utils/appError"
-import { constants } from "../utils/constants"
+import { Category } from "../../domains/category.domain.js"
+import { DatabaseService } from "../../infra/database/database.service.js"
+import AppError from "../utils/appError.js"
+import { constants } from "../utils/constants.js"
 
 @Injectable()
 export class CategoryService {

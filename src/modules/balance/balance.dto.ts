@@ -3,8 +3,8 @@ import {
 	ConsolidatedReport,
 	ReportCategory,
 	ReportPayment
-} from "@/domains/balance.domain"
-import { GetExpensesRequest } from "../expense/expense.dto"
+} from "../../domains/balance.domain.js"
+import { GetExpensesRequest } from "../expense/expense.dto.js"
 
 export const queryBalanceSchema = z.object({
 	startDate: z.coerce.date(),

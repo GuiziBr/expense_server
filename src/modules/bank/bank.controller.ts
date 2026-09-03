@@ -10,8 +10,8 @@ import {
 	Post,
 	Query
 } from "@nestjs/common"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { BankPresenter } from "@/infra/http/presenters/bank.presenter"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { BankPresenter } from "../../infra/http/presenters/bank.presenter.js"
 import {
 	BankByIdDTO,
 	BankDTO,
@@ -20,8 +20,8 @@ import {
 	createBankSchema,
 	ListBankDTO,
 	listBanksSchema
-} from "./bank.dto"
-import { BankService } from "./bank.service"
+} from "./bank.dto.js"
+import { BankService } from "./bank.service.js"
 
 @Controller("banks")
 export class BankController {

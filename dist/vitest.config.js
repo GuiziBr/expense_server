@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const unplugin_swc_1 = require("unplugin-swc");
-const config_1 = require("vitest/config");
-const path_1 = require("path");
-exports.default = (0, config_1.defineConfig)({
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
+import { resolve } from 'path';
+export default defineConfig({
     test: {
         globals: true,
         root: './',
@@ -14,9 +12,9 @@ exports.default = (0, config_1.defineConfig)({
             reporter: ['text', 'json', 'html']
         }
     },
-    resolve: { alias: { '@': (0, path_1.resolve)(__dirname, './src') } },
+    resolve: { alias: { '@': resolve(__dirname, './src') } },
     plugins: [
-        unplugin_swc_1.default.vite({ module: { type: 'es6' } })
+        swc.vite({ module: { type: 'es6' } })
     ]
 });
 //# sourceMappingURL=vitest.config.js.map

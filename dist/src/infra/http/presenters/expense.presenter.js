@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExpensePresenter = void 0;
-class ExpensePresenter {
+export class ExpensePresenter {
     static toExpenseDTO(expense) {
         return {
             id: expense.id,
@@ -46,5 +43,4 @@ class ExpensePresenter {
         };
     }
 }
-exports.ExpensePresenter = ExpensePresenter;
 //# sourceMappingURL=expense.presenter.js.map

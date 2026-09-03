@@ -1,6 +1,6 @@
 import { JwtService } from "@nestjs/jwt";
-import { AuthenticatedUser } from "../../domains/authentication.domain";
-import { UserService } from "../user/user.service";
+import { AuthenticatedUser } from "../../domains/authentication.domain.js";
+import { UserService } from "../user/user.service.js";
 export declare class AuthService {
     private readonly userService;
     private readonly jwtService;

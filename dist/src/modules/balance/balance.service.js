@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,16 +8,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var BalanceService_1;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BalanceService = void 0;
-const common_1 = require("@nestjs/common");
-const date_fns_1 = require("date-fns");
-const expense_service_1 = require("../expense/expense.service");
-const appError_1 = require("../utils/appError");
+import { Injectable, Logger } from "@nestjs/common";
+import { endOfMonth } from "date-fns";
+import { ExpenseService } from "../expense/expense.service.js";
+import AppError from "../utils/appError.js";
 let BalanceService = BalanceService_1 = class BalanceService {
+    expensesService;
+    logger = new Logger(BalanceService_1.name);
     constructor(expensesService) {
         this.expensesService = expensesService;
-        this.logger = new common_1.Logger(BalanceService_1.name);
     }
     getBank(bank, amount) {
         return { id: bank.id, name: bank.name, total: amount };
@@ -64,13 +62,13 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting balance`);
-            throw new appError_1.default("Error getting balance", 500);
+            throw new AppError("Error getting balance", 500);
         }
     }
     async getConsolidatedBalance({ year, month, userId }) {
         try {
             const initialDate = new Date(year, month, 1);
-            const finalDate = (0, date_fns_1.endOfMonth)(initialDate);
+            const finalDate = endOfMonth(initialDate);
             const expenses = await this.expensesService.getExpensesByDateRange(false, initialDate, finalDate);
             const consolidatedReport = expenses.reduce((acc, expense) => {
                 const ownerIndex = acc.findIndex(({ ownerId }) => ownerId === expense.ownerId);
@@ -125,13 +123,13 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting consolidated balance`);
-            throw new appError_1.default("Error getting consolidated balance", 500);
+            throw new AppError("Error getting consolidated balance", 500);
         }
     }
 };
-exports.BalanceService = BalanceService;
-exports.BalanceService = BalanceService = BalanceService_1 = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [expense_service_1.ExpenseService])
+BalanceService = BalanceService_1 = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [ExpenseService])
 ], BalanceService);
+export { BalanceService };
 //# sourceMappingURL=balance.service.js.map

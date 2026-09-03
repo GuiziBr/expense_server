@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
-import { InfraModule } from "@/infra/infra.module"
-import { PaymentTypeController } from "./payment-type.controller"
-import { PaymentTypeService } from "./payment-type.service"
+import { InfraModule } from "../../infra/infra.module.js"
+import { PaymentTypeController } from "./payment-type.controller.js"
+import { PaymentTypeService } from "./payment-type.service.js"
 
 @Module({
 	imports: [InfraModule],

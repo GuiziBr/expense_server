@@ -10,8 +10,8 @@ import {
 	Post,
 	Query
 } from "@nestjs/common"
-import { ZodValidationPipe } from "@/infra/http/pipes/zod-validation-pipe"
-import { StorePresenter } from "@/infra/http/presenters/store.presenter"
+import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
+import { StorePresenter } from "../../infra/http/presenters/store.presenter.js"
 import {
 	CreateStoreDTO,
 	createStoreSchema,
@@ -20,8 +20,8 @@ import {
 	StoreByIdDTO,
 	StoreDTO,
 	storeByIdSchema
-} from "./store.dto"
-import { StoreService } from "./store.service"
+} from "./store.dto.js"
+import { StoreService } from "./store.service.js"
 
 @Controller("stores")
 export class StoreController {

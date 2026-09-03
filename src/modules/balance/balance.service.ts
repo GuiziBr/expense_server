@@ -5,16 +5,16 @@ import {
 	ReportBank,
 	ReportCategory,
 	ReportPayment
-} from "@/domains/balance.domain"
-import { Expense } from "@/domains/expense.domain"
-import { ExpenseService } from "../expense/expense.service"
-import AppError from "../utils/appError"
+} from "../../domains/balance.domain.js"
+import { Expense } from "../../domains/expense.domain.js"
+import { ExpenseService } from "../expense/expense.service.js"
+import AppError from "../utils/appError.js"
 import {
 	GetBalanceRequest,
 	GetBalanceResponse,
 	GetConsolidateBalanceRequest,
 	GetConsolidatedBalanceResponse
-} from "./balance.dto"
+} from "./balance.dto.js"
 
 @Injectable()
 export class BalanceService {

@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZodValidationPipe = void 0;
-const common_1 = require("@nestjs/common");
-const zod_1 = require("zod");
-const zod_validation_error_1 = require("zod-validation-error");
-const appError_1 = require("../../../modules/utils/appError");
-class ZodValidationPipe {
+import { BadRequestException } from "@nestjs/common";
+import { ZodError } from "zod";
+import { fromZodError } from "zod-validation-error";
+import AppError from "../../../modules/utils/appError.js";
+export class ZodValidationPipe {
+    schema;
     constructor(schema) {
         this.schema = schema;
     }
@@ -14,14 +12,13 @@ class ZodValidationPipe {
             return this.schema.parse(value, {});
         }
         catch (error) {
-            if (error instanceof zod_1.ZodError) {
-                const param = String((0, zod_validation_error_1.fromZodError)(error)?.details[0]?.path[0]);
-                const message = (0, zod_validation_error_1.fromZodError)(error)?.details[0]?.message;
-                throw new appError_1.default(`${param} ${message}`);
+            if (error instanceof ZodError) {
+                const param = String(fromZodError(error)?.details[0]?.path[0]);
+                const message = fromZodError(error)?.details[0]?.message;
+                throw new AppError(`${param} ${message}`);
             }
-            throw new common_1.BadRequestException("Validation Failed");
+            throw new BadRequestException("Validation Failed");
         }
     }
 }
-exports.ZodValidationPipe = ZodValidationPipe;
 //# sourceMappingURL=zod-validation-pipe.js.map
