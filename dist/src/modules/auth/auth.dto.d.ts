@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { User } from "@/domains/user.domain";
+import { User } from "../../domains/user.domain";
 export declare const loginSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;

@@ -1,5 +1,5 @@
-import { Expense } from "@/domains/expense.domain";
-import { DatabaseService } from "@/infra/database/database.service";
+import { Expense } from "../../domains/expense.domain";
+import { DatabaseService } from "../../infra/database/database.service";
 import { PaymentTypeService } from "../payment-type/payment-type.service";
 import { StatementPeriodService } from "../statement-period/statement-period.service";
 import { CreateExpenseDTO, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto";
