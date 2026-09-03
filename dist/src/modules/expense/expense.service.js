@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var ExpenseService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseService = void 0;
@@ -17,7 +20,7 @@ const date_fns_1 = require("date-fns");
 const database_service_1 = require("../../infra/database/database.service");
 const payment_type_service_1 = require("../payment-type/payment-type.service");
 const statement_period_service_1 = require("../statement-period/statement-period.service");
-const appError_1 = require("../utils/appError");
+const appError_1 = __importDefault(require("../utils/appError"));
 const constants_1 = require("../utils/constants");
 let ExpenseService = ExpenseService_1 = class ExpenseService {
     constructor(databaseService, paymentTypeService, statementPeriodService) {

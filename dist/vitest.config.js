@@ -1,6 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const unplugin_swc_1 = require("unplugin-swc");
+const unplugin_swc_1 = __importDefault(require("unplugin-swc"));
 const config_1 = require("vitest/config");
 const path_1 = require("path");
 exports.default = (0, config_1.defineConfig)({

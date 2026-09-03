@@ -8,13 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var UserService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const library_1 = require("@prisma/client/runtime/library");
 const database_service_1 = require("../../infra/database/database.service");
-const appError_1 = require("../utils/appError");
+const appError_1 = __importDefault(require("../utils/appError"));
 let UserService = UserService_1 = class UserService {
     constructor(databaseService) {
         this.databaseService = databaseService;
