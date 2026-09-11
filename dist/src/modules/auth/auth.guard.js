@@ -8,15 +8,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
-import { env } from "../../infra/env.js";
 import { IS_PUBLIC_KEY } from "./public.decorator.js";
 let AuthGuard = class AuthGuard {
     jwtService;
+    configService;
     reflector;
-    constructor(jwtService, reflector) {
+    constructor(jwtService, configService, reflector) {
         this.jwtService = jwtService;
+        this.configService = configService;
         this.reflector = reflector;
     }
     async canActivate(context) {
@@ -34,7 +36,7 @@ let AuthGuard = class AuthGuard {
         }
         try {
             const payload = await this.jwtService.verifyAsync(token, {
-                secret: env.JWT_SECRET
+                secret: this.configService.get("JWT_SECRET", { infer: true })
             });
             request.user = payload;
         }
@@ -51,6 +53,7 @@ let AuthGuard = class AuthGuard {
 AuthGuard = __decorate([
     Injectable(),
     __metadata("design:paramtypes", [JwtService,
+        ConfigService,
         Reflector])
 ], AuthGuard);
 export { AuthGuard };

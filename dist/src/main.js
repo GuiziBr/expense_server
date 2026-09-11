@@ -1,12 +1,14 @@
+import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module.js";
-import { env } from "./infra/env.js";
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
         exposedHeaders: ["X-Total-Count"]
     });
-    await app.listen(env.PORT);
+    const configService = app.get(ConfigService);
+    const port = configService.get("PORT", { infer: true });
+    await app.listen(port);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

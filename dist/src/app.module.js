@@ -5,6 +5,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { envSchema } from "./infra/env.js";
 import { InfraModule } from "./infra/infra.module.js";
 import { AuthModule } from "./modules/auth/auth.module.js";
 import { BalanceModule } from "./modules/balance/balance.module.js";
@@ -21,6 +23,10 @@ let AppModule = class AppModule {
 AppModule = __decorate([
     Module({
         imports: [
+            ConfigModule.forRoot({
+                validate: (env) => envSchema.parse(env),
+                isGlobal: true
+            }),
             InfraModule,
             HealthModule,
             AuthModule,
