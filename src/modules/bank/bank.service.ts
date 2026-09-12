@@ -11,6 +11,13 @@ export class BankService {
 
 	constructor(private readonly databaseService: DatabaseService) {}
 
+	/**
+	 * Fetches all non-deleted banks, ordered by name ascending.
+	 * @param offset - Number of records to skip, for pagination.
+	 * @param limit - Maximum number of records to return.
+	 * @returns The matching banks.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async getAll(offset?: number, limit?: number): Promise<Bank[]> {
 		try {
 			const banks = await this.databaseService.bank.findMany({
@@ -26,6 +33,12 @@ export class BankService {
 		}
 	}
 
+	/**
+	 * Fetches a single non-deleted bank by id.
+	 * @param id - The bank id.
+	 * @returns The bank, or null if none matches.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async getById(id: string): Promise<Bank | null> {
 		try {
 			const bank = await this.databaseService.bank.findUnique({
@@ -40,6 +53,14 @@ export class BankService {
 		}
 	}
 
+	/**
+	 * Creates a bank with the given name, or, if a bank with that name already
+	 * exists (including soft-deleted ones), updates it and clears `deletedAt`
+	 * to reactivate it.
+	 * @param name - The bank name; must be unique among active banks.
+	 * @returns The created or reactivated bank.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async create(name: string): Promise<Bank> {
 		try {
 			const bank = await this.databaseService.bank.upsert({
@@ -56,6 +77,18 @@ export class BankService {
 		}
 	}
 
+	/**
+	 * Updates a bank's name. If another active bank already has the requested
+	 * name, throws. If the requested name only exists on a soft-deleted bank,
+	 * that soft-deleted bank is renamed (freeing up the name) inside a
+	 * transaction while the target bank is renamed and reactivated.
+	 * @param id - Id of the bank to update.
+	 * @param name - The new name for the bank.
+	 * @returns The updated bank.
+	 * @throws AppError with status 404 if the bank does not exist, 400 if
+	 * another active bank already has that name, or 500 on unexpected errors
+	 * (including a unique constraint violation from the database).
+	 */
 	async update(id: string, name: string): Promise<Bank> {
 		try {
 			const [bank, sameNameBank] = await Promise.all([
@@ -113,6 +146,13 @@ export class BankService {
 		}
 	}
 
+	/**
+	 * Soft-deletes a bank by setting its `deletedAt` timestamp. Deleting a
+	 * bank that no longer exists is treated as a no-op rather than an error.
+	 * @param id - Id of the bank to delete.
+	 * @returns Nothing.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async delete(id: string): Promise<void> {
 		try {
 			await this.databaseService.bank.update({
