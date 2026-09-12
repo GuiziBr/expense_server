@@ -1,4 +1,6 @@
 import { Module } from "@nestjs/common"
+import { ConfigModule } from "@nestjs/config"
+import { envSchema } from "./infra/env.js"
 import { InfraModule } from "./infra/infra.module.js"
 import { AuthModule } from "./modules/auth/auth.module.js"
 import { BalanceModule } from "./modules/balance/balance.module.js"
@@ -13,6 +15,10 @@ import { UserModule } from "./modules/user/user.module.js"
 
 @Module({
 	imports: [
+		ConfigModule.forRoot({
+			validate: (env) => envSchema.parse(env),
+			isGlobal: true
+		}),
 		InfraModule,
 		HealthModule,
 		AuthModule,
