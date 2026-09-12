@@ -27,6 +27,11 @@ import { BankService } from "./bank.service.js"
 export class BankController {
 	constructor(private readonly bankService: BankService) {}
 
+	/**
+	 * Lists banks, ordered by name ascending, excluding soft-deleted records.
+	 * @param query - Optional pagination query, validated against `listBanksSchema` (`offset`, `limit`).
+	 * @returns The list of banks mapped to their HTTP representation.
+	 */
 	@Get()
 	async listBanks(
 		@Query(new ZodValidationPipe(listBanksSchema)) query?: ListBankDTO
@@ -36,6 +41,12 @@ export class BankController {
 		return banks.map(BankPresenter.toHttp)
 	}
 
+	/**
+	 * Retrieves a single bank by its id.
+	 * @param params - Route params validated against `bankByIdSchema` (`id`).
+	 * @returns The bank mapped to its HTTP representation.
+	 * @throws NotFoundException if no bank with the given id exists (or it was soft-deleted).
+	 */
 	@Get(":id")
 	async getBankById(
 		@Param(new ZodValidationPipe(bankByIdSchema)) params: BankByIdDTO
@@ -48,6 +59,11 @@ export class BankController {
 		return BankPresenter.toHttp(bank) || null
 	}
 
+	/**
+	 * Creates a new bank, or reactivates a soft-deleted bank with the same name.
+	 * @param body - Request body validated against `createBankSchema` (`name`).
+	 * @returns The created (or reactivated) bank mapped to its HTTP representation.
+	 */
 	@Post()
 	async createBank(
 		@Body(new ZodValidationPipe(createBankSchema)) body: CreateBankDTO
@@ -57,6 +73,14 @@ export class BankController {
 		return BankPresenter.toHttp(bank)
 	}
 
+	/**
+	 * Updates a bank's name.
+	 * @param params - Route params validated against `bankByIdSchema` (`id`).
+	 * @param body - Request body validated against `createBankSchema` (`name`).
+	 * @returns The updated bank mapped to its HTTP representation.
+	 * @throws AppError with status 404 if the bank does not exist, or 400 if another
+	 * active bank already uses the requested name.
+	 */
 	@Patch(":id")
 	async updateBank(
 		@Param(new ZodValidationPipe(bankByIdSchema)) params: BankByIdDTO,
@@ -68,6 +92,11 @@ export class BankController {
 		return BankPresenter.toHttp(bank)
 	}
 
+	/**
+	 * Soft-deletes a bank by setting its `deletedAt` timestamp.
+	 * @param params - Route params validated against `bankByIdSchema` (`id`).
+	 * @returns Nothing; responds with HTTP 204 on success.
+	 */
 	@HttpCode(204)
 	@Delete(":id")
 	async deleteBank(

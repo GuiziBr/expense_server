@@ -23,6 +23,16 @@ import { BalanceService } from "./balance.service.js"
 export class BalanceController {
 	constructor(private readonly balanceService: BalanceService) {}
 
+	/**
+	 * Retrieves the personal and shared balance for the currently
+	 * authenticated user, optionally filtered by date range and other
+	 * criteria. Requires an authenticated request (populated by
+	 * {@link CurrentUserInterceptor}). The query string is validated
+	 * against `queryBalanceSchema`.
+	 * @param request - The incoming request, from which the current `userId` is extracted.
+	 * @param query - Validated query parameters (date range and filters).
+	 * @returns The computed personal and shared balance.
+	 */
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get()
 	async getBalance(
@@ -38,6 +48,15 @@ export class BalanceController {
 		})
 	}
 
+	/**
+	 * Retrieves the consolidated balance report for a given year/month,
+	 * comparing the requesting user against their partner. Requires an
+	 * authenticated request (populated by {@link CurrentUserInterceptor}).
+	 * Route params are validated against `queryConsolidatedBalanceSchema`.
+	 * @param request - The incoming request, from which the current `userId` is extracted.
+	 * @param params - The route params, containing `year` and `month` (1-indexed month).
+	 * @returns The consolidated balance report, presented via {@link BalancePresenter}.
+	 */
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get("/consolidated/:year/:month")
 	async getConsolidatedBalance(

@@ -27,6 +27,11 @@ import { StoreService } from "./store.service.js"
 export class StoreController {
 	constructor(private readonly storeService: StoreService) {}
 
+	/**
+	 * Lists stores, ordered by name ascending, excluding soft-deleted records.
+	 * @param query - Optional pagination query, validated against `listStoresSchema` (`offset`, `limit`).
+	 * @returns The list of stores mapped to their HTTP representation.
+	 */
 	@Get()
 	async listStores(
 		@Query(new ZodValidationPipe(listStoresSchema)) query?: ListStoreDTO
@@ -36,6 +41,12 @@ export class StoreController {
 		return stores.map(StorePresenter.toHttp)
 	}
 
+	/**
+	 * Retrieves a single store by its id.
+	 * @param params - Route params validated against `storeByIdSchema` (`id`).
+	 * @returns The store mapped to its HTTP representation.
+	 * @throws NotFoundException if no store with the given id exists (or it was soft-deleted).
+	 */
 	@Get(":id")
 	async getStoreById(
 		@Param(new ZodValidationPipe(storeByIdSchema)) params: StoreByIdDTO
@@ -48,6 +59,11 @@ export class StoreController {
 		return StorePresenter.toHttp(store) || null
 	}
 
+	/**
+	 * Creates a new store, or reactivates a soft-deleted store with the same name.
+	 * @param body - Request body validated against `createStoreSchema` (`name`).
+	 * @returns The created (or reactivated) store mapped to its HTTP representation.
+	 */
 	@Post()
 	async createStore(
 		@Body(new ZodValidationPipe(createStoreSchema)) body: CreateStoreDTO
@@ -57,6 +73,14 @@ export class StoreController {
 		return StorePresenter.toHttp(store)
 	}
 
+	/**
+	 * Updates a store's name.
+	 * @param params - Route params validated against `storeByIdSchema` (`id`).
+	 * @param body - Request body validated against `createStoreSchema` (`name`).
+	 * @returns The updated store mapped to its HTTP representation.
+	 * @throws AppError with status 404 if the store does not exist, or 400 if
+	 * another active store already uses the requested name.
+	 */
 	@Patch(":id")
 	async updateStore(
 		@Param(new ZodValidationPipe(storeByIdSchema)) params: StoreByIdDTO,
@@ -68,6 +92,11 @@ export class StoreController {
 		return StorePresenter.toHttp(store)
 	}
 
+	/**
+	 * Soft-deletes a store by setting its `deletedAt` timestamp.
+	 * @param params - Route params validated against `storeByIdSchema` (`id`).
+	 * @returns Nothing; responds with HTTP 204 on success.
+	 */
 	@HttpCode(204)
 	@Delete(":id")
 	async deleteStore(

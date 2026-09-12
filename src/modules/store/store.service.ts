@@ -11,6 +11,13 @@ export class StoreService {
 
 	constructor(private readonly databaseService: DatabaseService) {}
 
+	/**
+	 * Fetches all non-deleted stores, ordered by name ascending.
+	 * @param offset - Number of records to skip, for pagination.
+	 * @param limit - Maximum number of records to return.
+	 * @returns The matching stores.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async getAll(offset?: number, limit?: number): Promise<Store[]> {
 		try {
 			const stores = await this.databaseService.store.findMany({
@@ -28,6 +35,12 @@ export class StoreService {
 		}
 	}
 
+	/**
+	 * Fetches a single non-deleted store by id.
+	 * @param id - The store id.
+	 * @returns The store, or null if none matches.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async getById(id: string): Promise<Store | null> {
 		try {
 			const store = await this.databaseService.store.findUnique({
@@ -42,6 +55,14 @@ export class StoreService {
 		}
 	}
 
+	/**
+	 * Creates a store with the given name, or, if a store with that name
+	 * already exists (including soft-deleted ones), updates it and clears
+	 * `deletedAt` to reactivate it.
+	 * @param name - The store name; must be unique among active stores.
+	 * @returns The created or reactivated store.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async create(name: string): Promise<Store> {
 		try {
 			const store = await this.databaseService.store.upsert({
@@ -58,6 +79,17 @@ export class StoreService {
 		}
 	}
 
+	/**
+	 * Updates a store's name. If another active store already has the
+	 * requested name, throws. If the requested name only exists on a
+	 * soft-deleted store, that soft-deleted store is deleted and the target
+	 * store is renamed and reactivated via {@link reactivateStore}.
+	 * @param id - Id of the store to update.
+	 * @param name - The new name for the store.
+	 * @returns The updated store.
+	 * @throws AppError with status 404 if the store does not exist, 400 if
+	 * another active store already has that name, or 500 on unexpected errors.
+	 */
 	async update(id: string, name: string): Promise<Store> {
 		try {
 			const [store, sameNameStore] = await Promise.all([
@@ -99,6 +131,13 @@ export class StoreService {
 		}
 	}
 
+	/**
+	 * Soft-deletes a store by setting its `deletedAt` timestamp. Deleting a
+	 * store that no longer exists is treated as a no-op rather than an error.
+	 * @param id - Id of the store to delete.
+	 * @returns Nothing.
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	async delete(id: string): Promise<void> {
 		try {
 			await this.databaseService.store.update({
@@ -119,6 +158,18 @@ export class StoreService {
 		}
 	}
 
+	/**
+	 * Soft-deletes the store identified by `storeIdToDelete` and, concurrently,
+	 * reactivates (clears `deletedAt` on) the store identified by
+	 * `storeIdToRestore`, which already holds the desired name. Used by
+	 * {@link update} when the requested name belongs to a soft-deleted store:
+	 * the store originally being updated is retired and the soft-deleted one
+	 * bearing that name is restored in its place.
+	 * @param storeIdToDelete - Id of the store to soft-delete.
+	 * @param storeIdToRestore - Id of the soft-deleted store to reactivate.
+	 * @returns The reactivated store (previously identified by `storeIdToRestore`).
+	 * @throws AppError with status 500 on unexpected database errors.
+	 */
 	private async reactivateStore(
 		storeIdToDelete: string,
 		storeIdToRestore: string

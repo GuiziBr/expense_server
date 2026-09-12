@@ -11,6 +11,15 @@ export class AuthService {
 		private readonly jwtService: JwtService
 	) {}
 
+	/**
+	 * Validates user credentials and issues a signed JWT for the session.
+	 * Looks up the user by email, compares the given password against the stored
+	 * bcrypt hash, and signs a JWT payload containing the user's id and email.
+	 * @param email - The email address of the user attempting to sign in.
+	 * @param pass - The plain-text password to verify against the stored hash.
+	 * @returns The authenticated user along with a signed JWT access token.
+	 * @throws UnauthorizedException if no user is found for the given email, or if the password does not match.
+	 */
 	async signIn(email: string, pass: string): Promise<AuthenticatedUser> {
 		const user = await this.userService.findUserByEmail(email)
 
