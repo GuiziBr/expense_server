@@ -10,6 +10,12 @@ export class UserService {
 
 	constructor(private readonly databaseService: DatabaseService) {}
 
+	/**
+	 * Finds a user by their email address.
+	 * @param email - The email address to search for.
+	 * @returns The matching {@link User}, or `null` if none is found.
+	 * @throws {AppError} With status 500 if the database lookup fails.
+	 */
 	async findUserByEmail(email: string): Promise<User> {
 		try {
 			const user = await this.databaseService.user.findUnique({
@@ -22,6 +28,15 @@ export class UserService {
 		}
 	}
 
+	/**
+	 * Updates the avatar URL for a given user.
+	 * @param userId - The id of the user to update.
+	 * @param avatar - The new avatar value to persist.
+	 * @returns A promise that resolves once the update completes.
+	 * @throws {AppError} With status 400 if the update fails due to a known
+	 * database constraint (e.g. the user does not exist), or status 500 for
+	 * any other unexpected error.
+	 */
 	async updateUserAvatar(userId: string, avatar: string): Promise<void> {
 		try {
 			await this.databaseService.user.update({

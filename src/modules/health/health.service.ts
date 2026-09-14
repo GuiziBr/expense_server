@@ -6,6 +6,12 @@ export class HealthService {
 	private readonly logger = new Logger(HealthService.name)
 	constructor(private readonly databaseService: DatabaseService) {}
 
+	/**
+	 * Checks whether the service and its database connection are healthy
+	 * by executing a trivial query.
+	 * @returns `true` if the database responds successfully.
+	 * @throws {ServiceUnavailableException} If the database query fails.
+	 */
 	async isHealthy(): Promise<boolean> {
 		try {
 			await this.databaseService.$queryRaw`SELECT 1`

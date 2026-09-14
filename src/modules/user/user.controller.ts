@@ -15,6 +15,14 @@ import { UserService } from "./user.service.js"
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
+	/**
+	 * Updates the avatar of the currently authenticated user.
+	 * Requires an authenticated request (populated by {@link CurrentUserInterceptor}).
+	 * The request body is validated against `updateUserAvatarSchema`.
+	 * @param request - The incoming request, from which the current `userId` is extracted.
+	 * @param body - The request body, containing the new `avatar` value.
+	 * @returns A promise that resolves once the avatar has been updated.
+	 */
 	@UseInterceptors(CurrentUserInterceptor)
 	@UsePipes(new ZodValidationPipe(updateUserAvatarSchema))
 	@Patch("avatar")

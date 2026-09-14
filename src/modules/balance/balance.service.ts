@@ -22,6 +22,12 @@ export class BalanceService {
 
 	constructor(private readonly expensesService: ExpenseService) {}
 
+	/**
+	 * Builds a bank report entry with the given total amount.
+	 * @param bank - The bank's id and name.
+	 * @param amount - The total amount to attribute to the bank.
+	 * @returns A {@link ReportBank} entry.
+	 */
 	private getBank(
 		bank: { id: string; name: string },
 		amount: number
@@ -29,6 +35,12 @@ export class BalanceService {
 		return { id: bank.id, name: bank.name, total: amount }
 	}
 
+	/**
+	 * Builds a payment type report entry for a single expense, seeded with
+	 * that expense's bank as its only bank entry.
+	 * @param expense - The expense to derive the payment entry from.
+	 * @returns A {@link ReportPayment} entry.
+	 */
 	private getPayment(expense: Expense): ReportPayment {
 		return {
 			id: expense.paymentTypeId,
@@ -38,6 +50,11 @@ export class BalanceService {
 		}
 	}
 
+	/**
+	 * Builds a category report entry for a single expense.
+	 * @param expense - The expense to derive the category entry from.
+	 * @returns A {@link ReportCategory} entry.
+	 */
 	private getCategory(expense: Expense): ReportCategory {
 		return {
 			id: expense.categoryId,
@@ -46,6 +63,14 @@ export class BalanceService {
 		}
 	}
 
+	/**
+	 * Computes the personal balance (sum of the owner's personal expenses)
+	 * and the shared balance (net of what the owner is paying vs. owed)
+	 * for the given owner and date/filter criteria.
+	 * @param data - The owner id, date range, and optional filter criteria.
+	 * @returns The computed personal and shared balances.
+	 * @throws {AppError} With status 500 if the underlying expense queries fail.
+	 */
 	async getBalance(data: GetBalanceRequest): Promise<GetBalanceResponse> {
 		try {
 			const [{ expenses: personalExpenses }, { expenses: sharedExpenses }] =
@@ -84,6 +109,15 @@ export class BalanceService {
 		}
 	}
 
+	/**
+	 * Builds a consolidated balance report for a given month/year across all
+	 * shared expenses, grouping totals by owner, payment type/bank, and
+	 * category, then splits the result into the requesting user's balance
+	 * versus their partner's.
+	 * @param request - The target `year`, zero-indexed `month`, and requesting `userId`.
+	 * @returns The consolidated report along with the requester's and partner's balances.
+	 * @throws {AppError} With status 500 if the underlying expense query or aggregation fails.
+	 */
 	async getConsolidatedBalance({
 		year,
 		month,

@@ -27,6 +27,11 @@ import { PaymentTypeService } from "./payment-type.service.js"
 export class PaymentTypeController {
 	constructor(private readonly paymentTypeService: PaymentTypeService) {}
 
+	/**
+	 * Lists payment types, optionally paginated.
+	 * @param query - Validated query params containing `offset` and `limit` for pagination.
+	 * @returns The list of payment types mapped to their HTTP representation.
+	 */
 	@Get()
 	async listPaymentTypes(
 		@Query(new ZodValidationPipe(listPaymentTypesSchema))
@@ -37,6 +42,12 @@ export class PaymentTypeController {
 		return paymentTypes.map(PaymentTypePresenter.toHttp)
 	}
 
+	/**
+	 * Retrieves a single payment type by its id.
+	 * @param params - Validated route params containing the payment type `id`.
+	 * @returns The payment type mapped to its HTTP representation.
+	 * @throws {NotFoundException} When no payment type exists with the given id.
+	 */
 	@Get(":id")
 	async getPaymentTypeById(
 		@Param(new ZodValidationPipe(paymentTypeByIdSchema))
@@ -50,6 +61,12 @@ export class PaymentTypeController {
 		return PaymentTypePresenter.toHttp(paymentType) || null
 	}
 
+	/**
+	 * Creates a new payment type, or reactivates a soft-deleted one with the same
+	 * description.
+	 * @param body - Validated request body containing `description` and `hasStatement`.
+	 * @returns The created (or reactivated) payment type mapped to its HTTP representation.
+	 */
 	@Post()
 	async createPaymentType(
 		@Body(new ZodValidationPipe(createPaymentTypeSchema))
@@ -63,6 +80,14 @@ export class PaymentTypeController {
 		return PaymentTypePresenter.toHttp(paymentType)
 	}
 
+	/**
+	 * Updates an existing payment type's description and/or `hasStatement` flag.
+	 * @param params - Validated route params containing the payment type `id`.
+	 * @param body - Validated request body containing the new `description` and `hasStatement`.
+	 * @returns The updated payment type mapped to its HTTP representation.
+	 * @throws {AppError} With status 404 if the payment type is not found, or 400 if
+	 * another active payment type already has the same description.
+	 */
 	@Patch(":id")
 	async updatePaymentType(
 		@Param(new ZodValidationPipe(paymentTypeByIdSchema))
@@ -80,6 +105,11 @@ export class PaymentTypeController {
 		return PaymentTypePresenter.toHttp(paymentType)
 	}
 
+	/**
+	 * Soft-deletes a payment type by id, responding with 204 No Content.
+	 * @param params - Validated route params containing the payment type `id`.
+	 * @returns Nothing on success; deleting a non-existent payment type is a no-op.
+	 */
 	@HttpCode(204)
 	@Delete(":id")
 	async deletePaymentType(

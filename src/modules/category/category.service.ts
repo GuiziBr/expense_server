@@ -11,6 +11,13 @@ export class CategoryService {
 
 	constructor(private readonly databaseService: DatabaseService) {}
 
+	/**
+	 * Retrieves all non-deleted categories, ordered by description ascending.
+	 * @param offset - Number of records to skip, for pagination.
+	 * @param limit - Maximum number of records to return.
+	 * @returns The list of matching categories.
+	 * @throws {AppError} With status 500 if the query fails.
+	 */
 	async getAll(offset?: number, limit?: number): Promise<Category[]> {
 		try {
 			const categories = await this.databaseService.category.findMany({
@@ -28,6 +35,12 @@ export class CategoryService {
 		}
 	}
 
+	/**
+	 * Retrieves a single non-deleted category by its id.
+	 * @param id - The category id to look up.
+	 * @returns The matching category, or `null` if none is found.
+	 * @throws {AppError} With status 500 if the query fails.
+	 */
 	async getById(id: string): Promise<Category | null> {
 		try {
 			const category = await this.databaseService.category.findUnique({
@@ -42,6 +55,13 @@ export class CategoryService {
 		}
 	}
 
+	/**
+	 * Creates a category with the given description, or, if a soft-deleted category
+	 * with the same description already exists, reactivates it (upsert on `description`).
+	 * @param description - The category description; must be unique among active categories.
+	 * @returns The created or reactivated category.
+	 * @throws {AppError} With status 500 if the operation fails.
+	 */
 	async create(description: string): Promise<Category> {
 		try {
 			const category = await this.databaseService.category.upsert({
@@ -58,6 +78,17 @@ export class CategoryService {
 		}
 	}
 
+	/**
+	 * Updates a category's description. If another category already has the target
+	 * description, the update is only allowed when that other category is soft-deleted,
+	 * in which case this category is soft-deleted and the other one is reactivated
+	 * with the new description via {@link reactivateCategory}.
+	 * @param id - The id of the category to update.
+	 * @param description - The new description to apply.
+	 * @returns The updated (or reactivated) category.
+	 * @throws {AppError} With status 404 if the category is not found, or 400 if an
+	 * active category already has the same description; 500 on unexpected errors.
+	 */
 	async update(id: string, description: string): Promise<Category> {
 		try {
 			const [category, sameDescriptionCategory] = await Promise.all([
@@ -110,6 +141,14 @@ export class CategoryService {
 		}
 	}
 
+	/**
+	 * Soft-deletes a category by setting its `deletedAt` timestamp.
+	 * Deleting a category that does not exist is treated as a no-op rather than an error.
+	 * @param id - The id of the category to delete.
+	 * @returns Nothing.
+	 * @throws {AppError} With status 500 if the operation fails for a reason other than
+	 * the record not existing.
+	 */
 	async delete(id: string): Promise<void> {
 		try {
 			await this.databaseService.category.update({
@@ -130,6 +169,15 @@ export class CategoryService {
 		}
 	}
 
+	/**
+	 * Swaps the soft-delete state of two categories: soft-deletes `categoryIdToDelete`
+	 * and reactivates `categoryIdToRestore` (clearing its `deletedAt`), used when
+	 * updating a category's description to match a previously soft-deleted one.
+	 * @param categoryIdToDelete - The id of the category to soft-delete.
+	 * @param categoryIdToRestore - The id of the soft-deleted category to reactivate.
+	 * @returns The reactivated category.
+	 * @throws {AppError} With status 500 if the operation fails.
+	 */
 	private async reactivateCategory(
 		categoryIdToDelete: string,
 		categoryIdToRestore: string

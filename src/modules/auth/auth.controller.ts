@@ -9,6 +9,15 @@ import { Public } from "./public.decorator.js"
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
+	/**
+	 * Authenticates a user with email and password and returns a signed JWT session.
+	 * Marked with `@Public()`, so this endpoint bypasses the global authentication guard.
+	 * The request body is validated against `loginSchema` via `ZodValidationPipe` before
+	 * this handler runs, and will short-circuit with a validation error for malformed input.
+	 * @param body - The login payload, containing `email` and `password`.
+	 * @returns The authenticated user data together with the issued access token, shaped by `AuthenticatedUserPresenter`.
+	 * @throws UnauthorizedException if the email is not found or the password does not match.
+	 */
 	@Public()
 	@Post()
 	@UsePipes(new ZodValidationPipe(loginSchema))
