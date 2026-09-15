@@ -1,7 +1,6 @@
-import { ExecutionContext, Logger } from "@nestjs/common"
+import { ExecutionContext, Logger, NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "@/modules/utils/appError"
 import { CurrentUserInterceptor } from "./current-user.interceptor"
 
 describe("CurrentUserInterceptor", () => {
@@ -53,9 +52,9 @@ describe("CurrentUserInterceptor", () => {
 		it("should throw error if user not found", async () => {
 			vi.spyOn(databaseService.user, "findUnique").mockResolvedValue(null)
 
-			await expect(
-				interceptor.intercept(mockContext, next)
-			).rejects.toThrowError(AppError)
+			await expect(interceptor.intercept(mockContext, next)).rejects.toThrow(
+				new NotFoundException("User not found")
+			)
 
 			expect(loggerSpy).toBeCalledWith("Error - User not found - user_id")
 

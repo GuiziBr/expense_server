@@ -8,10 +8,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var StoreService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { DatabaseService } from "../../infra/database/database.service.js";
-import AppError from "../utils/appError.js";
 import { constants } from "../utils/constants.js";
 let StoreService = StoreService_1 = class StoreService {
     databaseService;
@@ -31,7 +30,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all stores`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async getById(id) {
@@ -43,7 +42,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting store by id ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async create(name) {
@@ -57,7 +56,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating store ${name}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async update(id, name) {
@@ -68,7 +67,7 @@ let StoreService = StoreService_1 = class StoreService {
             ]);
             if (!store) {
                 this.logger.error(`Store ${id} not found`);
-                throw new AppError("Store not found", 404);
+                throw new NotFoundException("Store not found");
             }
             if ((store && !sameNameStore) || sameNameStore?.id === id) {
                 const updatedStore = await this.databaseService.store.update({
@@ -80,18 +79,18 @@ let StoreService = StoreService_1 = class StoreService {
             if (sameNameStore) {
                 if (!sameNameStore?.deletedAt) {
                     this.logger.error(`Store with name "${name}" already exists`);
-                    throw new AppError("There is already a store with same name", 400);
+                    throw new BadRequestException("There is already a store with same name");
                 }
             }
             const reactivatedStore = await this.reactivateStore(id, sameNameStore.id);
             return reactivatedStore;
         }
         catch (error) {
-            if (error instanceof AppError) {
+            if (error instanceof HttpException) {
                 throw error;
             }
             this.logger.error(`Error - ${error.message || error} - updating store ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async delete(id) {
@@ -107,7 +106,7 @@ let StoreService = StoreService_1 = class StoreService {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting store ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async reactivateStore(storeIdToDelete, storeIdToRestore) {
@@ -123,7 +122,7 @@ let StoreService = StoreService_1 = class StoreService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - reactivating store ${storeIdToDelete}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
 };

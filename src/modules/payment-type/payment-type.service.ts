@@ -1,8 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	HttpException,
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { PaymentType } from "../../domains/payment-type.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 import { constants } from "../utils/constants.js"
 
 @Injectable()
@@ -15,7 +21,7 @@ export class PaymentTypeService {
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
 	 * @returns The list of matching payment types.
-	 * @throws {AppError} With status 500 if the query fails.
+	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getAll(offset?: number, limit?: number): Promise<PaymentType[]> {
 		try {
@@ -30,7 +36,7 @@ export class PaymentTypeService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting all payment types`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -38,7 +44,7 @@ export class PaymentTypeService {
 	 * Retrieves a single non-deleted payment type by its id.
 	 * @param id - The payment type id to look up.
 	 * @returns The matching payment type, or `null` if none is found.
-	 * @throws {AppError} With status 500 if the query fails.
+	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getById(id: string): Promise<PaymentType | null> {
 		try {
@@ -50,7 +56,7 @@ export class PaymentTypeService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting payment type by id ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -61,7 +67,7 @@ export class PaymentTypeService {
 	 * @param description - The payment type description; must be unique among active payment types.
 	 * @param hasStatement - Whether this payment type produces a statement.
 	 * @returns The created or reactivated payment type.
-	 * @throws {AppError} With status 500 if the operation fails.
+	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
 	async create(
 		description: string,
@@ -78,7 +84,7 @@ export class PaymentTypeService {
 			this.logger.error(
 				`Error - ${error.message || error} - creating payment type ${description}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -95,8 +101,9 @@ export class PaymentTypeService {
 	 * (implicit `undefined`) when the description collides with an active payment type
 	 * whose id differs and is not soft-deleted, since the thrown error path is only
 	 * reached inside the reactivation branch.
-	 * @throws {AppError} With status 404 if the payment type is not found, or 400 if an
-	 * active payment type already has the same description; 500 on unexpected errors.
+	 * @throws {NotFoundException} If the payment type is not found.
+	 * @throws {BadRequestException} If an active payment type already has the same description.
+	 * @throws {InternalServerErrorException} On unexpected errors.
 	 */
 	async update(
 		id: string,
@@ -113,7 +120,7 @@ export class PaymentTypeService {
 
 			if (!paymentType) {
 				this.logger.error(`Payment type ${id} not found`)
-				throw new AppError("Payment type not found", 404)
+				throw new NotFoundException("Payment type not found")
 			}
 
 			if (
@@ -133,9 +140,8 @@ export class PaymentTypeService {
 					this.logger.error(
 						`Payment type with description "${description}" already exists`
 					)
-					throw new AppError(
-						"There is already a payment type with same description",
-						400
+					throw new BadRequestException(
+						"There is already a payment type with same description"
 					)
 				}
 				const reactivatedPaymentType = await this.reactivatePaymentType(
@@ -145,13 +151,13 @@ export class PaymentTypeService {
 				return reactivatedPaymentType
 			}
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 			this.logger.error(
 				`Error - ${error.message || error} - updating payment type ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -160,7 +166,7 @@ export class PaymentTypeService {
 	 * Deleting a payment type that does not exist is treated as a no-op rather than an error.
 	 * @param id - The id of the payment type to delete.
 	 * @returns Nothing.
-	 * @throws {AppError} With status 500 if the operation fails for a reason other than
+	 * @throws {InternalServerErrorException} If the operation fails for a reason other than
 	 * the record not existing.
 	 */
 	async delete(id: string): Promise<void> {
@@ -179,7 +185,7 @@ export class PaymentTypeService {
 			this.logger.error(
 				`Error - ${error.message || error} - deleting payment type ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -191,7 +197,7 @@ export class PaymentTypeService {
 	 * @param paymentTypeIdToDelete - The id of the payment type to soft-delete.
 	 * @param paymentTypeIdToRestore - The id of the soft-deleted payment type to reactivate.
 	 * @returns The reactivated payment type.
-	 * @throws {AppError} With status 500 if the operation fails.
+	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
 	private async reactivatePaymentType(
 		paymentTypeIdToDelete: string,
@@ -210,7 +216,7 @@ export class PaymentTypeService {
 			this.logger.error(
 				`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }

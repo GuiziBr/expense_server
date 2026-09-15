@@ -1,4 +1,12 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	ForbiddenException,
+	HttpException,
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import {
 	addMonths,
@@ -12,7 +20,6 @@ import { Expense } from "../../domains/expense.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { PaymentTypeService } from "../payment-type/payment-type.service.js"
 import { StatementPeriodService } from "../statement-period/statement-period.service.js"
-import AppError from "../utils/appError.js"
 import { constants } from "../utils/constants.js"
 import {
 	CreateExpenseDTO,
@@ -93,8 +100,8 @@ export class ExpenseService {
 	 * @param currentMonth - When true and the payment type has no statement, use the
 	 * transaction's own month instead of the following month.
 	 * @returns The calculated due date.
-	 * @throws AppError if the payment type has a statement but no `bankId` was provided.
-	 * @throws AppError if no statement period is found for the given user/bank/payment type.
+	 * @throws {BadRequestException} If the payment type has a statement but no `bankId` was provided.
+	 * @throws {BadRequestException} If no statement period is found for the given user/bank/payment type.
 	 */
 	private async calculateDueDate(
 		transactionDate: Date,
@@ -113,7 +120,7 @@ export class ExpenseService {
 		}
 
 		if (paymentType?.hasStatement && !bankId) {
-			throw new AppError("This payment type must have a bank")
+			throw new BadRequestException("This payment type must have a bank")
 		}
 
 		const statementPeriod = await this.statementPeriodService.findByUserAndBank(
@@ -123,7 +130,7 @@ export class ExpenseService {
 		)
 
 		if (!statementPeriod) {
-			throw new AppError(
+			throw new BadRequestException(
 				"No statement period for provided payment type and bank was found"
 			)
 		}
@@ -149,18 +156,18 @@ export class ExpenseService {
 	 * @param userId - ID of the user who will own the expense.
 	 * @returns The newly created expense, with its related category, payment type,
 	 * bank, store, and user included.
-	 * @throws AppError with status 400 if `data.date` is in the future.
-	 * @throws AppError with status 400 if a referenced foreign key (category, payment
+	 * @throws {BadRequestException} If `data.date` is in the future.
+	 * @throws {BadRequestException} If a referenced foreign key (category, payment
 	 * type, bank, or store) does not exist, or if the expense violates the unique
 	 * constraint for duplicated expenses.
-	 * @throws AppError with status 500 on any other unexpected database error.
+	 * @throws {InternalServerErrorException} On any other unexpected database error.
 	 */
 	async createExpense(
 		data: CreateExpenseDTO,
 		userId: string
 	): Promise<Expense> {
 		if (isFuture(data.date))
-			throw new AppError("Date must not be in the future", 400)
+			throw new BadRequestException("Date must not be in the future")
 
 		try {
 			const netAmount = this.calculateNetAmount(
@@ -201,7 +208,7 @@ export class ExpenseService {
 
 			return expense
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 
@@ -212,12 +219,11 @@ export class ExpenseService {
 					const fieldName = dbField.split("_")[1]
 					const errorMessage = constants.foreignKeyMessages[fieldName]
 
-					throw new AppError(errorMessage, 400)
+					throw new BadRequestException(errorMessage)
 				}
 				if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
-					throw new AppError(
-						constants.uniqueConstraintMessages.duplicatedExpenses,
-						400
+					throw new BadRequestException(
+						constants.uniqueConstraintMessages.duplicatedExpenses
 					)
 				}
 			}
@@ -225,7 +231,7 @@ export class ExpenseService {
 			this.logger.error(
 				`Error - ${error instanceof Error ? error.message : error} - creating expense`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -238,13 +244,13 @@ export class ExpenseService {
 	 * @param userId - ID of the user performing the update; must be the expense owner.
 	 * @returns The updated expense, with its related category, payment type, bank,
 	 * store, and user included.
-	 * @throws AppError with status 404 if the expense does not exist (or is deleted,
+	 * @throws {NotFoundException} If the expense does not exist (or is deleted,
 	 * including if deleted between the initial check and the transaction).
-	 * @throws AppError with status 403 if `userId` is not the expense's owner.
-	 * @throws AppError with status 400 if `data.date` is in the future.
-	 * @throws AppError with status 400 if a referenced foreign key does not exist, or
+	 * @throws {ForbiddenException} If `userId` is not the expense's owner.
+	 * @throws {BadRequestException} If `data.date` is in the future.
+	 * @throws {BadRequestException} If a referenced foreign key does not exist, or
 	 * if the update violates the unique constraint for duplicated expenses.
-	 * @throws AppError with status 500 on any other unexpected database error.
+	 * @throws {InternalServerErrorException} On any other unexpected database error.
 	 */
 	async updateExpense(
 		id: string,
@@ -257,15 +263,15 @@ export class ExpenseService {
 			})
 
 			if (!expense) {
-				throw new AppError("Expense not found", 404)
+				throw new NotFoundException("Expense not found")
 			}
 
 			if (expense.ownerId !== userId) {
-				throw new AppError("Unauthorized", 403)
+				throw new ForbiddenException("Unauthorized")
 			}
 
 			if (isFuture(data.date)) {
-				throw new AppError("Date must not be in the future", 400)
+				throw new BadRequestException("Date must not be in the future")
 			}
 
 			const netAmount = this.calculateNetAmount(
@@ -288,7 +294,7 @@ export class ExpenseService {
 					})
 
 					if (!current) {
-						throw new AppError("Expense not found", 404)
+						throw new NotFoundException("Expense not found")
 					}
 
 					return tx.expense.update({
@@ -318,7 +324,7 @@ export class ExpenseService {
 
 			return updateExpense
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 
@@ -329,12 +335,11 @@ export class ExpenseService {
 					const fieldName = dbField.split("_")[1]
 					const errorMessage = constants.foreignKeyMessages[fieldName]
 
-					throw new AppError(errorMessage, 400)
+					throw new BadRequestException(errorMessage)
 				}
 				if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
-					throw new AppError(
-						constants.uniqueConstraintMessages.duplicatedExpenses,
-						400
+					throw new BadRequestException(
+						constants.uniqueConstraintMessages.duplicatedExpenses
 					)
 				}
 			}
@@ -342,7 +347,7 @@ export class ExpenseService {
 			this.logger.error(
 				`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -352,9 +357,9 @@ export class ExpenseService {
 	 * @param id - ID of the expense to delete.
 	 * @param userId - ID of the user performing the deletion; must be the expense owner.
 	 * @returns Nothing on success.
-	 * @throws AppError with status 404 if the expense does not exist.
-	 * @throws AppError with status 403 if `userId` is not the expense's owner.
-	 * @throws AppError with status 500 on any unexpected database error other than
+	 * @throws {NotFoundException} If the expense does not exist.
+	 * @throws {ForbiddenException} If `userId` is not the expense's owner.
+	 * @throws {InternalServerErrorException} On any unexpected database error other than
 	 * a "record not found" error, which is treated as an already-deleted no-op.
 	 */
 	async deleteExpense(id: string, userId: string): Promise<void> {
@@ -363,11 +368,11 @@ export class ExpenseService {
 		})
 
 		if (!expense) {
-			throw new AppError("Expense not found", 404)
+			throw new NotFoundException("Expense not found")
 		}
 
 		if (expense.ownerId !== userId) {
-			throw new AppError("Unauthorized", 403)
+			throw new ForbiddenException("Unauthorized")
 		}
 
 		try {
@@ -385,7 +390,7 @@ export class ExpenseService {
 			this.logger.error(
 				`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 

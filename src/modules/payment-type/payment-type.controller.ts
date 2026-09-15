@@ -85,8 +85,8 @@ export class PaymentTypeController {
 	 * @param params - Validated route params containing the payment type `id`.
 	 * @param body - Validated request body containing the new `description` and `hasStatement`.
 	 * @returns The updated payment type mapped to its HTTP representation.
-	 * @throws {AppError} With status 404 if the payment type is not found, or 400 if
-	 * another active payment type already has the same description.
+	 * @throws {NotFoundException} If the payment type is not found.
+	 * @throws {BadRequestException} If another active payment type already has the same description.
 	 */
 	@Patch(":id")
 	async updatePaymentType(

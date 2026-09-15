@@ -1,7 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger
+} from "@nestjs/common"
 import { StatementPeriod } from "../../domains/statement-period.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 
 @Injectable()
 export class StatementPeriodService {
@@ -16,7 +19,7 @@ export class StatementPeriodService {
 	 * @param bankId - The id of the bank.
 	 * @param paymentTypeId - The id of the payment type.
 	 * @returns The matching {@link StatementPeriod}, or `null` if none is found.
-	 * @throws {AppError} With status 500 if the database lookup fails.
+	 * @throws {InternalServerErrorException} If the database lookup fails.
 	 */
 	async findByUserAndBank(
 		userId: string,
@@ -37,7 +40,7 @@ export class StatementPeriodService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting statement period`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }

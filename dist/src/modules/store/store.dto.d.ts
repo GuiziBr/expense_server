@@ -11,7 +11,7 @@ export declare const listStoresSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type ListStoreDTO = z.infer<typeof listStoresSchema>;
 export declare const storeByIdSchema: z.ZodObject<{
-    id: z.ZodString;
+    id: z.ZodUUID;
 }, z.core.$strip>;
 export type StoreByIdDTO = z.infer<typeof storeByIdSchema>;
 export declare const createStoreSchema: z.ZodObject<{

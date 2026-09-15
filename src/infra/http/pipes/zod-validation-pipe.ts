@@ -1,7 +1,6 @@
 import { BadRequestException, PipeTransform } from "@nestjs/common"
 import { ZodError, ZodSchema } from "zod"
 import { fromZodError } from "zod-validation-error"
-import AppError from "../../../modules/utils/appError.js"
 
 export class ZodValidationPipe implements PipeTransform {
 	constructor(private schema: ZodSchema) {}
@@ -13,7 +12,7 @@ export class ZodValidationPipe implements PipeTransform {
 			if (error instanceof ZodError) {
 				const param = String(fromZodError(error)?.details[0]?.path[0])
 				const message = fromZodError(error)?.details[0]?.message
-				throw new AppError(`${param} ${message}`)
+				throw new BadRequestException(`${param} ${message}`)
 			}
 			throw new BadRequestException("Validation Failed")
 		}

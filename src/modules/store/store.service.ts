@@ -1,8 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	HttpException,
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Store } from "../../domains/store.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 import { constants } from "../utils/constants.js"
 
 @Injectable()
@@ -16,7 +22,7 @@ export class StoreService {
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
 	 * @returns The matching stores.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getAll(offset?: number, limit?: number): Promise<Store[]> {
 		try {
@@ -31,7 +37,7 @@ export class StoreService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting all stores`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -39,7 +45,7 @@ export class StoreService {
 	 * Fetches a single non-deleted store by id.
 	 * @param id - The store id.
 	 * @returns The store, or null if none matches.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getById(id: string): Promise<Store | null> {
 		try {
@@ -51,7 +57,7 @@ export class StoreService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting store by id ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -61,7 +67,7 @@ export class StoreService {
 	 * `deletedAt` to reactivate it.
 	 * @param name - The store name; must be unique among active stores.
 	 * @returns The created or reactivated store.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async create(name: string): Promise<Store> {
 		try {
@@ -75,20 +81,22 @@ export class StoreService {
 			this.logger.error(
 				`Error - ${error.message || error} - creating store ${name}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
 	/**
 	 * Updates a store's name. If another active store already has the
 	 * requested name, throws. If the requested name only exists on a
-	 * soft-deleted store, that soft-deleted store is deleted and the target
-	 * store is renamed and reactivated via {@link reactivateStore}.
+	 * soft-deleted store, the target store is soft-deleted and the
+	 * soft-deleted store bearing that name is reactivated in its place via
+	 * {@link reactivateStore}.
 	 * @param id - Id of the store to update.
 	 * @param name - The new name for the store.
 	 * @returns The updated store.
-	 * @throws AppError with status 404 if the store does not exist, 400 if
-	 * another active store already has that name, or 500 on unexpected errors.
+	 * @throws {NotFoundException} If the store does not exist.
+	 * @throws {BadRequestException} If another active store already has that name.
+	 * @throws {InternalServerErrorException} On unexpected errors.
 	 */
 	async update(id: string, name: string): Promise<Store> {
 		try {
@@ -99,7 +107,7 @@ export class StoreService {
 
 			if (!store) {
 				this.logger.error(`Store ${id} not found`)
-				throw new AppError("Store not found", 404)
+				throw new NotFoundException("Store not found")
 			}
 
 			if ((store && !sameNameStore) || sameNameStore?.id === id) {
@@ -113,7 +121,9 @@ export class StoreService {
 			if (sameNameStore) {
 				if (!sameNameStore?.deletedAt) {
 					this.logger.error(`Store with name "${name}" already exists`)
-					throw new AppError("There is already a store with same name", 400)
+					throw new BadRequestException(
+						"There is already a store with same name"
+					)
 				}
 			}
 
@@ -121,13 +131,13 @@ export class StoreService {
 
 			return reactivatedStore
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 			this.logger.error(
 				`Error - ${error.message || error} - updating store ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -136,7 +146,7 @@ export class StoreService {
 	 * store that no longer exists is treated as a no-op rather than an error.
 	 * @param id - Id of the store to delete.
 	 * @returns Nothing.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async delete(id: string): Promise<void> {
 		try {
@@ -154,7 +164,7 @@ export class StoreService {
 			this.logger.error(
 				`Error - ${error.message || error} - deleting store ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -168,7 +178,7 @@ export class StoreService {
 	 * @param storeIdToDelete - Id of the store to soft-delete.
 	 * @param storeIdToRestore - Id of the soft-deleted store to reactivate.
 	 * @returns The reactivated store (previously identified by `storeIdToRestore`).
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	private async reactivateStore(
 		storeIdToDelete: string,
@@ -187,7 +197,7 @@ export class StoreService {
 			this.logger.error(
 				`Error - ${error.message || error} - reactivating store ${storeIdToDelete}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }

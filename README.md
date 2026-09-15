@@ -104,6 +104,8 @@ For detailed information about the API, please refer to the code.
 ### Code Quality
 
 - `npm run lint`: Lint the code.
+- `npm run check`: Run linting, formatting, and import-organization checks (used in CI).
+- `npm run fix`: Apply safe fixes for lint, formatting, and import-organization issues.
 - `npm run format`: Format the code.
 
 ### Testing

@@ -7,10 +7,10 @@ export declare const queryBalanceSchema: z.ZodObject<{
     filterBy: z.ZodOptional<z.ZodEnum<{
         bank: "bank";
         category: "category";
-        paymentType: "paymentType";
         store: "store";
+        payment_type: "payment_type";
     }>>;
-    filterValue: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    filterValue: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 export type QueryBalanceDTO = z.infer<typeof queryBalanceSchema>;
 export interface GetBalanceRequest extends GetExpensesRequest {

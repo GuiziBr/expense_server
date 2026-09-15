@@ -8,10 +8,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var UserService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { DatabaseService } from "../../infra/database/database.service.js";
-import AppError from "../utils/appError.js";
 let UserService = UserService_1 = class UserService {
     databaseService;
     logger = new Logger(UserService_1.name);
@@ -27,7 +26,7 @@ let UserService = UserService_1 = class UserService {
         }
         catch (error) {
             this.logger.error(`Error - ${error} - finding user by email ${email}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async updateUserAvatar(userId, avatar) {
@@ -40,9 +39,9 @@ let UserService = UserService_1 = class UserService {
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - updating user avatar ${userId}`);
             if (error instanceof PrismaClientKnownRequestError) {
-                throw new AppError("Error updating user avatar", 400);
+                throw new BadRequestException("Error updating user avatar");
             }
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
 };

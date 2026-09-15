@@ -8,10 +8,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var BankService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { DatabaseService } from "../../infra/database/database.service.js";
-import AppError from "../utils/appError.js";
 import { constants } from "../utils/constants.js";
 let BankService = BankService_1 = class BankService {
     databaseService;
@@ -31,7 +30,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all banks`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async getById(id) {
@@ -43,7 +42,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting bank by id ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async create(name) {
@@ -57,7 +56,7 @@ let BankService = BankService_1 = class BankService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating bank ${name}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async update(id, name) {
@@ -68,7 +67,7 @@ let BankService = BankService_1 = class BankService {
             ]);
             if (!bank) {
                 this.logger.error(`Bank ${id} not found`);
-                throw new AppError("Bank not found", 404);
+                throw new NotFoundException("Bank not found");
             }
             if ((bank && !sameNameBank) || sameNameBank?.id === id) {
                 const updatedBank = await this.databaseService.bank.update({
@@ -80,7 +79,7 @@ let BankService = BankService_1 = class BankService {
             if (sameNameBank) {
                 if (!sameNameBank?.deletedAt) {
                     this.logger.error(`Bank with name "${name}" already exists`);
-                    throw new AppError("There is already a bank with same name", 400);
+                    throw new BadRequestException("There is already a bank with same name");
                 }
             }
             const [, renamedBank] = await this.databaseService.$transaction([
@@ -96,16 +95,16 @@ let BankService = BankService_1 = class BankService {
             return renamedBank;
         }
         catch (error) {
-            if (error instanceof AppError) {
+            if (error instanceof HttpException) {
                 throw error;
             }
             if (error instanceof PrismaClientKnownRequestError &&
                 error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
                 this.logger.error(`Bank with name "${name}" already exists`);
-                throw new AppError("There is already a bank with same name", 400);
+                throw new BadRequestException("There is already a bank with same name");
             }
             this.logger.error(`Error - ${error.message || error} - updating bank ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async delete(id) {
@@ -121,7 +120,7 @@ let BankService = BankService_1 = class BankService {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting bank ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
 };

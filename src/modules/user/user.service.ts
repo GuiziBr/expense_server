@@ -1,8 +1,12 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+	Logger
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { User } from "../../domains/user.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 
 @Injectable()
 export class UserService {
@@ -14,7 +18,7 @@ export class UserService {
 	 * Finds a user by their email address.
 	 * @param email - The email address to search for.
 	 * @returns The matching {@link User}, or `null` if none is found.
-	 * @throws {AppError} With status 500 if the database lookup fails.
+	 * @throws {InternalServerErrorException} If the database lookup fails.
 	 */
 	async findUserByEmail(email: string): Promise<User> {
 		try {
@@ -24,7 +28,7 @@ export class UserService {
 			return user
 		} catch (error) {
 			this.logger.error(`Error - ${error} - finding user by email ${email}`)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -33,9 +37,9 @@ export class UserService {
 	 * @param userId - The id of the user to update.
 	 * @param avatar - The new avatar value to persist.
 	 * @returns A promise that resolves once the update completes.
-	 * @throws {AppError} With status 400 if the update fails due to a known
-	 * database constraint (e.g. the user does not exist), or status 500 for
-	 * any other unexpected error.
+	 * @throws {BadRequestException} If the update fails due to a known
+	 * database constraint (e.g. the user does not exist).
+	 * @throws {InternalServerErrorException} For any other unexpected error.
 	 */
 	async updateUserAvatar(userId: string, avatar: string): Promise<void> {
 		try {
@@ -49,9 +53,9 @@ export class UserService {
 			)
 
 			if (error instanceof PrismaClientKnownRequestError) {
-				throw new AppError("Error updating user avatar", 400)
+				throw new BadRequestException("Error updating user avatar")
 			}
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }

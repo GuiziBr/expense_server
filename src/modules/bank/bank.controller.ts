@@ -78,8 +78,8 @@ export class BankController {
 	 * @param params - Route params validated against `bankByIdSchema` (`id`).
 	 * @param body - Request body validated against `createBankSchema` (`name`).
 	 * @returns The updated bank mapped to its HTTP representation.
-	 * @throws AppError with status 404 if the bank does not exist, or 400 if another
-	 * active bank already uses the requested name.
+	 * @throws {NotFoundException} If the bank does not exist.
+	 * @throws {BadRequestException} If another active bank already uses the requested name.
 	 */
 	@Patch(":id")
 	async updateBank(
