@@ -90,7 +90,7 @@ Same shape as `GET /stores/:id`.
 
 ## PATCH /stores/:id
 
-Updates a store's name. If another active store already uses the requested name, the update is rejected; if the name only exists on a soft-deleted store, that store is deleted and the target store is renamed and reactivated.
+Updates a store's name. If another active store already uses the requested name, the update is rejected; if the name only exists on a soft-deleted store, the target store is soft-deleted and the existing store is reactivated.
 
 ### Request body
 

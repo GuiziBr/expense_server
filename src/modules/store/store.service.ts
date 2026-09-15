@@ -88,8 +88,9 @@ export class StoreService {
 	/**
 	 * Updates a store's name. If another active store already has the
 	 * requested name, throws. If the requested name only exists on a
-	 * soft-deleted store, that soft-deleted store is deleted and the target
-	 * store is renamed and reactivated via {@link reactivateStore}.
+	 * soft-deleted store, the target store is soft-deleted and the
+	 * soft-deleted store bearing that name is reactivated in its place via
+	 * {@link reactivateStore}.
 	 * @param id - Id of the store to update.
 	 * @param name - The new name for the store.
 	 * @returns The updated store.
