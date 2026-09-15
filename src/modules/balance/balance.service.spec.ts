@@ -59,7 +59,9 @@ describe("BalanceService", () => {
 				new Error("Expenses error")
 			)
 
-			await expect(balanceService.getBalance(payload)).rejects.toThrow()
+			await expect(balanceService.getBalance(payload)).rejects.toThrow(
+				InternalServerErrorException
+			)
 			expect(expenseService.getPersonalExpenses).toHaveBeenCalledWith(payload)
 			expect(loggerSpy).toHaveBeenCalledWith(
 				"Error - Expenses error - getting balance"
