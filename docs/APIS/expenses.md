@@ -91,7 +91,7 @@ Retrieves the current user's personal expenses: expenses they own that are perso
 | `orderBy`     | enum     | —       | One of `description`, `amount`, `date`, `dueDate`, `category`, `payment_type`, `bank`, `store` |
 | `orderType`   | enum     | `asc`   | `asc` or `desc` |
 | `filterBy`    | enum     | —       | One of `category`, `payment_type`, `bank`, `store` |
-| `filterValue` | string   | —       | Value to filter `filterBy` on |
+| `filterValue` | string   | —       | The id of the `filterBy` record to filter on. Must be a valid UUID when `filterBy` is set |
 
 ### Response `200 OK`
 

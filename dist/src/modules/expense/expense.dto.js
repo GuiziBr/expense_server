@@ -14,7 +14,8 @@ export const createExpenseSchema = z.object({
 export const expenseByIdSchema = z.object({
     id: z.string().uuid()
 });
-export const queryExpenseSchema = z.object({
+export const queryExpenseSchema = z
+    .object({
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().default(() => new Date()),
     offset: z.coerce.number().min(0).default(0).optional(),
@@ -34,6 +35,17 @@ export const queryExpenseSchema = z.object({
     orderType: z.enum(["asc", "desc"]).default("asc"),
     filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
     filterValue: z.string().optional()
+})
+    .superRefine((data, ctx) => {
+    if (data.filterBy &&
+        data.filterValue &&
+        !z.uuid().safeParse(data.filterValue).success) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["filterValue"],
+            message: "must be a valid UUID"
+        });
+    }
 });
 export const updateExpenseSchema = createExpenseSchema;
 //# sourceMappingURL=expense.dto.js.map

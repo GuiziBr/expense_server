@@ -17,8 +17,8 @@ Retrieves the personal and shared balance for the currently authenticated user o
 |---------------|--------|----------|-------|
 | `startDate`   | string | yes      | ISO date, inclusive lower bound |
 | `endDate`     | string | yes      | ISO date, inclusive upper bound |
-| `filterBy`    | enum   | no       | One of `category`, `paymentType`, `bank`, `store` |
-| `filterValue` | string | no       | Value to filter `filterBy` on |
+| `filterBy`    | enum   | no       | One of `category`, `payment_type`, `bank`, `store` |
+| `filterValue` | string | no       | The id of the `filterBy` record to filter on. Must be a valid UUID when `filterBy` is set |
 
 ### Response `200 OK`
 

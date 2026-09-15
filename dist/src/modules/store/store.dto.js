@@ -4,7 +4,7 @@ export const listStoresSchema = z.object({
     limit: z.coerce.number().min(1).max(20).default(20)
 });
 export const storeByIdSchema = z.object({
-    id: z.string().uuid()
+    id: z.uuid()
 });
 export const createStoreSchema = z.object({
     name: z.string()
