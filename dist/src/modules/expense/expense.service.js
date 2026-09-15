@@ -8,13 +8,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ExpenseService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { PaymentTypeService } from "../payment-type/payment-type.service.js";
 import { StatementPeriodService } from "../statement-period/statement-period.service.js";
-import AppError from "../utils/appError.js";
 import { constants } from "../utils/constants.js";
 let ExpenseService = ExpenseService_1 = class ExpenseService {
     databaseService;
@@ -54,11 +53,11 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return endOfMonth(referenceDate);
         }
         if (paymentType?.hasStatement && !bankId) {
-            throw new AppError("This payment type must have a bank");
+            throw new BadRequestException("This payment type must have a bank");
         }
         const statementPeriod = await this.statementPeriodService.findByUserAndBank(userId, bankId, paymentTypeId);
         if (!statementPeriod) {
-            throw new AppError("No statement period for provided payment type and bank was found");
+            throw new BadRequestException("No statement period for provided payment type and bank was found");
         }
         const { initialDay, finalDay } = statementPeriod;
         const lastDayOfMonth = endOfMonth(transactionDate).getDate();
@@ -70,7 +69,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
     }
     async createExpense(data, userId) {
         if (isFuture(data.date))
-            throw new AppError("Date must not be in the future", 400);
+            throw new BadRequestException("Date must not be in the future");
         try {
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
@@ -99,7 +98,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return expense;
         }
         catch (error) {
-            if (error instanceof AppError) {
+            if (error instanceof HttpException) {
                 throw error;
             }
             if (error instanceof PrismaClientKnownRequestError) {
@@ -108,14 +107,14 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     const dbField = error.meta.field_name;
                     const fieldName = dbField.split("_")[1];
                     const errorMessage = constants.foreignKeyMessages[fieldName];
-                    throw new AppError(errorMessage, 400);
+                    throw new BadRequestException(errorMessage);
                 }
                 if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
-                    throw new AppError(constants.uniqueConstraintMessages.duplicatedExpenses, 400);
+                    throw new BadRequestException(constants.uniqueConstraintMessages.duplicatedExpenses);
                 }
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - creating expense`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async updateExpense(id, data, userId) {
@@ -124,13 +123,13 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 where: { id, deletedAt: null }
             });
             if (!expense) {
-                throw new AppError("Expense not found", 404);
+                throw new NotFoundException("Expense not found");
             }
             if (expense.ownerId !== userId) {
-                throw new AppError("Unauthorized", 403);
+                throw new ForbiddenException("Unauthorized");
             }
             if (isFuture(data.date)) {
-                throw new AppError("Date must not be in the future", 400);
+                throw new BadRequestException("Date must not be in the future");
             }
             const netAmount = this.calculateNetAmount(data.amount, data.personal, data.split);
             const dueDate = await this.calculateDueDate(data.date, data.payment_type_id, userId, data.bank_id, data.current_month);
@@ -139,7 +138,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     where: { id, deletedAt: null }
                 });
                 if (!current) {
-                    throw new AppError("Expense not found", 404);
+                    throw new NotFoundException("Expense not found");
                 }
                 return tx.expense.update({
                     where: { id },
@@ -167,7 +166,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             return updateExpense;
         }
         catch (error) {
-            if (error instanceof AppError) {
+            if (error instanceof HttpException) {
                 throw error;
             }
             if (error instanceof PrismaClientKnownRequestError) {
@@ -176,14 +175,14 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     const dbField = error.meta.field_name;
                     const fieldName = dbField.split("_")[1];
                     const errorMessage = constants.foreignKeyMessages[fieldName];
-                    throw new AppError(errorMessage, 400);
+                    throw new BadRequestException(errorMessage);
                 }
                 if (error.code === constants.UNIQUE_CONSTRAINT_VIOLATION) {
-                    throw new AppError(constants.uniqueConstraintMessages.duplicatedExpenses, 400);
+                    throw new BadRequestException(constants.uniqueConstraintMessages.duplicatedExpenses);
                 }
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async deleteExpense(id, userId) {
@@ -191,10 +190,10 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             where: { id, deletedAt: null }
         });
         if (!expense) {
-            throw new AppError("Expense not found", 404);
+            throw new NotFoundException("Expense not found");
         }
         if (expense.ownerId !== userId) {
-            throw new AppError("Unauthorized", 403);
+            throw new ForbiddenException("Unauthorized");
         }
         try {
             await this.databaseService.expense.update({
@@ -208,7 +207,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 return;
             }
             this.logger.error(`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {

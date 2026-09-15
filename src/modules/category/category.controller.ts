@@ -78,8 +78,8 @@ export class CategoryController {
 	 * @param params - Validated route params containing the category `id`.
 	 * @param body - Validated request body containing the new `description`.
 	 * @returns The updated category mapped to its HTTP representation.
-	 * @throws {AppError} With status 404 if the category is not found, or 400 if another
-	 * active category already has the same description.
+	 * @throws {NotFoundException} If the category is not found.
+	 * @throws {BadRequestException} If another active category already has the same description.
 	 */
 	@Patch(":id")
 	async updateCategory(

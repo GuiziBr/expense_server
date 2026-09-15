@@ -8,8 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var CurrentUserInterceptor_1;
-import { Injectable, Logger } from "@nestjs/common";
-import AppError from "../../modules/utils/appError.js";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service.js";
 let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterceptor {
     databaseService;
@@ -25,7 +24,7 @@ let CurrentUserInterceptor = CurrentUserInterceptor_1 = class CurrentUserInterce
         });
         if (!currentUser) {
             this.logger.error(`Error - User not found - ${sub}`);
-            throw new AppError("User not found", 404);
+            throw new NotFoundException("User not found");
         }
         request.userId = currentUser.id;
         return next.handle();

@@ -8,10 +8,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var BalanceService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { endOfMonth } from "date-fns";
 import { ExpenseService } from "../expense/expense.service.js";
-import AppError from "../utils/appError.js";
 let BalanceService = BalanceService_1 = class BalanceService {
     expensesService;
     logger = new Logger(BalanceService_1.name);
@@ -62,7 +61,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting balance`);
-            throw new AppError("Error getting balance", 500);
+            throw new InternalServerErrorException("Error getting balance");
         }
     }
     async getConsolidatedBalance({ year, month, userId }) {
@@ -123,7 +122,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting consolidated balance`);
-            throw new AppError("Error getting consolidated balance", 500);
+            throw new InternalServerErrorException("Error getting consolidated balance");
         }
     }
 };

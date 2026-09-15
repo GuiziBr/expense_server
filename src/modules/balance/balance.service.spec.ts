@@ -1,10 +1,9 @@
-import { Logger } from "@nestjs/common"
+import { InternalServerErrorException, Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { endOfMonth } from "date-fns"
 import { ExpenseService } from "../expense/expense.service"
 import { createExpense } from "../test-utils/expense.factory"
 import { BalanceService } from "./balance.service"
-import AppError from "@/modules/utils/appError"
 
 describe("BalanceService", () => {
 	let balanceService: BalanceService
@@ -126,7 +125,7 @@ describe("BalanceService", () => {
 
 			await expect(
 				balanceService.getConsolidatedBalance(payload)
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(InternalServerErrorException)
 
 			expect(expenseService.getExpensesByDateRange).toHaveBeenCalledWith(
 				false,

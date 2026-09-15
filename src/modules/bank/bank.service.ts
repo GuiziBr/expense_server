@@ -1,8 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	HttpException,
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Bank } from "../../domains/bank.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 import { constants } from "../utils/constants.js"
 
 @Injectable()
@@ -16,7 +22,7 @@ export class BankService {
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
 	 * @returns The matching banks.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getAll(offset?: number, limit?: number): Promise<Bank[]> {
 		try {
@@ -29,7 +35,7 @@ export class BankService {
 			return banks
 		} catch (error) {
 			this.logger.error(`Error - ${error.message || error} - getting all banks`)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -37,7 +43,7 @@ export class BankService {
 	 * Fetches a single non-deleted bank by id.
 	 * @param id - The bank id.
 	 * @returns The bank, or null if none matches.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getById(id: string): Promise<Bank | null> {
 		try {
@@ -49,7 +55,7 @@ export class BankService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting bank by id ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -59,7 +65,7 @@ export class BankService {
 	 * to reactivate it.
 	 * @param name - The bank name; must be unique among active banks.
 	 * @returns The created or reactivated bank.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async create(name: string): Promise<Bank> {
 		try {
@@ -73,7 +79,7 @@ export class BankService {
 			this.logger.error(
 				`Error - ${error.message || error} - creating bank ${name}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -85,9 +91,10 @@ export class BankService {
 	 * @param id - Id of the bank to update.
 	 * @param name - The new name for the bank.
 	 * @returns The updated bank.
-	 * @throws AppError with status 404 if the bank does not exist, 400 if
-	 * another active bank already has that name, or 500 on unexpected errors
-	 * (including a unique constraint violation from the database).
+	 * @throws {NotFoundException} If the bank does not exist.
+	 * @throws {BadRequestException} If another active bank already has that name.
+	 * @throws {InternalServerErrorException} On unexpected errors (including a unique
+	 * constraint violation from the database).
 	 */
 	async update(id: string, name: string): Promise<Bank> {
 		try {
@@ -98,7 +105,7 @@ export class BankService {
 
 			if (!bank) {
 				this.logger.error(`Bank ${id} not found`)
-				throw new AppError("Bank not found", 404)
+				throw new NotFoundException("Bank not found")
 			}
 
 			if ((bank && !sameNameBank) || sameNameBank?.id === id) {
@@ -112,7 +119,9 @@ export class BankService {
 			if (sameNameBank) {
 				if (!sameNameBank?.deletedAt) {
 					this.logger.error(`Bank with name "${name}" already exists`)
-					throw new AppError("There is already a bank with same name", 400)
+					throw new BadRequestException(
+						"There is already a bank with same name"
+					)
 				}
 			}
 
@@ -129,7 +138,7 @@ export class BankService {
 
 			return renamedBank
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 			if (
@@ -137,12 +146,12 @@ export class BankService {
 				error.code === constants.UNIQUE_CONSTRAINT_VIOLATION
 			) {
 				this.logger.error(`Bank with name "${name}" already exists`)
-				throw new AppError("There is already a bank with same name", 400)
+				throw new BadRequestException("There is already a bank with same name")
 			}
 			this.logger.error(
 				`Error - ${error.message || error} - updating bank ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -151,7 +160,7 @@ export class BankService {
 	 * bank that no longer exists is treated as a no-op rather than an error.
 	 * @param id - Id of the bank to delete.
 	 * @returns Nothing.
-	 * @throws AppError with status 500 on unexpected database errors.
+	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async delete(id: string): Promise<void> {
 		try {
@@ -169,7 +178,7 @@ export class BankService {
 			this.logger.error(
 				`Error - ${error.message || error} - deleting bank ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }
