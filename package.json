@@ -17,6 +17,7 @@
 		"start:debug": "nest start --debug --watch",
 		"start:prod": "node dist/src/main.js",
 		"lint": "npx @biomejs/biome lint --write",
+		"check": "npx @biomejs/biome check --write",
 		"migrate": "npx prisma migrate dev",
 		"docker:up": "docker compose up",
 		"docker:migrate:dev": "docker compose exec server npx prisma migrate dev",
