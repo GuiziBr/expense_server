@@ -1,3 +1,4 @@
+import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
 import { createPaymentType } from "../test-utils/payment-type.factory"
@@ -69,6 +70,14 @@ describe("PaymentTypeController", () => {
 			})
 
 			expect(paymentTypeService.getById).toBeCalledWith("id")
+		})
+
+		it("should throw NotFoundException when payment type does not exist", async () => {
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue(null)
+
+			await expect(
+				paymentTypeController.getPaymentTypeById({ id: "id" })
+			).rejects.toThrow(NotFoundException)
 		})
 	})
 

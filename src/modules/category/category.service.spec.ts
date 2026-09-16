@@ -7,6 +7,8 @@ import {
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createCategory } from "../test-utils/category.factory"
+import { createPrismaError } from "../test-utils/errors.factory"
+import { constants } from "../utils/constants"
 import { CategoryService } from "./category.service"
 
 describe("CategoryService", () => {
@@ -236,6 +238,25 @@ describe("CategoryService", () => {
 			})
 		})
 
+		it("should throw internal server error exception when reactivation fails", async () => {
+			const deletedCategory = createCategory({ deletedAt: new Date() })
+
+			vi.spyOn(databaseService.category, "findUnique").mockResolvedValue(
+				deletedCategory
+			)
+			vi.spyOn(databaseService.category, "update").mockRejectedValue(
+				new Error()
+			)
+
+			await expect(
+				categoryService.update(fakeCategory.id, "updated-category")
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - Error - reactivating category ${fakeCategory.id}`
+			)
+		})
+
 		it("should throw internal server error exception", async () => {
 			vi.spyOn(databaseService.category, "findUnique").mockRejectedValue(
 				new Error()
@@ -247,6 +268,45 @@ describe("CategoryService", () => {
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating category category-id"
+			)
+		})
+	})
+
+	describe("delete", () => {
+		it("should soft-delete the category", async () => {
+			await categoryService.delete("category-id")
+
+			expect(databaseService.category.update).toBeCalledWith({
+				where: { id: "category-id" },
+				data: { deletedAt: expect.any(Date) }
+			})
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should not throw when the category no longer exists", async () => {
+			vi.spyOn(databaseService.category, "update").mockRejectedValue(
+				createPrismaError(constants.RECORD_NOT_FOUND)
+			)
+
+			await expect(
+				categoryService.delete("category-id")
+			).resolves.toBeUndefined()
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should throw internal server error exception", async () => {
+			vi.spyOn(databaseService.category, "update").mockRejectedValue(
+				new Error()
+			)
+
+			await expect(categoryService.delete("category-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				"Error - Error - deleting category category-id"
 			)
 		})
 	})

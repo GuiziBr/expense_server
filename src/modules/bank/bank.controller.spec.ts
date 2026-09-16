@@ -1,3 +1,4 @@
+import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
 import { createBank } from "../test-utils/bank.factory"
@@ -62,6 +63,14 @@ describe("BankController", () => {
 			})
 
 			expect(bankService.getById).toBeCalledWith("id")
+		})
+
+		it("should throw NotFoundException when bank does not exist", async () => {
+			vi.spyOn(bankService, "getById").mockResolvedValue(null)
+
+			await expect(bankController.getBankById({ id: "id" })).rejects.toThrow(
+				NotFoundException
+			)
 		})
 	})
 
