@@ -31,7 +31,7 @@ let CategoryController = class CategoryController {
         if (!category) {
             throw new NotFoundException();
         }
-        return CategoryPresenter.toHttp(category) || null;
+        return CategoryPresenter.toHttp(category);
     }
     async createCategory(body) {
         const { description } = body;

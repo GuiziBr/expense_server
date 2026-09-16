@@ -31,7 +31,7 @@ let StoreController = class StoreController {
         if (!store) {
             throw new NotFoundException();
         }
-        return StorePresenter.toHttp(store) || null;
+        return StorePresenter.toHttp(store);
     }
     async createStore(body) {
         const { name } = body;
