@@ -58,7 +58,7 @@ export class PaymentTypeController {
 		if (!paymentType) {
 			throw new NotFoundException()
 		}
-		return PaymentTypePresenter.toHttp(paymentType) || null
+		return PaymentTypePresenter.toHttp(paymentType)
 	}
 
 	/**

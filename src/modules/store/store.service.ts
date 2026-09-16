@@ -118,13 +118,9 @@ export class StoreService {
 				return updatedStore
 			}
 
-			if (sameNameStore) {
-				if (!sameNameStore?.deletedAt) {
-					this.logger.error(`Store with name "${name}" already exists`)
-					throw new BadRequestException(
-						"There is already a store with same name"
-					)
-				}
+			if (!sameNameStore.deletedAt) {
+				this.logger.error(`Store with name "${name}" already exists`)
+				throw new BadRequestException("There is already a store with same name")
 			}
 
 			const reactivatedStore = await this.reactivateStore(id, sameNameStore.id)

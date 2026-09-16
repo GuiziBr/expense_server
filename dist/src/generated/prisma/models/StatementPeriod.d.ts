@@ -85,7 +85,7 @@ export type StatementPeriodAggregateArgs<ExtArgs extends runtime.Types.Extension
     _max?: StatementPeriodMaxAggregateInputType;
 };
 export type GetStatementPeriodAggregateType<T extends StatementPeriodAggregateArgs> = {
-    [P in keyof T & keyof AggregateStatementPeriod]: P extends "_count" | "count" ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateStatementPeriod[P]> : Prisma.GetScalarType<T[P], AggregateStatementPeriod[P]>;
+    [P in keyof T & keyof AggregateStatementPeriod]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateStatementPeriod[P]> : Prisma.GetScalarType<T[P], AggregateStatementPeriod[P]>;
 };
 export type StatementPeriodGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.StatementPeriodWhereInput;
@@ -112,8 +112,8 @@ export type StatementPeriodGroupByOutputType = {
     _min: StatementPeriodMinAggregateOutputType | null;
     _max: StatementPeriodMaxAggregateOutputType | null;
 };
-export type GetStatementPeriodGroupByPayload<T extends StatementPeriodGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<StatementPeriodGroupByOutputType, T["by"]> & {
-    [P in keyof T & keyof StatementPeriodGroupByOutputType]: P extends "_count" ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], StatementPeriodGroupByOutputType[P]> : Prisma.GetScalarType<T[P], StatementPeriodGroupByOutputType[P]>;
+export type GetStatementPeriodGroupByPayload<T extends StatementPeriodGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<StatementPeriodGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof StatementPeriodGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], StatementPeriodGroupByOutputType[P]> : Prisma.GetScalarType<T[P], StatementPeriodGroupByOutputType[P]>;
 }>>;
 export type StatementPeriodWhereInput = {
     AND?: Prisma.StatementPeriodWhereInput | Prisma.StatementPeriodWhereInput[];
@@ -773,14 +773,14 @@ export type $StatementPeriodPayload<ExtArgs extends runtime.Types.Extensions.Int
     composites: {};
 };
 export type StatementPeriodGetPayload<S extends boolean | null | undefined | StatementPeriodDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$StatementPeriodPayload, S>;
-export type StatementPeriodCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<StatementPeriodFindManyArgs, "select" | "include" | "distinct" | "omit"> & {
+export type StatementPeriodCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<StatementPeriodFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: StatementPeriodCountAggregateInputType | true;
 };
 export interface StatementPeriodDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: {
-        types: Prisma.TypeMap<ExtArgs>["model"]["StatementPeriod"];
+        types: Prisma.TypeMap<ExtArgs>['model']['StatementPeriod'];
         meta: {
-            name: "StatementPeriod";
+            name: 'StatementPeriod';
         };
     };
     findUnique<T extends StatementPeriodFindUniqueArgs>(args: Prisma.SelectSubset<T, StatementPeriodFindUniqueArgs<ExtArgs>>): Prisma.Prisma__StatementPeriodClient<runtime.Types.Result.GetResult<Prisma.$StatementPeriodPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
@@ -797,22 +797,22 @@ export interface StatementPeriodDelegate<ExtArgs extends runtime.Types.Extension
     updateMany<T extends StatementPeriodUpdateManyArgs>(args: Prisma.SelectSubset<T, StatementPeriodUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
     updateManyAndReturn<T extends StatementPeriodUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, StatementPeriodUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StatementPeriodPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
     upsert<T extends StatementPeriodUpsertArgs>(args: Prisma.SelectSubset<T, StatementPeriodUpsertArgs<ExtArgs>>): Prisma.Prisma__StatementPeriodClient<runtime.Types.Result.GetResult<Prisma.$StatementPeriodPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
-    count<T extends StatementPeriodCountArgs>(args?: Prisma.Subset<T, StatementPeriodCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<"select", any> ? T["select"] extends true ? number : Prisma.GetScalarType<T["select"], StatementPeriodCountAggregateOutputType> : number>;
+    count<T extends StatementPeriodCountArgs>(args?: Prisma.Subset<T, StatementPeriodCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], StatementPeriodCountAggregateOutputType> : number>;
     aggregate<T extends StatementPeriodAggregateArgs>(args: Prisma.Subset<T, StatementPeriodAggregateArgs>): Prisma.PrismaPromise<GetStatementPeriodAggregateType<T>>;
-    groupBy<T extends StatementPeriodGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<"skip", Prisma.Keys<T>>, Prisma.Extends<"take", Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
-        orderBy: StatementPeriodGroupByArgs["orderBy"];
+    groupBy<T extends StatementPeriodGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: StatementPeriodGroupByArgs['orderBy'];
     } : {
-        orderBy?: StatementPeriodGroupByArgs["orderBy"];
-    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T["orderBy"]>>>, ByFields extends Prisma.MaybeTupleToUnion<T["by"]>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T["having"]>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T["by"] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        orderBy?: StatementPeriodGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
         [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
             Error,
-            "Field ",
+            'Field ',
             P,
             ` in "having" needs to be provided in "by"`
         ];
-    }[HavingFields] : "take" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
-    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : "skip" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
     }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
@@ -829,15 +829,15 @@ export interface Prisma__StatementPeriodClient<T, Null = never, ExtArgs extends 
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
 }
 export interface StatementPeriodFieldRefs {
-    readonly id: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly userId: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly paymentTypeId: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly bankId: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly initialDay: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly finalDay: Prisma.FieldRef<"StatementPeriod", "String">;
-    readonly createdAt: Prisma.FieldRef<"StatementPeriod", "DateTime">;
-    readonly updatedAt: Prisma.FieldRef<"StatementPeriod", "DateTime">;
-    readonly deletedAt: Prisma.FieldRef<"StatementPeriod", "DateTime">;
+    readonly id: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly userId: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly paymentTypeId: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly bankId: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly initialDay: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly finalDay: Prisma.FieldRef<"StatementPeriod", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"StatementPeriod", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"StatementPeriod", 'DateTime'>;
+    readonly deletedAt: Prisma.FieldRef<"StatementPeriod", 'DateTime'>;
 }
 export type StatementPeriodFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.StatementPeriodSelect<ExtArgs> | null;

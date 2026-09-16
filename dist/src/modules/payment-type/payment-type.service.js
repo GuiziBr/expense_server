@@ -79,14 +79,12 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
                 });
                 return updatedPaymentType;
             }
-            if (sameDescriptionPaymentType) {
-                if (!sameDescriptionPaymentType?.deletedAt) {
-                    this.logger.error(`Payment type with description "${description}" already exists`);
-                    throw new BadRequestException("There is already a payment type with same description");
-                }
-                const reactivatedPaymentType = await this.reactivatePaymentType(id, sameDescriptionPaymentType.id);
-                return reactivatedPaymentType;
+            if (!sameDescriptionPaymentType.deletedAt) {
+                this.logger.error(`Payment type with description "${description}" already exists`);
+                throw new BadRequestException("There is already a payment type with same description");
             }
+            const reactivatedPaymentType = await this.reactivatePaymentType(id, sameDescriptionPaymentType.id);
+            return reactivatedPaymentType;
         }
         catch (error) {
             if (error instanceof HttpException) {

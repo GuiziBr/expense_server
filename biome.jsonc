@@ -28,7 +28,7 @@
 			"prisma/**",
 			"!prisma/migrations",
 			"!infra/",
-			"!src/generated/"
+			"!src/generated"
 		]
 	}
 }

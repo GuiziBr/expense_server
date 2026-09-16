@@ -1,3 +1,4 @@
+import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
 import { createCategory } from "../test-utils/category.factory"
@@ -65,6 +66,14 @@ describe("CategoryController", () => {
 			})
 
 			expect(categoryService.getById).toBeCalledWith("id")
+		})
+
+		it("should throw NotFoundException when category does not exist", async () => {
+			vi.spyOn(categoryService, "getById").mockResolvedValue(null)
+
+			await expect(
+				categoryController.getCategoryById({ id: "id" })
+			).rejects.toThrow(NotFoundException)
 		})
 	})
 

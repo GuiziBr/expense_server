@@ -56,7 +56,7 @@ export class StoreController {
 		if (!store) {
 			throw new NotFoundException()
 		}
-		return StorePresenter.toHttp(store) || null
+		return StorePresenter.toHttp(store)
 	}
 
 	/**

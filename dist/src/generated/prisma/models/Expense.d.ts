@@ -137,7 +137,7 @@ export type ExpenseAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
     _max?: ExpenseMaxAggregateInputType;
 };
 export type GetExpenseAggregateType<T extends ExpenseAggregateArgs> = {
-    [P in keyof T & keyof AggregateExpense]: P extends "_count" | "count" ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateExpense[P]> : Prisma.GetScalarType<T[P], AggregateExpense[P]>;
+    [P in keyof T & keyof AggregateExpense]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateExpense[P]> : Prisma.GetScalarType<T[P], AggregateExpense[P]>;
 };
 export type ExpenseGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.ExpenseWhereInput;
@@ -174,8 +174,8 @@ export type ExpenseGroupByOutputType = {
     _min: ExpenseMinAggregateOutputType | null;
     _max: ExpenseMaxAggregateOutputType | null;
 };
-export type GetExpenseGroupByPayload<T extends ExpenseGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<ExpenseGroupByOutputType, T["by"]> & {
-    [P in keyof T & keyof ExpenseGroupByOutputType]: P extends "_count" ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], ExpenseGroupByOutputType[P]> : Prisma.GetScalarType<T[P], ExpenseGroupByOutputType[P]>;
+export type GetExpenseGroupByPayload<T extends ExpenseGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<ExpenseGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof ExpenseGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], ExpenseGroupByOutputType[P]> : Prisma.GetScalarType<T[P], ExpenseGroupByOutputType[P]>;
 }>>;
 export type ExpenseWhereInput = {
     AND?: Prisma.ExpenseWhereInput | Prisma.ExpenseWhereInput[];
@@ -1412,14 +1412,14 @@ export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     composites: {};
 };
 export type ExpenseGetPayload<S extends boolean | null | undefined | ExpenseDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ExpensePayload, S>;
-export type ExpenseCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<ExpenseFindManyArgs, "select" | "include" | "distinct" | "omit"> & {
+export type ExpenseCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<ExpenseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: ExpenseCountAggregateInputType | true;
 };
 export interface ExpenseDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: {
-        types: Prisma.TypeMap<ExtArgs>["model"]["Expense"];
+        types: Prisma.TypeMap<ExtArgs>['model']['Expense'];
         meta: {
-            name: "Expense";
+            name: 'Expense';
         };
     };
     findUnique<T extends ExpenseFindUniqueArgs>(args: Prisma.SelectSubset<T, ExpenseFindUniqueArgs<ExtArgs>>): Prisma.Prisma__ExpenseClient<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
@@ -1436,22 +1436,22 @@ export interface ExpenseDelegate<ExtArgs extends runtime.Types.Extensions.Intern
     updateMany<T extends ExpenseUpdateManyArgs>(args: Prisma.SelectSubset<T, ExpenseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
     updateManyAndReturn<T extends ExpenseUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ExpenseUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
     upsert<T extends ExpenseUpsertArgs>(args: Prisma.SelectSubset<T, ExpenseUpsertArgs<ExtArgs>>): Prisma.Prisma__ExpenseClient<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
-    count<T extends ExpenseCountArgs>(args?: Prisma.Subset<T, ExpenseCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<"select", any> ? T["select"] extends true ? number : Prisma.GetScalarType<T["select"], ExpenseCountAggregateOutputType> : number>;
+    count<T extends ExpenseCountArgs>(args?: Prisma.Subset<T, ExpenseCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], ExpenseCountAggregateOutputType> : number>;
     aggregate<T extends ExpenseAggregateArgs>(args: Prisma.Subset<T, ExpenseAggregateArgs>): Prisma.PrismaPromise<GetExpenseAggregateType<T>>;
-    groupBy<T extends ExpenseGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<"skip", Prisma.Keys<T>>, Prisma.Extends<"take", Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
-        orderBy: ExpenseGroupByArgs["orderBy"];
+    groupBy<T extends ExpenseGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: ExpenseGroupByArgs['orderBy'];
     } : {
-        orderBy?: ExpenseGroupByArgs["orderBy"];
-    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T["orderBy"]>>>, ByFields extends Prisma.MaybeTupleToUnion<T["by"]>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T["having"]>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T["by"] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        orderBy?: ExpenseGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
         [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
             Error,
-            "Field ",
+            'Field ',
             P,
             ` in "having" needs to be provided in "by"`
         ];
-    }[HavingFields] : "take" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
-    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : "skip" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
     }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
@@ -1470,21 +1470,21 @@ export interface Prisma__ExpenseClient<T, Null = never, ExtArgs extends runtime.
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
 }
 export interface ExpenseFieldRefs {
-    readonly id: Prisma.FieldRef<"Expense", "String">;
-    readonly description: Prisma.FieldRef<"Expense", "String">;
-    readonly date: Prisma.FieldRef<"Expense", "DateTime">;
-    readonly amount: Prisma.FieldRef<"Expense", "Int">;
-    readonly split: Prisma.FieldRef<"Expense", "Boolean">;
-    readonly personal: Prisma.FieldRef<"Expense", "Boolean">;
-    readonly dueDate: Prisma.FieldRef<"Expense", "DateTime">;
-    readonly ownerId: Prisma.FieldRef<"Expense", "String">;
-    readonly categoryId: Prisma.FieldRef<"Expense", "String">;
-    readonly paymentTypeId: Prisma.FieldRef<"Expense", "String">;
-    readonly bankId: Prisma.FieldRef<"Expense", "String">;
-    readonly storeId: Prisma.FieldRef<"Expense", "String">;
-    readonly createdAt: Prisma.FieldRef<"Expense", "DateTime">;
-    readonly updatedAt: Prisma.FieldRef<"Expense", "DateTime">;
-    readonly deletedAt: Prisma.FieldRef<"Expense", "DateTime">;
+    readonly id: Prisma.FieldRef<"Expense", 'String'>;
+    readonly description: Prisma.FieldRef<"Expense", 'String'>;
+    readonly date: Prisma.FieldRef<"Expense", 'DateTime'>;
+    readonly amount: Prisma.FieldRef<"Expense", 'Int'>;
+    readonly split: Prisma.FieldRef<"Expense", 'Boolean'>;
+    readonly personal: Prisma.FieldRef<"Expense", 'Boolean'>;
+    readonly dueDate: Prisma.FieldRef<"Expense", 'DateTime'>;
+    readonly ownerId: Prisma.FieldRef<"Expense", 'String'>;
+    readonly categoryId: Prisma.FieldRef<"Expense", 'String'>;
+    readonly paymentTypeId: Prisma.FieldRef<"Expense", 'String'>;
+    readonly bankId: Prisma.FieldRef<"Expense", 'String'>;
+    readonly storeId: Prisma.FieldRef<"Expense", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"Expense", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"Expense", 'DateTime'>;
+    readonly deletedAt: Prisma.FieldRef<"Expense", 'DateTime'>;
 }
 export type ExpenseFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.ExpenseSelect<ExtArgs> | null;

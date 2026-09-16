@@ -61,7 +61,7 @@ export type BankAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
     _max?: BankMaxAggregateInputType;
 };
 export type GetBankAggregateType<T extends BankAggregateArgs> = {
-    [P in keyof T & keyof AggregateBank]: P extends "_count" | "count" ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateBank[P]> : Prisma.GetScalarType<T[P], AggregateBank[P]>;
+    [P in keyof T & keyof AggregateBank]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateBank[P]> : Prisma.GetScalarType<T[P], AggregateBank[P]>;
 };
 export type BankGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.BankWhereInput;
@@ -84,8 +84,8 @@ export type BankGroupByOutputType = {
     _min: BankMinAggregateOutputType | null;
     _max: BankMaxAggregateOutputType | null;
 };
-export type GetBankGroupByPayload<T extends BankGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<BankGroupByOutputType, T["by"]> & {
-    [P in keyof T & keyof BankGroupByOutputType]: P extends "_count" ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], BankGroupByOutputType[P]> : Prisma.GetScalarType<T[P], BankGroupByOutputType[P]>;
+export type GetBankGroupByPayload<T extends BankGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<BankGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof BankGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], BankGroupByOutputType[P]> : Prisma.GetScalarType<T[P], BankGroupByOutputType[P]>;
 }>>;
 export type BankWhereInput = {
     AND?: Prisma.BankWhereInput | Prisma.BankWhereInput[];
@@ -414,14 +414,14 @@ export type $BankPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     composites: {};
 };
 export type BankGetPayload<S extends boolean | null | undefined | BankDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$BankPayload, S>;
-export type BankCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<BankFindManyArgs, "select" | "include" | "distinct" | "omit"> & {
+export type BankCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<BankFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
     select?: BankCountAggregateInputType | true;
 };
 export interface BankDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
     [K: symbol]: {
-        types: Prisma.TypeMap<ExtArgs>["model"]["Bank"];
+        types: Prisma.TypeMap<ExtArgs>['model']['Bank'];
         meta: {
-            name: "Bank";
+            name: 'Bank';
         };
     };
     findUnique<T extends BankFindUniqueArgs>(args: Prisma.SelectSubset<T, BankFindUniqueArgs<ExtArgs>>): Prisma.Prisma__BankClient<runtime.Types.Result.GetResult<Prisma.$BankPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
@@ -438,22 +438,22 @@ export interface BankDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
     updateMany<T extends BankUpdateManyArgs>(args: Prisma.SelectSubset<T, BankUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
     updateManyAndReturn<T extends BankUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, BankUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
     upsert<T extends BankUpsertArgs>(args: Prisma.SelectSubset<T, BankUpsertArgs<ExtArgs>>): Prisma.Prisma__BankClient<runtime.Types.Result.GetResult<Prisma.$BankPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
-    count<T extends BankCountArgs>(args?: Prisma.Subset<T, BankCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<"select", any> ? T["select"] extends true ? number : Prisma.GetScalarType<T["select"], BankCountAggregateOutputType> : number>;
+    count<T extends BankCountArgs>(args?: Prisma.Subset<T, BankCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], BankCountAggregateOutputType> : number>;
     aggregate<T extends BankAggregateArgs>(args: Prisma.Subset<T, BankAggregateArgs>): Prisma.PrismaPromise<GetBankAggregateType<T>>;
-    groupBy<T extends BankGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<"skip", Prisma.Keys<T>>, Prisma.Extends<"take", Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
-        orderBy: BankGroupByArgs["orderBy"];
+    groupBy<T extends BankGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: BankGroupByArgs['orderBy'];
     } : {
-        orderBy?: BankGroupByArgs["orderBy"];
-    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T["orderBy"]>>>, ByFields extends Prisma.MaybeTupleToUnion<T["by"]>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T["having"]>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T["by"] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        orderBy?: BankGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
         [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
             Error,
-            "Field ",
+            'Field ',
             P,
             ` in "having" needs to be provided in "by"`
         ];
-    }[HavingFields] : "take" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
-    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : "skip" extends Prisma.Keys<T> ? "orderBy" extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
     }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
         [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
@@ -469,11 +469,11 @@ export interface Prisma__BankClient<T, Null = never, ExtArgs extends runtime.Typ
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
 }
 export interface BankFieldRefs {
-    readonly id: Prisma.FieldRef<"Bank", "String">;
-    readonly name: Prisma.FieldRef<"Bank", "String">;
-    readonly createdAt: Prisma.FieldRef<"Bank", "DateTime">;
-    readonly updatedAt: Prisma.FieldRef<"Bank", "DateTime">;
-    readonly deletedAt: Prisma.FieldRef<"Bank", "DateTime">;
+    readonly id: Prisma.FieldRef<"Bank", 'String'>;
+    readonly name: Prisma.FieldRef<"Bank", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"Bank", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"Bank", 'DateTime'>;
+    readonly deletedAt: Prisma.FieldRef<"Bank", 'DateTime'>;
 }
 export type BankFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.BankSelect<ExtArgs> | null;
