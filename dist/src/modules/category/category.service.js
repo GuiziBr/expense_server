@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var CategoryService_1;
 import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 let CategoryService = CategoryService_1 = class CategoryService {
@@ -102,7 +102,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             });
         }
         catch (error) {
-            if (error instanceof PrismaClientKnownRequestError &&
+            if (error instanceof Prisma.PrismaClientKnownRequestError &&
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }

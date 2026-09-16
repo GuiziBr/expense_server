@@ -1,6 +1,6 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "../../generated/prisma/client.js";
 export const createPrismaError = (code = "error", meta) => {
-    return new PrismaClientKnownRequestError("prisma error", {
+    return new Prisma.PrismaClientKnownRequestError("prisma error", {
         code,
         meta,
         clientVersion: "1.0.0"
