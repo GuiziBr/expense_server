@@ -6,8 +6,8 @@ import {
 	Logger,
 	NotFoundException
 } from "@nestjs/common"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Bank } from "../../domains/bank.domain.js"
+import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 
@@ -142,7 +142,7 @@ export class BankService {
 				throw error
 			}
 			if (
-				error instanceof PrismaClientKnownRequestError &&
+				error instanceof Prisma.PrismaClientKnownRequestError &&
 				error.code === constants.UNIQUE_CONSTRAINT_VIOLATION
 			) {
 				this.logger.error(`Bank with name "${name}" already exists`)
@@ -170,7 +170,7 @@ export class BankService {
 			})
 		} catch (error) {
 			if (
-				error instanceof PrismaClientKnownRequestError &&
+				error instanceof Prisma.PrismaClientKnownRequestError &&
 				error.code === constants.RECORD_NOT_FOUND
 			) {
 				return

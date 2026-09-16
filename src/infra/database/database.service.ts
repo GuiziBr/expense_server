@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from "@nestjs/common"
-import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
+import { PrismaClient } from "../../generated/prisma/client.js"
 
 /**
  * Shared database provider that extends the Prisma Client, exposing its query
@@ -8,6 +9,12 @@ import { PrismaClient } from "@prisma/client"
  */
 @Injectable()
 export class DatabaseService extends PrismaClient implements OnModuleInit {
+	constructor() {
+		super({
+			adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+		})
+	}
+
 	/**
 	 * Nest lifecycle hook invoked once this module has been initialized.
 	 * Side effect: opens the connection to the database via Prisma's

@@ -56,3 +56,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # db files
 db
+
+# generated prisma client
+/src/generated

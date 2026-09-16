@@ -27,7 +27,8 @@
 			"test/**/*.ts",
 			"prisma/**",
 			"!prisma/migrations",
-			"!infra/"
+			"!infra/",
+			"!src/generated/"
 		]
 	}
 }
