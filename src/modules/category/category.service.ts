@@ -1,8 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	HttpException,
+	Injectable,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Category } from "../../domains/category.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
-import AppError from "../utils/appError.js"
 import { constants } from "../utils/constants.js"
 
 @Injectable()
@@ -16,7 +22,7 @@ export class CategoryService {
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
 	 * @returns The list of matching categories.
-	 * @throws {AppError} With status 500 if the query fails.
+	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getAll(offset?: number, limit?: number): Promise<Category[]> {
 		try {
@@ -31,7 +37,7 @@ export class CategoryService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting all categories`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -39,7 +45,7 @@ export class CategoryService {
 	 * Retrieves a single non-deleted category by its id.
 	 * @param id - The category id to look up.
 	 * @returns The matching category, or `null` if none is found.
-	 * @throws {AppError} With status 500 if the query fails.
+	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getById(id: string): Promise<Category | null> {
 		try {
@@ -51,7 +57,7 @@ export class CategoryService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting category by id ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -60,7 +66,7 @@ export class CategoryService {
 	 * with the same description already exists, reactivates it (upsert on `description`).
 	 * @param description - The category description; must be unique among active categories.
 	 * @returns The created or reactivated category.
-	 * @throws {AppError} With status 500 if the operation fails.
+	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
 	async create(description: string): Promise<Category> {
 		try {
@@ -74,7 +80,7 @@ export class CategoryService {
 			this.logger.error(
 				`Error - ${error.message || error} - creating category ${description}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -86,8 +92,9 @@ export class CategoryService {
 	 * @param id - The id of the category to update.
 	 * @param description - The new description to apply.
 	 * @returns The updated (or reactivated) category.
-	 * @throws {AppError} With status 404 if the category is not found, or 400 if an
-	 * active category already has the same description; 500 on unexpected errors.
+	 * @throws {NotFoundException} If the category is not found.
+	 * @throws {BadRequestException} If an active category already has the same description.
+	 * @throws {InternalServerErrorException} On unexpected errors.
 	 */
 	async update(id: string, description: string): Promise<Category> {
 		try {
@@ -98,7 +105,7 @@ export class CategoryService {
 
 			if (!category) {
 				this.logger.error(`Category ${id} not found`)
-				throw new AppError("Category not found", 404)
+				throw new NotFoundException("Category not found")
 			}
 
 			if (
@@ -117,9 +124,8 @@ export class CategoryService {
 					this.logger.error(
 						`Category with description "${description}" already exists`
 					)
-					throw new AppError(
-						"There is already a category with same description",
-						400
+					throw new BadRequestException(
+						"There is already a category with same description"
 					)
 				}
 			}
@@ -131,13 +137,13 @@ export class CategoryService {
 
 			return reactivatedCategory
 		} catch (error) {
-			if (error instanceof AppError) {
+			if (error instanceof HttpException) {
 				throw error
 			}
 			this.logger.error(
 				`Error - ${error.message || error} - updating category ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -146,7 +152,7 @@ export class CategoryService {
 	 * Deleting a category that does not exist is treated as a no-op rather than an error.
 	 * @param id - The id of the category to delete.
 	 * @returns Nothing.
-	 * @throws {AppError} With status 500 if the operation fails for a reason other than
+	 * @throws {InternalServerErrorException} If the operation fails for a reason other than
 	 * the record not existing.
 	 */
 	async delete(id: string): Promise<void> {
@@ -165,7 +171,7 @@ export class CategoryService {
 			this.logger.error(
 				`Error - ${error.message || error} - deleting category ${id}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 
@@ -176,7 +182,7 @@ export class CategoryService {
 	 * @param categoryIdToDelete - The id of the category to soft-delete.
 	 * @param categoryIdToRestore - The id of the soft-deleted category to reactivate.
 	 * @returns The reactivated category.
-	 * @throws {AppError} With status 500 if the operation fails.
+	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
 	private async reactivateCategory(
 		categoryIdToDelete: string,
@@ -195,7 +201,7 @@ export class CategoryService {
 			this.logger.error(
 				`Error - ${error.message || error} - reactivating category ${categoryIdToDelete}`
 			)
-			throw new AppError("Internal server error", 500)
+			throw new InternalServerErrorException("Internal server error")
 		}
 	}
 }

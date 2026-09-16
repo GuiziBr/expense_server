@@ -4,7 +4,7 @@ export const listCategoriesSchema = z.object({
     limit: z.coerce.number().int().min(1).max(20).default(20)
 });
 export const categoryByIdSchema = z.object({
-    id: z.string().uuid()
+    id: z.uuid()
 });
 export const createCategorySchema = z.object({
     description: z.string().trim().min(1)

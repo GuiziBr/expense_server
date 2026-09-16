@@ -1,10 +1,13 @@
-import { Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	InternalServerErrorException,
+	Logger
+} from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { User } from "@/domains/user.domain"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createPrismaError } from "../test-utils/errors.factory"
 import { UserService } from "./user.service"
-import AppError from "@/modules/utils/appError"
 
 describe("UserService", () => {
 	let userService: UserService
@@ -39,7 +42,7 @@ describe("UserService", () => {
 			)
 
 			await expect(userService.findUserByEmail("email")).rejects.toThrow(
-				AppError
+				InternalServerErrorException
 			)
 
 			expect(databaseService.user.findUnique).toBeCalledWith({
@@ -72,7 +75,7 @@ describe("UserService", () => {
 
 			await expect(
 				userService.updateUserAvatar("user_id", "avatar")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.user.update).toBeCalledWith({
 				where: { id: "user_id" },
@@ -89,7 +92,7 @@ describe("UserService", () => {
 
 			await expect(
 				userService.updateUserAvatar("user_id", "avatar")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(InternalServerErrorException)
 
 			expect(databaseService.user.update).toBeCalledWith({
 				where: { id: "user_id" },

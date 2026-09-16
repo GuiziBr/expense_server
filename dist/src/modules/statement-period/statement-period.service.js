@@ -8,9 +8,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var StatementPeriodService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { DatabaseService } from "../../infra/database/database.service.js";
-import AppError from "../utils/appError.js";
 let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodService {
     databaseService;
     logger = new Logger(StatementPeriodService_1.name);
@@ -30,7 +29,7 @@ let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodSer
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting statement period`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
 };

@@ -1,4 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common"
+import {
+	Injectable,
+	InternalServerErrorException,
+	Logger
+} from "@nestjs/common"
 import { endOfMonth } from "date-fns"
 import {
 	ConsolidatedReport,
@@ -8,7 +12,6 @@ import {
 } from "../../domains/balance.domain.js"
 import { Expense } from "../../domains/expense.domain.js"
 import { ExpenseService } from "../expense/expense.service.js"
-import AppError from "../utils/appError.js"
 import {
 	GetBalanceRequest,
 	GetBalanceResponse,
@@ -69,7 +72,7 @@ export class BalanceService {
 	 * for the given owner and date/filter criteria.
 	 * @param data - The owner id, date range, and optional filter criteria.
 	 * @returns The computed personal and shared balances.
-	 * @throws {AppError} With status 500 if the underlying expense queries fail.
+	 * @throws {InternalServerErrorException} If the underlying expense queries fail.
 	 */
 	async getBalance(data: GetBalanceRequest): Promise<GetBalanceResponse> {
 		try {
@@ -105,7 +108,7 @@ export class BalanceService {
 			}
 		} catch (error) {
 			this.logger.error(`Error - ${error.message || error} - getting balance`)
-			throw new AppError("Error getting balance", 500)
+			throw new InternalServerErrorException("Error getting balance")
 		}
 	}
 
@@ -116,7 +119,7 @@ export class BalanceService {
 	 * versus their partner's.
 	 * @param request - The target `year`, zero-indexed `month`, and requesting `userId`.
 	 * @returns The consolidated report along with the requester's and partner's balances.
-	 * @throws {AppError} With status 500 if the underlying expense query or aggregation fails.
+	 * @throws {InternalServerErrorException} If the underlying expense query or aggregation fails.
 	 */
 	async getConsolidatedBalance({
 		year,
@@ -209,7 +212,9 @@ export class BalanceService {
 			this.logger.error(
 				`Error - ${error.message || error} - getting consolidated balance`
 			)
-			throw new AppError("Error getting consolidated balance", 500)
+			throw new InternalServerErrorException(
+				"Error getting consolidated balance"
+			)
 		}
 	}
 }

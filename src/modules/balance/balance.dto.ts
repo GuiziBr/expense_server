@@ -6,12 +6,26 @@ import {
 } from "../../domains/balance.domain.js"
 import { GetExpensesRequest } from "../expense/expense.dto.js"
 
-export const queryBalanceSchema = z.object({
-	startDate: z.coerce.date(),
-	endDate: z.coerce.date(),
-	filterBy: z.enum(["category", "paymentType", "bank", "store"]).optional(),
-	filterValue: z.string().optional().optional()
-})
+export const queryBalanceSchema = z
+	.object({
+		startDate: z.coerce.date(),
+		endDate: z.coerce.date(),
+		filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+		filterValue: z.string().optional()
+	})
+	.superRefine((data, ctx) => {
+		if (
+			data.filterBy &&
+			data.filterValue &&
+			!z.uuid().safeParse(data.filterValue).success
+		) {
+			ctx.addIssue({
+				code: "custom",
+				path: ["filterValue"],
+				message: "must be a valid UUID"
+			})
+		}
+	})
 
 export type QueryBalanceDTO = z.infer<typeof queryBalanceSchema>
 

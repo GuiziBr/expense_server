@@ -1,9 +1,14 @@
-import { Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	ForbiddenException,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { addDays, addMonths, endOfMonth, setDate } from "date-fns"
 import { StatementPeriod } from "@/domains/statement-period.domain"
 import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "@/modules/utils/appError"
 import { PaymentTypeService } from "../payment-type/payment-type.service"
 import { StatementPeriodService } from "../statement-period/statement-period.service"
 import { createPrismaError } from "../test-utils/errors.factory"
@@ -102,7 +107,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.expense.create).not.toHaveBeenCalled()
 		})
@@ -114,7 +119,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(paymentTypeService.getById).toBeCalledWith("payment-type-id")
 
@@ -130,7 +135,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(paymentTypeService.getById).toBeCalledWith("payment-type-id")
 
@@ -411,7 +416,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.expense.create).toBeCalledWith({
 				data: {
@@ -461,7 +466,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.createExpense(payload, "user_id")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.expense.create).toBeCalledWith({
 				data: {
@@ -756,7 +761,7 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
-			).rejects.toThrow(new AppError("Expense not found", 404))
+			).rejects.toThrow(new NotFoundException("Expense not found"))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -764,7 +769,7 @@ describe("ExpenseService", () => {
 		it("should throw 403 if user is not the owner", async () => {
 			await expect(
 				expenseService.deleteExpense(fakeExpense.id, "other-user-id")
-			).rejects.toThrow(new AppError("Unauthorized", 403))
+			).rejects.toThrow(new ForbiddenException("Unauthorized"))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -786,7 +791,9 @@ describe("ExpenseService", () => {
 
 			await expect(
 				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
-			).rejects.toThrow(new AppError("Internal server error", 500))
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
 
 			expect(loggerSpy).toBeCalledWith(
 				`Error - DB connection lost - deleting expense ${fakeExpense.id}`
@@ -823,7 +830,7 @@ describe("ExpenseService", () => {
 					createUpdatePayload(new Date(), false, false),
 					fakeExpense.ownerId
 				)
-			).rejects.toThrow(new AppError("Expense not found", 404))
+			).rejects.toThrow(new NotFoundException("Expense not found"))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -835,7 +842,7 @@ describe("ExpenseService", () => {
 					createUpdatePayload(new Date(), false, false),
 					"other-user-id"
 				)
-			).rejects.toThrow(new AppError("Unauthorized", 403))
+			).rejects.toThrow(new ForbiddenException("Unauthorized"))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -847,7 +854,9 @@ describe("ExpenseService", () => {
 					createUpdatePayload(addDays(new Date(), 1), false, false),
 					fakeExpense.ownerId
 				)
-			).rejects.toThrow(new AppError("Date must not be in the future", 400))
+			).rejects.toThrow(
+				new BadRequestException("Date must not be in the future")
+			)
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -867,7 +876,7 @@ describe("ExpenseService", () => {
 					createUpdatePayload(new Date(), false, false),
 					fakeExpense.ownerId
 				)
-			).rejects.toThrow(new AppError("Expense not found", 404))
+			).rejects.toThrow(new NotFoundException("Expense not found"))
 
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
@@ -1062,7 +1071,7 @@ describe("ExpenseService", () => {
 					payload,
 					fakeExpense.ownerId
 				)
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(loggerSpy).toBeCalledWith("Error - P2003 - updating expense")
 		})
@@ -1084,7 +1093,9 @@ describe("ExpenseService", () => {
 					payload,
 					fakeExpense.ownerId
 				)
-			).rejects.toThrow(new AppError("Internal server error", 500))
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
 
 			expect(loggerSpy).toBeCalledWith(
 				`Error - DB connection lost - updating expense ${fakeExpense.id}`

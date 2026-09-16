@@ -78,8 +78,8 @@ export class StoreController {
 	 * @param params - Route params validated against `storeByIdSchema` (`id`).
 	 * @param body - Request body validated against `createStoreSchema` (`name`).
 	 * @returns The updated store mapped to its HTTP representation.
-	 * @throws AppError with status 404 if the store does not exist, or 400 if
-	 * another active store already uses the requested name.
+	 * @throws {NotFoundException} If the store does not exist.
+	 * @throws {BadRequestException} If another active store already uses the requested name.
 	 */
 	@Patch(":id")
 	async updateStore(

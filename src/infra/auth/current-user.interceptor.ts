@@ -2,9 +2,9 @@ import {
 	CallHandler,
 	ExecutionContext,
 	Injectable,
-	Logger
+	Logger,
+	NotFoundException
 } from "@nestjs/common"
-import AppError from "../../modules/utils/appError.js"
 import { DatabaseService } from "../database/database.service.js"
 
 @Injectable()
@@ -23,7 +23,7 @@ export class CurrentUserInterceptor {
 
 		if (!currentUser) {
 			this.logger.error(`Error - User not found - ${sub}`)
-			throw new AppError("User not found", 404)
+			throw new NotFoundException("User not found")
 		}
 
 		request.userId = currentUser.id

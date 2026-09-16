@@ -8,10 +8,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var CategoryService_1;
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { DatabaseService } from "../../infra/database/database.service.js";
-import AppError from "../utils/appError.js";
 import { constants } from "../utils/constants.js";
 let CategoryService = CategoryService_1 = class CategoryService {
     databaseService;
@@ -31,7 +30,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting all categories`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async getById(id) {
@@ -43,7 +42,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - getting category by id ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async create(description) {
@@ -57,7 +56,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - creating category ${description}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async update(id, description) {
@@ -68,7 +67,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             ]);
             if (!category) {
                 this.logger.error(`Category ${id} not found`);
-                throw new AppError("Category not found", 404);
+                throw new NotFoundException("Category not found");
             }
             if ((category && !sameDescriptionCategory) ||
                 sameDescriptionCategory?.id === id) {
@@ -81,18 +80,18 @@ let CategoryService = CategoryService_1 = class CategoryService {
             if (sameDescriptionCategory) {
                 if (!sameDescriptionCategory?.deletedAt) {
                     this.logger.error(`Category with description "${description}" already exists`);
-                    throw new AppError("There is already a category with same description", 400);
+                    throw new BadRequestException("There is already a category with same description");
                 }
             }
             const reactivatedCategory = await this.reactivateCategory(id, sameDescriptionCategory.id);
             return reactivatedCategory;
         }
         catch (error) {
-            if (error instanceof AppError) {
+            if (error instanceof HttpException) {
                 throw error;
             }
             this.logger.error(`Error - ${error.message || error} - updating category ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async delete(id) {
@@ -108,7 +107,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
                 return;
             }
             this.logger.error(`Error - ${error.message || error} - deleting category ${id}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
     async reactivateCategory(categoryIdToDelete, categoryIdToRestore) {
@@ -124,7 +123,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - reactivating category ${categoryIdToDelete}`);
-            throw new AppError("Internal server error", 500);
+            throw new InternalServerErrorException("Internal server error");
         }
     }
 };

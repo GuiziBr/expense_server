@@ -1,9 +1,13 @@
-import { Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
 import { createStore } from "../test-utils/store.factory"
 import { StoreService } from "./store.service"
-import AppError from "@/modules/utils/appError"
 
 describe("StoreService", () => {
 	let storeService: StoreService
@@ -39,7 +43,9 @@ describe("StoreService", () => {
 		it("should throw Internal server error exception", async () => {
 			vi.spyOn(databaseService.store, "findMany").mockRejectedValue(new Error())
 
-			await expect(storeService.getAll(0, 1)).rejects.toThrow(AppError)
+			await expect(storeService.getAll(0, 1)).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.store.findMany).toBeCalledWith({
 				where: { deletedAt: null },
@@ -71,7 +77,9 @@ describe("StoreService", () => {
 				new Error()
 			)
 
-			await expect(storeService.getById("store-id")).rejects.toThrow(AppError)
+			await expect(storeService.getById("store-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.store.findUnique).toBeCalledWith({
 				where: { id: "store-id", deletedAt: null }
@@ -99,7 +107,9 @@ describe("StoreService", () => {
 
 			const name = "store_name"
 
-			await expect(storeService.create(name)).rejects.toThrow(AppError)
+			await expect(storeService.create(name)).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.store.upsert).toBeCalledWith({
 				where: { name },
@@ -132,7 +142,7 @@ describe("StoreService", () => {
 
 			await expect(
 				storeService.update("store-id", "updated-store")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(NotFoundException)
 
 			expect(databaseService.store.findUnique).toBeCalledWith({
 				where: { id: "store-id" }
@@ -169,7 +179,7 @@ describe("StoreService", () => {
 		it("should throw Store already exists exception", async () => {
 			await expect(
 				storeService.update("store-id", "updated-store")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.store.findUnique).toBeCalledWith({
 				where: { id: "store-id" }
@@ -221,7 +231,7 @@ describe("StoreService", () => {
 
 			await expect(
 				storeService.update("store-id", "updated-Store")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(InternalServerErrorException)
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating store store-id"

@@ -15,7 +15,7 @@ export const listStoresSchema = z.object({
 export type ListStoreDTO = z.infer<typeof listStoresSchema>
 
 export const storeByIdSchema = z.object({
-	id: z.string().uuid()
+	id: z.uuid()
 })
 
 export type StoreByIdDTO = z.infer<typeof storeByIdSchema>

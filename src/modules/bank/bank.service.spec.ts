@@ -1,7 +1,11 @@
-import { Logger } from "@nestjs/common"
+import {
+	BadRequestException,
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
-import AppError from "@/modules/utils/appError"
 import { createBank } from "../test-utils/bank.factory"
 import { createPrismaError } from "../test-utils/errors.factory"
 import { constants } from "../utils/constants"
@@ -42,7 +46,9 @@ describe("BankService", () => {
 		it("should throw Internal server error exception", async () => {
 			vi.spyOn(databaseService.bank, "findMany").mockRejectedValue(new Error())
 
-			await expect(bankService.getAll(0, 1)).rejects.toThrow(AppError)
+			await expect(bankService.getAll(0, 1)).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.bank.findMany).toBeCalledWith({
 				where: { deletedAt: null },
@@ -74,7 +80,9 @@ describe("BankService", () => {
 				new Error()
 			)
 
-			await expect(bankService.getById("bank-id")).rejects.toThrow(AppError)
+			await expect(bankService.getById("bank-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.bank.findUnique).toBeCalledWith({
 				where: { id: "bank-id", deletedAt: null }
@@ -102,7 +110,9 @@ describe("BankService", () => {
 
 			const name = "bank_name"
 
-			await expect(bankService.create(name)).rejects.toThrow(AppError)
+			await expect(bankService.create(name)).rejects.toThrow(
+				InternalServerErrorException
+			)
 
 			expect(databaseService.bank.upsert).toBeCalledWith({
 				where: { name },
@@ -135,7 +145,7 @@ describe("BankService", () => {
 
 			await expect(
 				bankService.update("bank-id", "updated-bank")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(NotFoundException)
 
 			expect(databaseService.bank.findUnique).toBeCalledWith({
 				where: { id: "bank-id" }
@@ -172,7 +182,7 @@ describe("BankService", () => {
 		it("should throw bank already exists exception", async () => {
 			await expect(
 				bankService.update("bank-id", "updated-bank")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(databaseService.bank.findUnique).toBeCalledWith({
 				where: { id: "bank-id" }
@@ -230,7 +240,7 @@ describe("BankService", () => {
 
 			await expect(
 				bankService.update(fakeBank.id, "updated-bank")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(BadRequestException)
 
 			expect(loggerSpy).toBeCalledWith(
 				'Bank with name "updated-bank" already exists'
@@ -244,7 +254,7 @@ describe("BankService", () => {
 
 			await expect(
 				bankService.update("bank-id", "updated-bank")
-			).rejects.toThrow(AppError)
+			).rejects.toThrow(InternalServerErrorException)
 
 			expect(loggerSpy).toBeCalledWith("Error - Error - updating bank bank-id")
 		})

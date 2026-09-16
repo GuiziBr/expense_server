@@ -87,9 +87,9 @@ export class ExpenseController {
 	 * @param params - Validated route params containing the expense `id`.
 	 * @param body - Validated expense update payload.
 	 * @returns The updated expense, presented as an `ExpenseDTO`.
-	 * @throws AppError with status 404 if the expense does not exist.
-	 * @throws AppError with status 403 if the current user is not the expense owner.
-	 * @throws AppError with status 400 if the expense date is in the future.
+	 * @throws {NotFoundException} If the expense does not exist.
+	 * @throws {ForbiddenException} If the current user is not the expense owner.
+	 * @throws {BadRequestException} If the expense date is in the future.
 	 */
 	@UseInterceptors(CurrentUserInterceptor)
 	@Put(":id")
@@ -111,8 +111,8 @@ export class ExpenseController {
 	 * @param userId - ID of the currently authenticated user, injected from the request.
 	 * @param params - Validated route params containing the expense `id`.
 	 * @returns Nothing; responds with HTTP 204 on success.
-	 * @throws AppError with status 404 if the expense does not exist.
-	 * @throws AppError with status 403 if the current user is not the expense owner.
+	 * @throws {NotFoundException} If the expense does not exist.
+	 * @throws {ForbiddenException} If the current user is not the expense owner.
 	 */
 	@UseInterceptors(CurrentUserInterceptor)
 	@HttpCode(204)
