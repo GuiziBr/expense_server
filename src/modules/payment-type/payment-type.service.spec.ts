@@ -6,7 +6,9 @@ import {
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
+import { createPrismaError } from "../test-utils/errors.factory"
 import { createPaymentType } from "../test-utils/payment-type.factory"
+import { constants } from "../utils/constants"
 import { PaymentTypeService } from "./payment-type.service"
 
 describe("PaymentTypeService", () => {
@@ -243,6 +245,25 @@ describe("PaymentTypeService", () => {
 			})
 		})
 
+		it("should throw internal server error exception when reactivation fails", async () => {
+			const deletedPaymentType = createPaymentType({ deletedAt: new Date() })
+
+			vi.spyOn(databaseService.paymentType, "findUnique").mockResolvedValue(
+				deletedPaymentType
+			)
+			vi.spyOn(databaseService.paymentType, "update").mockRejectedValue(
+				new Error()
+			)
+
+			await expect(
+				paymentTypeService.update(fakePaymentType.id, "updated-payment", false)
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - Error - reactivating payment type ${fakePaymentType.id}`
+			)
+		})
+
 		it("should throw internal server error exception", async () => {
 			vi.spyOn(databaseService.paymentType, "findUnique").mockRejectedValue(
 				new Error()
@@ -254,6 +275,45 @@ describe("PaymentTypeService", () => {
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating payment type payment-id"
+			)
+		})
+	})
+
+	describe("delete", () => {
+		it("should soft-delete the payment type", async () => {
+			await paymentTypeService.delete("payment-id")
+
+			expect(databaseService.paymentType.update).toBeCalledWith({
+				where: { id: "payment-id" },
+				data: { deletedAt: expect.any(Date) }
+			})
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should not throw when the payment type no longer exists", async () => {
+			vi.spyOn(databaseService.paymentType, "update").mockRejectedValue(
+				createPrismaError(constants.RECORD_NOT_FOUND)
+			)
+
+			await expect(
+				paymentTypeService.delete("payment-id")
+			).resolves.toBeUndefined()
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should throw internal server error exception", async () => {
+			vi.spyOn(databaseService.paymentType, "update").mockRejectedValue(
+				new Error()
+			)
+
+			await expect(paymentTypeService.delete("payment-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				"Error - Error - deleting payment type payment-id"
 			)
 		})
 	})

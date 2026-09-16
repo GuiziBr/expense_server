@@ -6,7 +6,9 @@ import {
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service"
+import { createPrismaError } from "../test-utils/errors.factory"
 import { createStore } from "../test-utils/store.factory"
+import { constants } from "../utils/constants"
 import { StoreService } from "./store.service"
 
 describe("StoreService", () => {
@@ -224,6 +226,23 @@ describe("StoreService", () => {
 			})
 		})
 
+		it("should throw internal server error exception when reactivation fails", async () => {
+			const deletedStore = createStore({ deletedAt: new Date() })
+
+			vi.spyOn(databaseService.store, "findUnique").mockResolvedValue(
+				deletedStore
+			)
+			vi.spyOn(databaseService.store, "update").mockRejectedValue(new Error())
+
+			await expect(
+				storeService.update(fakeStore.id, "updated-store")
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - Error - reactivating store ${fakeStore.id}`
+			)
+		})
+
 		it("should throw internal server error exception", async () => {
 			vi.spyOn(databaseService.store, "findUnique").mockRejectedValue(
 				new Error()
@@ -235,6 +254,41 @@ describe("StoreService", () => {
 
 			expect(loggerSpy).toBeCalledWith(
 				"Error - Error - updating store store-id"
+			)
+		})
+	})
+
+	describe("delete", () => {
+		it("should soft-delete the store", async () => {
+			await storeService.delete("store-id")
+
+			expect(databaseService.store.update).toBeCalledWith({
+				where: { id: "store-id" },
+				data: { deletedAt: expect.any(Date) }
+			})
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should not throw when the store no longer exists", async () => {
+			vi.spyOn(databaseService.store, "update").mockRejectedValue(
+				createPrismaError(constants.RECORD_NOT_FOUND)
+			)
+
+			await expect(storeService.delete("store-id")).resolves.toBeUndefined()
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should throw internal server error exception", async () => {
+			vi.spyOn(databaseService.store, "update").mockRejectedValue(new Error())
+
+			await expect(storeService.delete("store-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				"Error - Error - deleting store store-id"
 			)
 		})
 	})

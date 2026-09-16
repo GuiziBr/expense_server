@@ -60,5 +60,29 @@ describe("CurrentUserInterceptor", () => {
 
 			expect(next.handle).not.toHaveBeenCalled()
 		})
+
+		it("should set userId on the request and call next when user is found", async () => {
+			const request: { user: { sub: string }; url: string; userId?: string } = {
+				user: { sub: "user_id" },
+				url: "/test"
+			}
+			mockContext = {
+				switchToHttp: vi.fn().mockReturnValue({
+					getRequest: vi.fn().mockReturnValue(request)
+				})
+			} as unknown as ExecutionContext
+
+			await interceptor.intercept(mockContext, next)
+
+			expect(databaseService.user.findUnique).toBeCalledWith({
+				where: { id: "user_id" }
+			})
+
+			expect(request.userId).toBe("user_id")
+
+			expect(next.handle).toHaveBeenCalled()
+
+			expect(loggerSpy).not.toBeCalled()
+		})
 	})
 })

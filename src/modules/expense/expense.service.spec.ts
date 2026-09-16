@@ -142,6 +142,30 @@ describe("ExpenseService", () => {
 			expect(databaseService.expense.create).not.toHaveBeenCalled()
 		})
 
+		it("should default bankId and storeId to null when omitted", async () => {
+			const expenseDate = new Date()
+
+			const payload = createPayload(expenseDate, true, false)
+			delete payload.bank_id
+			delete payload.store_id
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+
+			await expenseService.createExpense(payload, "user_id")
+
+			expect(databaseService.expense.create).toBeCalledWith(
+				expect.objectContaining({
+					data: expect.objectContaining({
+						bankId: null,
+						storeId: null
+					})
+				})
+			)
+		})
+
 		it("should create personal expense with no statement for end of next month by default", async () => {
 			const expenseDate = new Date()
 
@@ -501,9 +525,89 @@ describe("ExpenseService", () => {
 
 			expect(loggerSpy).toBeCalledWith("Error - P2002 - creating expense")
 		})
+
+		it("should throw 500 on unknown error during create", async () => {
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue(
+				new Error("DB connection lost")
+			)
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				"Error - DB connection lost - creating expense"
+			)
+		})
+
+		it("should throw 500 and log the raw error when a non-Error is thrown", async () => {
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue("raw error")
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith("Error - raw error - creating expense")
+		})
+
+		it("should throw 500 on an unrecognized prisma error code", async () => {
+			const prismaError = createPrismaError("P9999")
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith("Error - P9999 - creating expense")
+		})
+
+		it("should fall back to the raw error when a prisma error has no code", async () => {
+			const prismaError = createPrismaError("")
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - ${prismaError} - creating expense`
+			)
+		})
 	})
 
 	describe("getPersonalExpenses", () => {
+		it("should default orderBy to date when the column is not recognized", async () => {
+			const expensesRequest = {
+				ownerId: "user_id",
+				endDate: new Date(),
+				orderType: "asc"
+			} as GetExpensesRequest
+
+			await expenseService.getPersonalExpenses(expensesRequest)
+
+			expect(databaseService.expense.findMany).toBeCalledWith(
+				expect.objectContaining({
+					orderBy: { date: "asc" }
+				})
+			)
+		})
+
 		it("should return personal expenses with no start date", async () => {
 			const expensesRequest = {
 				ownerId: "user_id",
@@ -799,6 +903,20 @@ describe("ExpenseService", () => {
 				`Error - DB connection lost - deleting expense ${fakeExpense.id}`
 			)
 		})
+
+		it("should throw 500 and log the raw error when a non-Error is thrown", async () => {
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue("raw error")
+
+			await expect(
+				expenseService.deleteExpense(fakeExpense.id, fakeExpense.ownerId)
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - raw error - deleting expense ${fakeExpense.id}`
+			)
+		})
 	})
 
 	describe("updateExpense", () => {
@@ -1076,6 +1194,30 @@ describe("ExpenseService", () => {
 			expect(loggerSpy).toBeCalledWith("Error - P2003 - updating expense")
 		})
 
+		it("should throw error on unique constraint violation", async () => {
+			const prismaError = createPrismaError(
+				constants.UNIQUE_CONSTRAINT_VIOLATION,
+				{ field_name: "error_category_id" }
+			)
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
+			).rejects.toThrow(BadRequestException)
+
+			expect(loggerSpy).toBeCalledWith("Error - P2002 - updating expense")
+		})
+
 		it("should throw 500 on unknown error during update", async () => {
 			const payload = createUpdatePayload(new Date(), false, false)
 
@@ -1099,6 +1241,78 @@ describe("ExpenseService", () => {
 
 			expect(loggerSpy).toBeCalledWith(
 				`Error - DB connection lost - updating expense ${fakeExpense.id}`
+			)
+		})
+
+		it("should throw 500 and log the raw error when a non-Error is thrown", async () => {
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue("raw error")
+
+			await expect(
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - raw error - updating expense ${fakeExpense.id}`
+			)
+		})
+
+		it("should throw 500 on an unrecognized prisma error code", async () => {
+			const prismaError = createPrismaError("P9999")
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith("Error - P9999 - updating expense")
+		})
+
+		it("should fall back to the raw error when a prisma error has no code", async () => {
+			const prismaError = createPrismaError("")
+			const payload = createUpdatePayload(new Date(), false, false)
+
+			vi.spyOn(paymentTypeService, "getById").mockResolvedValue({
+				...fakePaymentType,
+				hasStatement: false
+			})
+			vi.spyOn(databaseService.expense, "update").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.updateExpense(
+					fakeExpense.id,
+					payload,
+					fakeExpense.ownerId
+				)
+			).rejects.toThrow(
+				new InternalServerErrorException("Internal server error")
+			)
+
+			expect(loggerSpy).toBeCalledWith(
+				`Error - ${prismaError} - updating expense`
 			)
 		})
 	})

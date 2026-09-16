@@ -31,7 +31,7 @@ let PaymentTypeController = class PaymentTypeController {
         if (!paymentType) {
             throw new NotFoundException();
         }
-        return PaymentTypePresenter.toHttp(paymentType) || null;
+        return PaymentTypePresenter.toHttp(paymentType);
     }
     async createPaymentType(body) {
         const { description, hasStatement } = body;
