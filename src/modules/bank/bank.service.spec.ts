@@ -259,4 +259,37 @@ describe("BankService", () => {
 			expect(loggerSpy).toBeCalledWith("Error - Error - updating bank bank-id")
 		})
 	})
+
+	describe("delete", () => {
+		it("should soft-delete the bank", async () => {
+			await bankService.delete("bank-id")
+
+			expect(databaseService.bank.update).toBeCalledWith({
+				where: { id: "bank-id" },
+				data: { deletedAt: expect.any(Date) }
+			})
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should not throw when the bank no longer exists", async () => {
+			vi.spyOn(databaseService.bank, "update").mockRejectedValue(
+				createPrismaError(constants.RECORD_NOT_FOUND)
+			)
+
+			await expect(bankService.delete("bank-id")).resolves.toBeUndefined()
+
+			expect(loggerSpy).not.toBeCalled()
+		})
+
+		it("should throw internal server error exception", async () => {
+			vi.spyOn(databaseService.bank, "update").mockRejectedValue(new Error())
+
+			await expect(bankService.delete("bank-id")).rejects.toThrow(
+				InternalServerErrorException
+			)
+
+			expect(loggerSpy).toBeCalledWith("Error - Error - deleting bank bank-id")
+		})
+	})
 })

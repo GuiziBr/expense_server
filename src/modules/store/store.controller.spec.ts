@@ -1,3 +1,4 @@
+import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
 import { createStore } from "../test-utils/store.factory"
@@ -62,6 +63,14 @@ describe("StoreController", () => {
 			})
 
 			expect(storeService.getById).toBeCalledWith("id")
+		})
+
+		it("should throw NotFoundException when store does not exist", async () => {
+			vi.spyOn(storeService, "getById").mockResolvedValue(null)
+
+			await expect(storeController.getStoreById({ id: "id" })).rejects.toThrow(
+				NotFoundException
+			)
 		})
 	})
 

@@ -31,7 +31,7 @@ let BankController = class BankController {
         if (!bank) {
             throw new NotFoundException();
         }
-        return BankPresenter.toHttp(bank) || null;
+        return BankPresenter.toHttp(bank);
     }
     async createBank(body) {
         const { name } = body;

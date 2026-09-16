@@ -76,11 +76,9 @@ let BankService = BankService_1 = class BankService {
                 });
                 return updatedBank;
             }
-            if (sameNameBank) {
-                if (!sameNameBank?.deletedAt) {
-                    this.logger.error(`Bank with name "${name}" already exists`);
-                    throw new BadRequestException("There is already a bank with same name");
-                }
+            if (!sameNameBank.deletedAt) {
+                this.logger.error(`Bank with name "${name}" already exists`);
+                throw new BadRequestException("There is already a bank with same name");
             }
             const [, renamedBank] = await this.databaseService.$transaction([
                 this.databaseService.bank.update({
