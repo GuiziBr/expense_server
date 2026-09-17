@@ -1,9 +1,11 @@
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
+import { PrismaClient } from "../src/generated/prisma/client.js"
 
-const prisma = new PrismaClient()
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+const prisma = new PrismaClient({ adapter })
 
 const seedDataDir = join(dirname(fileURLToPath(import.meta.url)), "seed-data")
 // biome-ignore lint/suspicious/noExplicitAny: JSON data

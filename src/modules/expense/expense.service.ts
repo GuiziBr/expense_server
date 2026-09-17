@@ -7,7 +7,6 @@ import {
 	Logger,
 	NotFoundException
 } from "@nestjs/common"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import {
 	addMonths,
 	endOfMonth,
@@ -17,6 +16,7 @@ import {
 	setDate
 } from "date-fns"
 import { Expense } from "../../domains/expense.domain.js"
+import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { PaymentTypeService } from "../payment-type/payment-type.service.js"
 import { StatementPeriodService } from "../statement-period/statement-period.service.js"
@@ -212,7 +212,7 @@ export class ExpenseService {
 				throw error
 			}
 
-			if (error instanceof PrismaClientKnownRequestError) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				this.logger.error(`Error - ${error.code || error} - creating expense`)
 				if (error.code === constants.FOREIGN_KEY_VIOLATION) {
 					const dbField = error.meta.field_name as string
@@ -328,7 +328,7 @@ export class ExpenseService {
 				throw error
 			}
 
-			if (error instanceof PrismaClientKnownRequestError) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				this.logger.error(`Error - ${error.code || error} - updating expense`)
 				if (error.code === constants.FOREIGN_KEY_VIOLATION) {
 					const dbField = error.meta.field_name as string
@@ -382,7 +382,7 @@ export class ExpenseService {
 			})
 		} catch (error) {
 			if (
-				error instanceof PrismaClientKnownRequestError &&
+				error instanceof Prisma.PrismaClientKnownRequestError &&
 				error.code === constants.RECORD_NOT_FOUND
 			) {
 				return

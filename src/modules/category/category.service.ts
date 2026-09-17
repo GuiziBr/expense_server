@@ -6,8 +6,8 @@ import {
 	Logger,
 	NotFoundException
 } from "@nestjs/common"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Category } from "../../domains/category.domain.js"
+import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 
@@ -161,7 +161,7 @@ export class CategoryService {
 			})
 		} catch (error) {
 			if (
-				error instanceof PrismaClientKnownRequestError &&
+				error instanceof Prisma.PrismaClientKnownRequestError &&
 				error.code === constants.RECORD_NOT_FOUND
 			) {
 				return
