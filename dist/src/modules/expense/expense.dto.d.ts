@@ -50,13 +50,13 @@ export declare const queryExpenseSchema: z.ZodObject<{
     offset: z.ZodOptional<z.ZodDefault<z.ZodCoercedNumber<unknown>>>;
     limit: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
     orderBy: z.ZodOptional<z.ZodEnum<{
+        description: "description";
+        date: "date";
+        amount: "amount";
+        dueDate: "dueDate";
         bank: "bank";
         category: "category";
         store: "store";
-        date: "date";
-        description: "description";
-        amount: "amount";
-        dueDate: "dueDate";
         payment_type: "payment_type";
     }>>;
     orderType: z.ZodDefault<z.ZodEnum<{

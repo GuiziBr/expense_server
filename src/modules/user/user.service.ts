@@ -4,8 +4,8 @@ import {
 	InternalServerErrorException,
 	Logger
 } from "@nestjs/common"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { User } from "../../domains/user.domain.js"
+import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 
 @Injectable()
@@ -52,7 +52,7 @@ export class UserService {
 				`Error - ${error.message || error} - updating user avatar ${userId}`
 			)
 
-			if (error instanceof PrismaClientKnownRequestError) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				throw new BadRequestException("Error updating user avatar")
 			}
 			throw new InternalServerErrorException("Internal server error")

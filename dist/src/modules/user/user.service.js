@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var UserService_1;
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 let UserService = UserService_1 = class UserService {
     databaseService;
@@ -38,7 +38,7 @@ let UserService = UserService_1 = class UserService {
         }
         catch (error) {
             this.logger.error(`Error - ${error.message || error} - updating user avatar ${userId}`);
-            if (error instanceof PrismaClientKnownRequestError) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 throw new BadRequestException("Error updating user avatar");
             }
             throw new InternalServerErrorException("Internal server error");

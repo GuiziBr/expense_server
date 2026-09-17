@@ -25,7 +25,7 @@ services:
     volumes:
       - ./:/server
       - /server/node_modules
-      - /server/node_modules/.prisma
+      - /server/src/generated
     depends_on:
       db:
         condition: service_healthy

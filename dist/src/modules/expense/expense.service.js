@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ExpenseService_1;
 import { BadRequestException, ForbiddenException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { addMonths, endOfMonth, getMonth, getYear, isFuture, setDate } from "date-fns";
+import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { PaymentTypeService } from "../payment-type/payment-type.service.js";
 import { StatementPeriodService } from "../statement-period/statement-period.service.js";
@@ -101,7 +101,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             if (error instanceof HttpException) {
                 throw error;
             }
-            if (error instanceof PrismaClientKnownRequestError) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - creating expense`);
                 if (error.code === constants.FOREIGN_KEY_VIOLATION) {
                     const dbField = error.meta.field_name;
@@ -169,7 +169,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             if (error instanceof HttpException) {
                 throw error;
             }
-            if (error instanceof PrismaClientKnownRequestError) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - updating expense`);
                 if (error.code === constants.FOREIGN_KEY_VIOLATION) {
                     const dbField = error.meta.field_name;
@@ -202,7 +202,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             });
         }
         catch (error) {
-            if (error instanceof PrismaClientKnownRequestError &&
+            if (error instanceof Prisma.PrismaClientKnownRequestError &&
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }

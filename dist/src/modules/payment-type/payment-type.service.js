@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var PaymentTypeService_1;
 import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
@@ -102,7 +102,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             });
         }
         catch (error) {
-            if (error instanceof PrismaClientKnownRequestError &&
+            if (error instanceof Prisma.PrismaClientKnownRequestError &&
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
