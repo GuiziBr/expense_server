@@ -59,7 +59,7 @@
 		"source-map-support": "^0.5.21",
 		"ts-loader": "^9.4.3",
 		"tsconfig-paths": "^4.2.0",
-		"tsx": "^4.23.13",
+		"tsx": "^4.23.14",
 		"typescript": "^6.0.3",
 		"ultracite": "^7.12.0",
 		"unplugin-swc": "^1.6.0",
