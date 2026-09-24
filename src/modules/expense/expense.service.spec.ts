@@ -62,8 +62,11 @@ describe("ExpenseService", () => {
 			findFirst: vi.fn().mockResolvedValue(fakeExpense),
 			findMany: vi.fn().mockResolvedValue([fakeExpense]),
 			count: vi.fn().mockResolvedValue(1),
-			update: vi.fn().mockResolvedValue(undefined)
+			update: vi.fn().mockResolvedValue(undefined),
+			groupBy: vi.fn().mockResolvedValue([])
 		}
+
+		const lookupMock = () => ({ findMany: vi.fn().mockResolvedValue([]) })
 
 		const module = await Test.createTestingModule({
 			providers: [
@@ -74,7 +77,11 @@ describe("ExpenseService", () => {
 						$transaction: vi
 							.fn()
 							.mockImplementation((fn) => fn({ expense: expenseMock })),
-						expense: expenseMock
+						expense: expenseMock,
+						category: lookupMock(),
+						paymentType: lookupMock(),
+						bank: lookupMock(),
+						store: lookupMock()
 					}
 				},
 				{
@@ -1314,6 +1321,138 @@ describe("ExpenseService", () => {
 			expect(loggerSpy).toBeCalledWith(
 				`Error - ${prismaError} - updating expense`
 			)
+		})
+	})
+
+	describe("sumPersonalExpensesBy", () => {
+		const startDate = new Date(2024, 0, 1)
+		const endDate = new Date(2024, 0, 31)
+
+		const expectedWhereClause = {
+			deletedAt: null,
+			OR: [
+				{
+					AND: [
+						{ ownerId: "user_id" },
+						{ OR: [{ personal: true }, { split: true }] }
+					]
+				},
+				{ AND: [{ NOT: { ownerId: "user_id" } }, { personal: false }] }
+			],
+			dueDate: { lte: endDate, gte: startDate }
+		}
+
+		it("should group personal expenses by category and label them by description", async () => {
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ categoryId: "cat-1", _sum: { amount: 100 } },
+				{ categoryId: "cat-2", _sum: { amount: 300 } }
+			] as never)
+			vi.spyOn(databaseService.category, "findMany").mockResolvedValue([
+				{ id: "cat-1", description: "Groceries" },
+				{ id: "cat-2", description: "Rent" }
+			] as never)
+
+			const result = await expenseService.sumPersonalExpensesBy(
+				"user_id",
+				"category",
+				startDate,
+				endDate
+			)
+
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith({
+				by: ["categoryId"],
+				where: expectedWhereClause,
+				_sum: { amount: true }
+			})
+			expect(databaseService.category.findMany).toHaveBeenCalledWith({
+				where: { id: { in: ["cat-1", "cat-2"] } },
+				select: { id: true, description: true }
+			})
+			expect(result).toEqual([
+				{ id: "cat-2", description: "Rent", total: 300 },
+				{ id: "cat-1", description: "Groceries", total: 100 }
+			])
+		})
+
+		it("should group by payment type and label them by description", async () => {
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ paymentTypeId: "pt-1", _sum: { amount: 50 } }
+			] as never)
+			vi.spyOn(databaseService.paymentType, "findMany").mockResolvedValue([
+				{ id: "pt-1", description: "Credit Card" }
+			] as never)
+
+			const result = await expenseService.sumPersonalExpensesBy(
+				"user_id",
+				"payment_type",
+				startDate,
+				endDate
+			)
+
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith(
+				expect.objectContaining({ by: ["paymentTypeId"] })
+			)
+			expect(result).toEqual([
+				{ id: "pt-1", description: "Credit Card", total: 50 }
+			])
+		})
+
+		it("should group by bank, label by name and keep expenses with no bank as a null row", async () => {
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ bankId: null, _sum: { amount: 70 } },
+				{ bankId: "bank-1", _sum: { amount: 200 } }
+			] as never)
+			vi.spyOn(databaseService.bank, "findMany").mockResolvedValue([
+				{ id: "bank-1", name: "Chase" }
+			] as never)
+
+			const result = await expenseService.sumPersonalExpensesBy(
+				"user_id",
+				"bank",
+				startDate,
+				endDate
+			)
+
+			expect(databaseService.bank.findMany).toHaveBeenCalledWith({
+				where: { id: { in: ["bank-1"] } },
+				select: { id: true, name: true }
+			})
+			expect(result).toEqual([
+				{ id: "bank-1", name: "Chase", total: 200 },
+				{ id: null, name: null, total: 70 }
+			])
+		})
+
+		it("should group by store and default a null sum to zero", async () => {
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ storeId: "store-1", _sum: { amount: null } }
+			] as never)
+			vi.spyOn(databaseService.store, "findMany").mockResolvedValue([
+				{ id: "store-1", name: "Costco" }
+			] as never)
+
+			const result = await expenseService.sumPersonalExpensesBy(
+				"user_id",
+				"store",
+				startDate,
+				endDate
+			)
+
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith(
+				expect.objectContaining({ by: ["storeId"] })
+			)
+			expect(result).toEqual([{ id: "store-1", name: "Costco", total: 0 }])
+		})
+
+		it("should return an empty list when there are no expenses", async () => {
+			const result = await expenseService.sumPersonalExpensesBy(
+				"user_id",
+				"category",
+				startDate,
+				endDate
+			)
+
+			expect(result).toEqual([])
 		})
 	})
 })
