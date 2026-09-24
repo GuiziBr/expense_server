@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ConsolidatedReport, ReportCategory, ReportPayment } from "../../domains/balance.domain.js";
-import { GetExpensesRequest } from "../expense/expense.dto.js";
+import { ExpenseTotal, FilterBy, GetExpensesRequest } from "../expense/expense.dto.js";
 export declare const queryBalanceSchema: z.ZodObject<{
     startDate: z.ZodCoercedDate<unknown>;
     endDate: z.ZodCoercedDate<unknown>;
@@ -40,6 +40,22 @@ export interface GetConsolidatedBalanceResponse {
     requester: ConsolidatedReport;
     partner: ConsolidatedReport;
 }
+export declare const queryBalanceBreakdownSchema: z.ZodObject<{
+    filterBy: z.ZodEnum<{
+        bank: "bank";
+        category: "category";
+        store: "store";
+        payment_type: "payment_type";
+    }>;
+}, z.core.$strip>;
+export type QueryBalanceBreakdownDTO = z.infer<typeof queryBalanceBreakdownSchema>;
+export interface GetBalanceBreakdownRequest {
+    userId: string;
+    month: number;
+    year: number;
+    filterBy: FilterBy;
+}
+export type GetBalanceBreakdownResponse = Array<ExpenseTotal>;
 interface BalanceOwner {
     id?: string;
     name?: string;

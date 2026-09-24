@@ -23,6 +23,8 @@ import { StatementPeriodService } from "../statement-period/statement-period.ser
 import { constants } from "../utils/constants.js"
 import {
 	CreateExpenseDTO,
+	ExpenseTotal,
+	FilterBy,
 	GetExpensesRequest,
 	GetExpensesResponse,
 	OrderByType,
@@ -85,6 +87,83 @@ export class ExpenseService {
 						}
 					}
 		return orderByClause
+	}
+
+	/**
+	 * Builds the Prisma `where` clause matching non-deleted expenses considered
+	 * "personal" to the given owner: expenses they own that are personal or
+	 * split, plus expenses owned by others that are not personal.
+	 * @param ownerId - ID of the user whose personal expenses are being matched.
+	 * @param endDate - Inclusive upper bound on `dueDate`.
+	 * @param startDate - Optional inclusive lower bound on `dueDate`.
+	 * @returns A Prisma-compatible `where` object.
+	 */
+	private buildPersonalExpensesWhere(
+		ownerId: string,
+		endDate: Date,
+		startDate?: Date
+	) {
+		return {
+			deletedAt: null,
+			OR: [
+				{ AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
+				{ AND: [{ NOT: { ownerId } }, { personal: false }] }
+			],
+			dueDate: {
+				lte: endDate,
+				...(startDate ? { gte: startDate } : {})
+			}
+		}
+	}
+
+	/**
+	 * Fetches the display label of each given id for the filter type's lookup
+	 * table (`description` for categories/payment types, `name` for banks/stores).
+	 * Soft-deleted records are included so historical expenses keep their label.
+	 * @param filterBy - The filter type whose lookup table to query.
+	 * @param ids - IDs of the records to fetch labels for.
+	 * @returns A map of record id to its label.
+	 */
+	private async getFilterLabels(
+		filterBy: FilterBy,
+		ids: string[]
+	): Promise<Map<string, string>> {
+		const where = { id: { in: ids } }
+
+		const lookups: Record<
+			FilterBy,
+			() => Promise<Array<{ id: string; description?: string; name?: string }>>
+		> = {
+			category: () =>
+				this.databaseService.category.findMany({
+					where,
+					select: { id: true, description: true }
+				}),
+			payment_type: () =>
+				this.databaseService.paymentType.findMany({
+					where,
+					select: { id: true, description: true }
+				}),
+			bank: () =>
+				this.databaseService.bank.findMany({
+					where,
+					select: { id: true, name: true }
+				}),
+			store: () =>
+				this.databaseService.store.findMany({
+					where,
+					select: { id: true, name: true }
+				})
+		}
+
+		const records = await lookups[filterBy]()
+
+		return new Map(
+			records.map((record): [string, string] => [
+				record.id,
+				record.description ?? record.name
+			])
+		)
 	}
 
 	/**
@@ -421,17 +500,11 @@ export class ExpenseService {
 		filterBy,
 		filterValue
 	}: GetExpensesRequest): Promise<GetExpensesResponse> {
-		const whereClause = {
-			deletedAt: null,
-			OR: [
-				{ AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
-				{ AND: [{ NOT: { ownerId } }, { personal: false }] }
-			],
-			dueDate: {
-				lte: endDate,
-				...(startDate ? { gte: startDate } : {})
-			}
-		}
+		const whereClause = this.buildPersonalExpensesWhere(
+			ownerId,
+			endDate,
+			startDate
+		)
 
 		if (filterBy && filterValue) {
 			whereClause[constants.filterColumns[filterBy]] = filterValue
@@ -457,6 +530,54 @@ export class ExpenseService {
 		])
 
 		return { expenses, totalCount }
+	}
+
+	/**
+	 * Sums the given owner's personal expenses (see `getPersonalExpenses`) within
+	 * a due date range, grouped by the given filter type, in a single aggregate
+	 * query plus one label lookup.
+	 * @param ownerId - ID of the user whose personal expenses are being summed.
+	 * @param filterBy - The filter type to group by.
+	 * @param startDate - Inclusive lower bound on `dueDate`.
+	 * @param endDate - Inclusive upper bound on `dueDate`.
+	 * @returns One entry per filter value, sorted by `total` descending. Entries are
+	 * `{ id, description, total }` for categories/payment types and
+	 * `{ id, name, total }` for banks/stores, where expenses with no bank/store are
+	 * grouped under `id: null, name: null`.
+	 */
+	async sumPersonalExpensesBy(
+		ownerId: string,
+		filterBy: FilterBy,
+		startDate: Date,
+		endDate: Date
+	): Promise<ExpenseTotal[]> {
+		const column = constants.filterColumns[filterBy] as
+			| "categoryId"
+			| "paymentTypeId"
+			| "bankId"
+			| "storeId"
+
+		const groups = await this.databaseService.expense.groupBy({
+			by: [column],
+			where: this.buildPersonalExpensesWhere(ownerId, endDate, startDate),
+			_sum: { amount: true }
+		})
+
+		const ids = groups.map((group) => group[column]).filter(Boolean)
+		const labels = await this.getFilterLabels(filterBy, ids)
+		const hasDescription =
+			filterBy === "category" || filterBy === "payment_type"
+
+		return groups
+			.map((group): ExpenseTotal => {
+				const id = group[column] ?? null
+				const total = group._sum.amount ?? 0
+
+				return hasDescription
+					? { id, description: labels.get(id), total }
+					: { id, name: id ? (labels.get(id) ?? null) : null, total }
+			})
+			.sort((a, b) => b.total - a.total)
 	}
 
 	/**

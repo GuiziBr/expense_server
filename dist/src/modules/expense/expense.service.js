@@ -44,6 +44,45 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             };
         return orderByClause;
     }
+    buildPersonalExpensesWhere(ownerId, endDate, startDate) {
+        return {
+            deletedAt: null,
+            OR: [
+                { AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
+                { AND: [{ NOT: { ownerId } }, { personal: false }] }
+            ],
+            dueDate: {
+                lte: endDate,
+                ...(startDate ? { gte: startDate } : {})
+            }
+        };
+    }
+    async getFilterLabels(filterBy, ids) {
+        const where = { id: { in: ids } };
+        const lookups = {
+            category: () => this.databaseService.category.findMany({
+                where,
+                select: { id: true, description: true }
+            }),
+            payment_type: () => this.databaseService.paymentType.findMany({
+                where,
+                select: { id: true, description: true }
+            }),
+            bank: () => this.databaseService.bank.findMany({
+                where,
+                select: { id: true, name: true }
+            }),
+            store: () => this.databaseService.store.findMany({
+                where,
+                select: { id: true, name: true }
+            })
+        };
+        const records = await lookups[filterBy]();
+        return new Map(records.map((record) => [
+            record.id,
+            record.description ?? record.name
+        ]));
+    }
     async calculateDueDate(transactionDate, paymentTypeId, userId, bankId, currentMonth) {
         const paymentType = await this.paymentTypeService.getById(paymentTypeId);
         if (!paymentType?.hasStatement) {
@@ -211,17 +250,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         }
     }
     async getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {
-        const whereClause = {
-            deletedAt: null,
-            OR: [
-                { AND: [{ ownerId }, { OR: [{ personal: true }, { split: true }] }] },
-                { AND: [{ NOT: { ownerId } }, { personal: false }] }
-            ],
-            dueDate: {
-                lte: endDate,
-                ...(startDate ? { gte: startDate } : {})
-            }
-        };
+        const whereClause = this.buildPersonalExpensesWhere(ownerId, endDate, startDate);
         if (filterBy && filterValue) {
             whereClause[constants.filterColumns[filterBy]] = filterValue;
         }
@@ -243,6 +272,26 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             this.databaseService.expense.count({ where: whereClause })
         ]);
         return { expenses, totalCount };
+    }
+    async sumPersonalExpensesBy(ownerId, filterBy, startDate, endDate) {
+        const column = constants.filterColumns[filterBy];
+        const groups = await this.databaseService.expense.groupBy({
+            by: [column],
+            where: this.buildPersonalExpensesWhere(ownerId, endDate, startDate),
+            _sum: { amount: true }
+        });
+        const ids = groups.map((group) => group[column]).filter(Boolean);
+        const labels = await this.getFilterLabels(filterBy, ids);
+        const hasDescription = filterBy === "category" || filterBy === "payment_type";
+        return groups
+            .map((group) => {
+            const id = group[column] ?? null;
+            const total = group._sum.amount ?? 0;
+            return hasDescription
+                ? { id, description: labels.get(id), total }
+                : { id, name: id ? (labels.get(id) ?? null) : null, total };
+        })
+            .sort((a, b) => b.total - a.total);
     }
     async getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {
         const whereClause = {

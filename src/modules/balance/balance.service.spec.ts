@@ -28,6 +28,11 @@ describe("BalanceService", () => {
 		]
 	}
 
+	const fakeBalanceBreakdown = [
+		{ id: "bank-id", name: "Bank", total: 20 },
+		{ id: null, name: null, total: 10 }
+	]
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			providers: [
@@ -39,7 +44,10 @@ describe("BalanceService", () => {
 							.fn()
 							.mockResolvedValue(fakePersonalExpenses),
 						getSharedExpenses: vi.fn().mockResolvedValue(fakeSharedExpenses),
-						getExpensesByDateRange: vi.fn().mockResolvedValue(fakeExpenses)
+						getExpensesByDateRange: vi.fn().mockResolvedValue(fakeExpenses),
+						sumPersonalExpensesBy: vi
+							.fn()
+							.mockResolvedValue(fakeBalanceBreakdown)
 					}
 				}
 			]
@@ -376,6 +384,64 @@ describe("BalanceService", () => {
 					total: fakeExpenses[1].amount
 				}
 			})
+		})
+	})
+
+	describe("getBalanceBreakdown", () => {
+		it("should sum personal expenses by filter type within the month", async () => {
+			const result = await balanceService.getBalanceBreakdown({
+				year: 2024,
+				month: 1,
+				userId: "owner-id",
+				filterBy: "bank"
+			})
+
+			expect(result).toEqual(fakeBalanceBreakdown)
+			expect(expenseService.sumPersonalExpensesBy).toHaveBeenCalledWith(
+				"owner-id",
+				"bank",
+				new Date(2024, 1, 1),
+				endOfMonth(new Date(2024, 1, 1))
+			)
+			expect(endOfMonth(new Date(2024, 1, 1)).getDate()).toBe(29)
+		})
+
+		it("should throw error if error summing expenses", async () => {
+			vi.spyOn(expenseService, "sumPersonalExpensesBy").mockRejectedValue(
+				new Error("Expenses error")
+			)
+
+			await expect(
+				balanceService.getBalanceBreakdown({
+					year: 2022,
+					month: 1,
+					userId: "owner-id",
+					filterBy: "category"
+				})
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - Expenses error - getting balance breakdown"
+			)
+		})
+
+		it("should log the raw error when it has no message", async () => {
+			vi.spyOn(expenseService, "sumPersonalExpensesBy").mockRejectedValue(
+				"raw error"
+			)
+
+			await expect(
+				balanceService.getBalanceBreakdown({
+					year: 2022,
+					month: 1,
+					userId: "owner-id",
+					filterBy: "category"
+				})
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - raw error - getting balance breakdown"
+			)
 		})
 	})
 })

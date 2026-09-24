@@ -4,13 +4,18 @@ import {
 	ReportCategory,
 	ReportPayment
 } from "../../domains/balance.domain.js"
-import { GetExpensesRequest } from "../expense/expense.dto.js"
+import {
+	ExpenseTotal,
+	FilterBy,
+	filterBySchema,
+	GetExpensesRequest
+} from "../expense/expense.dto.js"
 
 export const queryBalanceSchema = z
 	.object({
 		startDate: z.coerce.date(),
 		endDate: z.coerce.date(),
-		filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+		filterBy: filterBySchema.optional(),
 		filterValue: z.string().optional()
 	})
 	.superRefine((data, ctx) => {
@@ -62,6 +67,23 @@ export interface GetConsolidatedBalanceResponse {
 	requester: ConsolidatedReport
 	partner: ConsolidatedReport
 }
+
+export const queryBalanceBreakdownSchema = z.object({
+	filterBy: filterBySchema
+})
+
+export type QueryBalanceBreakdownDTO = z.infer<
+	typeof queryBalanceBreakdownSchema
+>
+
+export interface GetBalanceBreakdownRequest {
+	userId: string
+	month: number
+	year: number
+	filterBy: FilterBy
+}
+
+export type GetBalanceBreakdownResponse = Array<ExpenseTotal>
 
 interface BalanceOwner {
 	id?: string

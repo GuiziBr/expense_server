@@ -1,4 +1,4 @@
-import { ConsolidatedBalanceDTO, GetBalanceResponse, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from "./balance.dto.js";
+import { ConsolidatedBalanceDTO, GetBalanceBreakdownResponse, GetBalanceResponse, QueryBalanceBreakdownDTO, QueryBalanceDTO, QueryConsolidatedBalanceDTO } from "./balance.dto.js";
 import { BalanceService } from "./balance.service.js";
 export declare class BalanceController {
     private readonly balanceService;
@@ -9,4 +9,7 @@ export declare class BalanceController {
     getConsolidatedBalance({ userId }: {
         userId: any;
     }, params: QueryConsolidatedBalanceDTO): Promise<ConsolidatedBalanceDTO>;
+    getBalanceBreakdown({ userId }: {
+        userId: any;
+    }, params: QueryConsolidatedBalanceDTO, query: QueryBalanceBreakdownDTO): Promise<GetBalanceBreakdownResponse>;
 }
