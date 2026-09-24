@@ -64,6 +64,17 @@ let BalanceService = BalanceService_1 = class BalanceService {
             throw new InternalServerErrorException("Error getting balance");
         }
     }
+    async getBalanceBreakdown({ year, month, userId, filterBy }) {
+        try {
+            const initialDate = new Date(year, month, 1);
+            const finalDate = endOfMonth(initialDate);
+            return await this.expensesService.sumPersonalExpensesBy(userId, filterBy, initialDate, finalDate);
+        }
+        catch (error) {
+            this.logger.error(`Error - ${error.message || error} - getting balance breakdown`);
+            throw new InternalServerErrorException("Error getting balance breakdown");
+        }
+    }
     async getConsolidatedBalance({ year, month, userId }) {
         try {
             const initialDate = new Date(year, month, 1);

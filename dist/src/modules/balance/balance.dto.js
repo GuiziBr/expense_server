@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { filterBySchema } from "../expense/expense.dto.js";
 export const queryBalanceSchema = z
     .object({
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
-    filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+    filterBy: filterBySchema.optional(),
     filterValue: z.string().optional()
 })
     .superRefine((data, ctx) => {
@@ -20,5 +21,8 @@ export const queryBalanceSchema = z
 export const queryConsolidatedBalanceSchema = z.object({
     month: z.coerce.number().min(1).max(12),
     year: z.coerce.number().min(1900)
+});
+export const queryBalanceBreakdownSchema = z.object({
+    filterBy: filterBySchema
 });
 //# sourceMappingURL=balance.dto.js.map
