@@ -71,6 +71,14 @@ describe("BalanceController", () => {
 		}
 	}
 
+	const fakeBalanceBreakdown = [
+		{
+			id: fakeExpenses[0].categoryId,
+			description: fakeExpenses[0].category.description,
+			total: fakeExpenses[0].amount
+		}
+	]
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			controllers: [BalanceController],
@@ -79,6 +87,9 @@ describe("BalanceController", () => {
 					provide: BalanceService,
 					useValue: {
 						getBalance: vi.fn(),
+						getBalanceBreakdown: vi
+							.fn()
+							.mockResolvedValue(fakeBalanceBreakdown),
 						getConsolidatedBalance: vi
 							.fn()
 							.mockResolvedValue(fakeConsolidatedBalance)
@@ -147,6 +158,24 @@ describe("BalanceController", () => {
 				userId: 1,
 				month: 0,
 				year: 2022
+			})
+		})
+	})
+
+	describe("getBalanceBreakdown", () => {
+		it("should get balance breakdown with a zero-indexed month", async () => {
+			const result = await balanceController.getBalanceBreakdown(
+				{ userId: 1 },
+				{ month: 1, year: 2022 },
+				{ filterBy: "category" }
+			)
+
+			expect(result).toEqual(fakeBalanceBreakdown)
+			expect(balanceService.getBalanceBreakdown).toHaveBeenCalledWith({
+				userId: 1,
+				month: 0,
+				year: 2022,
+				filterBy: "category"
 			})
 		})
 	})
