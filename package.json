@@ -48,7 +48,7 @@
 		"@biomejs/biome": "^2.5.14",
 		"@faker-js/faker": "^10.4.0",
 		"@nestjs/cli": "^12.0.8",
-		"@nestjs/schematics": "^12.0.5",
+		"@nestjs/schematics": "^12.0.6",
 		"@nestjs/testing": "^12.1.1",
 		"@types/bcrypt": "^6.0.0",
 		"@types/express": "^5.0.6",
