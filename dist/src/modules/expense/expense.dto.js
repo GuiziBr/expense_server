@@ -14,6 +14,12 @@ export const createExpenseSchema = z.object({
 export const expenseByIdSchema = z.object({
     id: z.string().uuid()
 });
+export const filterBySchema = z.enum([
+    "category",
+    "payment_type",
+    "bank",
+    "store"
+]);
 export const queryExpenseSchema = z
     .object({
     startDate: z.coerce.date().optional(),
@@ -33,7 +39,7 @@ export const queryExpenseSchema = z
     ])
         .optional(),
     orderType: z.enum(["asc", "desc"]).default("asc"),
-    filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+    filterBy: filterBySchema.optional(),
     filterValue: z.string().optional()
 })
     .superRefine((data, ctx) => {

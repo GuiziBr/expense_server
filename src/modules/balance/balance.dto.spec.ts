@@ -1,4 +1,4 @@
-import { queryBalanceSchema } from "./balance.dto"
+import { queryBalanceBreakdownSchema, queryBalanceSchema } from "./balance.dto"
 
 describe("queryBalanceSchema", () => {
 	const baseQuery = {
@@ -34,6 +34,39 @@ describe("queryBalanceSchema", () => {
 		if (!result.success) {
 			expect(result.error.issues[0].message).toBe("must be a valid UUID")
 			expect(result.error.issues[0].path).toEqual(["filterValue"])
+		}
+	})
+})
+
+describe("queryBalanceBreakdownSchema", () => {
+	it.each(["category", "payment_type", "bank", "store"])(
+		"should pass when filterBy is %s",
+		(filterBy) => {
+			const result = queryBalanceBreakdownSchema.safeParse({ filterBy })
+
+			expect(result.success).toBe(true)
+		}
+	)
+
+	it("should fail when filterBy is not provided", () => {
+		const result = queryBalanceBreakdownSchema.safeParse({})
+
+		expect(result.success).toBe(false)
+
+		if (!result.success) {
+			expect(result.error.issues[0].path).toEqual(["filterBy"])
+		}
+	})
+
+	it("should fail when filterBy is not a valid filter type", () => {
+		const result = queryBalanceBreakdownSchema.safeParse({
+			filterBy: "user"
+		})
+
+		expect(result.success).toBe(false)
+
+		if (!result.success) {
+			expect(result.error.issues[0].path).toEqual(["filterBy"])
 		}
 	})
 })

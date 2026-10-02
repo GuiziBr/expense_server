@@ -13,6 +13,8 @@ import {
 import { Expense } from "../../domains/expense.domain.js"
 import { ExpenseService } from "../expense/expense.service.js"
 import {
+	GetBalanceBreakdownRequest,
+	GetBalanceBreakdownResponse,
 	GetBalanceRequest,
 	GetBalanceResponse,
 	GetConsolidateBalanceRequest,
@@ -109,6 +111,39 @@ export class BalanceService {
 		} catch (error) {
 			this.logger.error(`Error - ${error.message || error} - getting balance`)
 			throw new InternalServerErrorException("Error getting balance")
+		}
+	}
+
+	/**
+	 * Computes the requesting user's personal expense totals for a given
+	 * month/year, grouped by a single filter type (category, payment type,
+	 * bank, or store).
+	 * @param request - The target `year`, zero-indexed `month`, requesting `userId`, and `filterBy` type.
+	 * @returns One entry per filter value with its id, label, and total, sorted by total descending.
+	 * @throws {InternalServerErrorException} If the underlying aggregate query fails.
+	 */
+	async getBalanceBreakdown({
+		year,
+		month,
+		userId,
+		filterBy
+	}: GetBalanceBreakdownRequest): Promise<GetBalanceBreakdownResponse> {
+		try {
+			const initialDate = new Date(year, month, 1)
+
+			const finalDate = endOfMonth(initialDate)
+
+			return await this.expensesService.sumPersonalExpensesBy(
+				userId,
+				filterBy,
+				initialDate,
+				finalDate
+			)
+		} catch (error) {
+			this.logger.error(
+				`Error - ${error.message || error} - getting balance breakdown`
+			)
+			throw new InternalServerErrorException("Error getting balance breakdown")
 		}
 	}
 

@@ -44,6 +44,13 @@ export declare const expenseByIdSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 export type ExpenseByIdDTO = z.infer<typeof expenseByIdSchema>;
+export declare const filterBySchema: z.ZodEnum<{
+    bank: "bank";
+    category: "category";
+    store: "store";
+    payment_type: "payment_type";
+}>;
+export type FilterBy = z.infer<typeof filterBySchema>;
 export declare const queryExpenseSchema: z.ZodObject<{
     startDate: z.ZodOptional<z.ZodCoercedDate<unknown>>;
     endDate: z.ZodDefault<z.ZodCoercedDate<unknown>>;
@@ -101,3 +108,14 @@ export interface GetExpensesResponse {
     expenses: Expense[];
     totalCount: number;
 }
+export interface ExpenseTotalByDescription {
+    id: string;
+    description: string;
+    total: number;
+}
+export interface ExpenseTotalByName {
+    id: string | null;
+    name: string | null;
+    total: number;
+}
+export type ExpenseTotal = ExpenseTotalByDescription | ExpenseTotalByName;

@@ -14,7 +14,7 @@ import { Controller, Get, Param, Query, Request, UseInterceptors } from "@nestjs
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js";
-import { queryBalanceSchema, queryConsolidatedBalanceSchema } from "./balance.dto.js";
+import { queryBalanceBreakdownSchema, queryBalanceSchema, queryConsolidatedBalanceSchema } from "./balance.dto.js";
 import { BalanceService } from "./balance.service.js";
 let BalanceController = class BalanceController {
     balanceService;
@@ -40,6 +40,14 @@ let BalanceController = class BalanceController {
         });
         return BalancePresenter.toConsolidatedBalanceDTO(consolidatedBalance);
     }
+    async getBalanceBreakdown({ userId }, params, query) {
+        return this.balanceService.getBalanceBreakdown({
+            userId,
+            month: Number(params.month) - 1,
+            year: Number(params.year),
+            filterBy: query.filterBy
+        });
+    }
 };
 __decorate([
     UseInterceptors(CurrentUserInterceptor),
@@ -59,6 +67,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getConsolidatedBalance", null);
+__decorate([
+    UseInterceptors(CurrentUserInterceptor),
+    Get("/breakdown/:year/:month"),
+    __param(0, Request()),
+    __param(1, Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))),
+    __param(2, Query(new ZodValidationPipe(queryBalanceBreakdownSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], BalanceController.prototype, "getBalanceBreakdown", null);
 BalanceController = __decorate([
     Controller("balance"),
     __metadata("design:paramtypes", [BalanceService])

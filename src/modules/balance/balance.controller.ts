@@ -11,9 +11,12 @@ import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js"
 import {
 	ConsolidatedBalanceDTO,
+	GetBalanceBreakdownResponse,
 	GetBalanceResponse,
+	QueryBalanceBreakdownDTO,
 	QueryBalanceDTO,
 	QueryConsolidatedBalanceDTO,
+	queryBalanceBreakdownSchema,
 	queryBalanceSchema,
 	queryConsolidatedBalanceSchema
 } from "./balance.dto.js"
@@ -73,5 +76,33 @@ export class BalanceController {
 				year: yearValue
 			})
 		return BalancePresenter.toConsolidatedBalanceDTO(consolidatedBalance)
+	}
+
+	/**
+	 * Retrieves the current user's personal expense totals for a given
+	 * year/month, grouped by a single filter type. Requires an authenticated
+	 * request (populated by {@link CurrentUserInterceptor}). Route params are
+	 * validated against `queryConsolidatedBalanceSchema` and the query string
+	 * against `queryBalanceBreakdownSchema`.
+	 * @param request - The incoming request, from which the current `userId` is extracted.
+	 * @param params - The route params, containing `year` and `month` (1-indexed month).
+	 * @param query - Validated query parameters, containing the `filterBy` type.
+	 * @returns One entry per filter value with its id, label, and total.
+	 */
+	@UseInterceptors(CurrentUserInterceptor)
+	@Get("/breakdown/:year/:month")
+	async getBalanceBreakdown(
+		@Request() { userId },
+		@Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))
+		params: QueryConsolidatedBalanceDTO,
+		@Query(new ZodValidationPipe(queryBalanceBreakdownSchema))
+		query: QueryBalanceBreakdownDTO
+	): Promise<GetBalanceBreakdownResponse> {
+		return this.balanceService.getBalanceBreakdown({
+			userId,
+			month: Number(params.month) - 1,
+			year: Number(params.year),
+			filterBy: query.filterBy
+		})
 	}
 }

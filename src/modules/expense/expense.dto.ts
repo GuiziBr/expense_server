@@ -50,6 +50,15 @@ export const expenseByIdSchema = z.object({
 
 export type ExpenseByIdDTO = z.infer<typeof expenseByIdSchema>
 
+export const filterBySchema = z.enum([
+	"category",
+	"payment_type",
+	"bank",
+	"store"
+])
+
+export type FilterBy = z.infer<typeof filterBySchema>
+
 export const queryExpenseSchema = z
 	.object({
 		startDate: z.coerce.date().optional(),
@@ -69,7 +78,7 @@ export const queryExpenseSchema = z
 			])
 			.optional(),
 		orderType: z.enum(["asc", "desc"]).default("asc"),
-		filterBy: z.enum(["category", "payment_type", "bank", "store"]).optional(),
+		filterBy: filterBySchema.optional(),
 		filterValue: z.string().optional()
 	})
 	.superRefine((data, ctx) => {
@@ -109,3 +118,17 @@ export interface GetExpensesResponse {
 	expenses: Expense[]
 	totalCount: number
 }
+
+export interface ExpenseTotalByDescription {
+	id: string
+	description: string
+	total: number
+}
+
+export interface ExpenseTotalByName {
+	id: string | null
+	name: string | null
+	total: number
+}
+
+export type ExpenseTotal = ExpenseTotalByDescription | ExpenseTotalByName
