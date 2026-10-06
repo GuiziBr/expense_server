@@ -117,6 +117,24 @@ export class ExpenseService {
 	}
 
 	/**
+	 * Builds the Prisma `where` clause matching non-deleted shared (non-personal)
+	 * expenses, regardless of owner.
+	 * @param endDate - Inclusive upper bound on `dueDate`.
+	 * @param startDate - Optional inclusive lower bound on `dueDate`.
+	 * @returns A Prisma-compatible `where` object.
+	 */
+	private buildSharedExpensesWhere(endDate: Date, startDate?: Date) {
+		return {
+			deletedAt: null,
+			personal: false,
+			dueDate: {
+				lte: endDate,
+				...(startDate ? { gte: startDate } : {})
+			}
+		}
+	}
+
+	/**
 	 * Fetches the display label of each given id for the filter type's lookup
 	 * table (`description` for categories/payment types, `name` for banks/stores).
 	 * Soft-deleted records are included so historical expenses keep their label.
@@ -604,14 +622,7 @@ export class ExpenseService {
 		filterBy,
 		filterValue
 	}: GetExpensesRequest): Promise<GetExpensesResponse> {
-		const whereClause = {
-			deletedAt: null,
-			personal: false,
-			dueDate: {
-				lte: endDate,
-				...(startDate ? { gte: startDate } : {})
-			}
-		}
+		const whereClause = this.buildSharedExpensesWhere(endDate, startDate)
 
 		if (filterBy && filterValue) {
 			whereClause[constants.filterColumns[filterBy]] = filterValue
@@ -637,6 +648,74 @@ export class ExpenseService {
 		])
 
 		return { expenses, totalCount }
+	}
+
+	/**
+	 * Sums the given owner's personal expenses (see `getPersonalExpenses`) within
+	 * a due date range in a single aggregate query.
+	 * @param request.ownerId - ID of the user whose personal expenses are being summed.
+	 * @param request.startDate - Optional inclusive lower bound on `dueDate`.
+	 * @param request.endDate - Inclusive upper bound on `dueDate`.
+	 * @param request.filterBy - Optional column (resolved via `constants.filterColumns`) to filter on.
+	 * @param request.filterValue - Value to filter `filterBy` on.
+	 * @returns The summed amount, or `0` when nothing matches.
+	 */
+	async sumPersonalExpenses({
+		ownerId,
+		startDate,
+		endDate,
+		filterBy,
+		filterValue
+	}: GetExpensesRequest): Promise<number> {
+		const whereClause = this.buildPersonalExpensesWhere(
+			ownerId,
+			endDate,
+			startDate
+		)
+
+		if (filterBy && filterValue) {
+			whereClause[constants.filterColumns[filterBy]] = filterValue
+		}
+
+		const { _sum } = await this.databaseService.expense.aggregate({
+			where: whereClause,
+			_sum: { amount: true }
+		})
+
+		return _sum.amount ?? 0
+	}
+
+	/**
+	 * Sums shared expenses (see `getSharedExpenses`) within a due date range,
+	 * grouped by owner, in a single aggregate query.
+	 * @param request.startDate - Optional inclusive lower bound on `dueDate`.
+	 * @param request.endDate - Inclusive upper bound on `dueDate`.
+	 * @param request.filterBy - Optional column (resolved via `constants.filterColumns`) to filter on.
+	 * @param request.filterValue - Value to filter `filterBy` on.
+	 * @returns One `{ ownerId, total }` entry per owner with matching expenses.
+	 */
+	async sumSharedExpensesByOwner({
+		startDate,
+		endDate,
+		filterBy,
+		filterValue
+	}: GetExpensesRequest): Promise<Array<{ ownerId: string; total: number }>> {
+		const whereClause = this.buildSharedExpensesWhere(endDate, startDate)
+
+		if (filterBy && filterValue) {
+			whereClause[constants.filterColumns[filterBy]] = filterValue
+		}
+
+		const groups = await this.databaseService.expense.groupBy({
+			by: ["ownerId"],
+			where: whereClause,
+			_sum: { amount: true }
+		})
+
+		return groups.map((group) => ({
+			ownerId: group.ownerId,
+			total: group._sum.amount ?? 0
+		}))
 	}
 
 	/**
