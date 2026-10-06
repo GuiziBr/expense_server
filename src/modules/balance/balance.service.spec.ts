@@ -18,15 +18,11 @@ describe("BalanceService", () => {
 		createExpense({ ownerId: "owner-id-2" })
 	]
 
-	const fakePersonalExpenses = {
-		expenses: [{ amount: 10 }]
-	}
-	const fakeSharedExpenses = {
-		expenses: [
-			{ ownerId: "owner-id", amount: 5 },
-			{ ownerId: "owner-id-2", amount: 10 }
-		]
-	}
+	const fakePersonalTotal = 10
+	const fakeSharedTotals = [
+		{ ownerId: "owner-id", total: 5 },
+		{ ownerId: "owner-id-2", total: 10 }
+	]
 
 	const fakeBalanceBreakdown = [
 		{ id: "bank-id", name: "Bank", total: 20 },
@@ -40,10 +36,10 @@ describe("BalanceService", () => {
 				{
 					provide: ExpenseService,
 					useValue: {
-						getPersonalExpenses: vi
+						sumPersonalExpenses: vi.fn().mockResolvedValue(fakePersonalTotal),
+						sumSharedExpensesByOwner: vi
 							.fn()
-							.mockResolvedValue(fakePersonalExpenses),
-						getSharedExpenses: vi.fn().mockResolvedValue(fakeSharedExpenses),
+							.mockResolvedValue(fakeSharedTotals),
 						getExpensesByDateRange: vi.fn().mockResolvedValue(fakeExpenses),
 						sumPersonalExpensesBy: vi
 							.fn()
@@ -59,34 +55,28 @@ describe("BalanceService", () => {
 	})
 
 	describe("getBalance", () => {
-		it("should throw error if error getting personal expenses", async () => {
-			const payload = {
-				ownerId: "owner-id",
-				startDate: new Date(),
-				endDate: new Date()
-			}
+		const payload = {
+			ownerId: "owner-id",
+			startDate: new Date(),
+			endDate: new Date()
+		}
 
-			vi.spyOn(expenseService, "getPersonalExpenses").mockRejectedValue(
+		it("should throw error if error getting personal total", async () => {
+			vi.spyOn(expenseService, "sumPersonalExpenses").mockRejectedValue(
 				new Error("Expenses error")
 			)
 
 			await expect(balanceService.getBalance(payload)).rejects.toThrow(
 				InternalServerErrorException
 			)
-			expect(expenseService.getPersonalExpenses).toHaveBeenCalledWith(payload)
+			expect(expenseService.sumPersonalExpenses).toHaveBeenCalledWith(payload)
 			expect(loggerSpy).toHaveBeenCalledWith(
 				"Error - Expenses error - getting balance"
 			)
 		})
 
 		it("should log the raw error when it has no message", async () => {
-			const payload = {
-				ownerId: "owner-id",
-				startDate: new Date(),
-				endDate: new Date()
-			}
-
-			vi.spyOn(expenseService, "getPersonalExpenses").mockRejectedValue(
+			vi.spyOn(expenseService, "sumSharedExpensesByOwner").mockRejectedValue(
 				"raw error"
 			)
 
@@ -99,47 +89,45 @@ describe("BalanceService", () => {
 		})
 
 		it("should get balance for same owner", async () => {
-			const payload = {
-				ownerId: "owner-id",
-				startDate: new Date(),
-				endDate: new Date()
-			}
-
 			const result = await balanceService.getBalance(payload)
 
 			expect(result).toEqual({
 				personalBalance: 10,
-				sharedBalance: {
-					paying: 5,
-					payed: 10,
-					total: -5
-				}
+				sharedBalance: { paying: 5, payed: 10, total: -5 }
 			})
-
-			expect(expenseService.getPersonalExpenses).toHaveBeenCalledWith(payload)
-			expect(expenseService.getSharedExpenses).toHaveBeenCalledWith(payload)
+			expect(expenseService.sumPersonalExpenses).toHaveBeenCalledWith(payload)
+			expect(expenseService.sumSharedExpensesByOwner).toHaveBeenCalledWith(
+				payload
+			)
 		})
 
 		it("should get balance for different owner", async () => {
-			const payload = {
-				ownerId: "owner-id-2",
-				startDate: new Date(),
-				endDate: new Date()
-			}
+			const otherPayload = { ...payload, ownerId: "owner-id-2" }
+
+			const result = await balanceService.getBalance(otherPayload)
+
+			expect(result).toEqual({
+				personalBalance: 10,
+				sharedBalance: { paying: 10, payed: 5, total: 5 }
+			})
+			expect(expenseService.sumPersonalExpenses).toHaveBeenCalledWith(
+				otherPayload
+			)
+			expect(expenseService.sumSharedExpensesByOwner).toHaveBeenCalledWith(
+				otherPayload
+			)
+		})
+
+		it("should return zeros when there are no shared expenses", async () => {
+			vi.spyOn(expenseService, "sumPersonalExpenses").mockResolvedValue(0)
+			vi.spyOn(expenseService, "sumSharedExpensesByOwner").mockResolvedValue([])
 
 			const result = await balanceService.getBalance(payload)
 
 			expect(result).toEqual({
-				personalBalance: 10,
-				sharedBalance: {
-					paying: 10,
-					payed: 5,
-					total: 5
-				}
+				personalBalance: 0,
+				sharedBalance: { paying: 0, payed: 0, total: 0 }
 			})
-
-			expect(expenseService.getPersonalExpenses).toHaveBeenCalledWith(payload)
-			expect(expenseService.getSharedExpenses).toHaveBeenCalledWith(payload)
 		})
 	})
 

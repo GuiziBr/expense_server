@@ -57,6 +57,16 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             }
         };
     }
+    buildSharedExpensesWhere(endDate, startDate) {
+        return {
+            deletedAt: null,
+            personal: false,
+            dueDate: {
+                lte: endDate,
+                ...(startDate ? { gte: startDate } : {})
+            }
+        };
+    }
     async getFilterLabels(filterBy, ids) {
         const where = { id: { in: ids } };
         const lookups = {
@@ -294,14 +304,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             .sort((a, b) => b.total - a.total);
     }
     async getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {
-        const whereClause = {
-            deletedAt: null,
-            personal: false,
-            dueDate: {
-                lte: endDate,
-                ...(startDate ? { gte: startDate } : {})
-            }
-        };
+        const whereClause = this.buildSharedExpensesWhere(endDate, startDate);
         if (filterBy && filterValue) {
             whereClause[constants.filterColumns[filterBy]] = filterValue;
         }
@@ -323,6 +326,32 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             this.databaseService.expense.count({ where: whereClause })
         ]);
         return { expenses, totalCount };
+    }
+    async sumPersonalExpenses({ ownerId, startDate, endDate, filterBy, filterValue }) {
+        const whereClause = this.buildPersonalExpensesWhere(ownerId, endDate, startDate);
+        if (filterBy && filterValue) {
+            whereClause[constants.filterColumns[filterBy]] = filterValue;
+        }
+        const { _sum } = await this.databaseService.expense.aggregate({
+            where: whereClause,
+            _sum: { amount: true }
+        });
+        return _sum.amount ?? 0;
+    }
+    async sumSharedExpensesByOwner({ startDate, endDate, filterBy, filterValue }) {
+        const whereClause = this.buildSharedExpensesWhere(endDate, startDate);
+        if (filterBy && filterValue) {
+            whereClause[constants.filterColumns[filterBy]] = filterValue;
+        }
+        const groups = await this.databaseService.expense.groupBy({
+            by: ["ownerId"],
+            where: whereClause,
+            _sum: { amount: true }
+        });
+        return groups.map((group) => ({
+            ownerId: group.ownerId,
+            total: group._sum.amount ?? 0
+        }));
     }
     async getExpensesByDateRange(personal, startDate, endDate) {
         return this.databaseService.expense.findMany({

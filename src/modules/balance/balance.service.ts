@@ -78,26 +78,20 @@ export class BalanceService {
 	 */
 	async getBalance(data: GetBalanceRequest): Promise<GetBalanceResponse> {
 		try {
-			const [{ expenses: personalExpenses }, { expenses: sharedExpenses }] =
-				await Promise.all([
-					this.expensesService.getPersonalExpenses(data),
-					this.expensesService.getSharedExpenses(data)
-				])
+			const [personalBalance, sharedTotals] = await Promise.all([
+				this.expensesService.sumPersonalExpenses(data),
+				this.expensesService.sumSharedExpensesByOwner(data)
+			])
 
 			const { ownerId } = data
 
-			const personalBalance = personalExpenses.reduce(
-				(acc, expense) => acc + expense.amount,
-				0
-			)
-
-			const sharedBalance = sharedExpenses.reduce(
-				(acc, expense) => {
-					if (expense.ownerId === ownerId) acc.paying += expense.amount
-					else acc.payed += expense.amount
+			const sharedBalance = sharedTotals.reduce(
+				(acc, { ownerId: totalOwnerId, total }) => {
+					if (totalOwnerId === ownerId) acc.paying += total
+					else acc.payed += total
 					return acc
 				},
-				{ paying: 0, payed: 0, total: 0 }
+				{ paying: 0, payed: 0 }
 			)
 
 			return {
