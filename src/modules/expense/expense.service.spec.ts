@@ -63,7 +63,8 @@ describe("ExpenseService", () => {
 			findMany: vi.fn().mockResolvedValue([fakeExpense]),
 			count: vi.fn().mockResolvedValue(1),
 			update: vi.fn().mockResolvedValue(undefined),
-			groupBy: vi.fn().mockResolvedValue([])
+			groupBy: vi.fn().mockResolvedValue([]),
+			aggregate: vi.fn().mockResolvedValue({ _sum: { amount: 0 } })
 		}
 
 		const lookupMock = () => ({ findMany: vi.fn().mockResolvedValue([]) })
@@ -1453,6 +1454,136 @@ describe("ExpenseService", () => {
 			)
 
 			expect(result).toEqual([])
+		})
+	})
+
+	describe("sumPersonalExpenses", () => {
+		const startDate = new Date(2024, 0, 1)
+		const endDate = new Date(2024, 0, 31)
+
+		const personalWhere = {
+			deletedAt: null,
+			OR: [
+				{
+					AND: [
+						{ ownerId: "user_id" },
+						{ OR: [{ personal: true }, { split: true }] }
+					]
+				},
+				{ AND: [{ NOT: { ownerId: "user_id" } }, { personal: false }] }
+			],
+			dueDate: { lte: endDate, gte: startDate }
+		}
+
+		it("should return the aggregated sum", async () => {
+			vi.spyOn(databaseService.expense, "aggregate").mockResolvedValue({
+				_sum: { amount: 150 }
+			} as never)
+
+			const result = await expenseService.sumPersonalExpenses({
+				ownerId: "user_id",
+				startDate,
+				endDate
+			} as GetExpensesRequest)
+
+			expect(result).toBe(150)
+			expect(databaseService.expense.aggregate).toHaveBeenCalledWith({
+				where: personalWhere,
+				_sum: { amount: true }
+			})
+		})
+
+		it("should apply filterBy and filterValue", async () => {
+			await expenseService.sumPersonalExpenses({
+				ownerId: "user_id",
+				startDate,
+				endDate,
+				filterBy: "category",
+				filterValue: "category_id"
+			} as GetExpensesRequest)
+
+			expect(databaseService.expense.aggregate).toHaveBeenCalledWith({
+				where: { ...personalWhere, categoryId: "category_id" },
+				_sum: { amount: true }
+			})
+		})
+
+		it("should omit the lower bound when there is no start date and treat a null sum as 0", async () => {
+			vi.spyOn(databaseService.expense, "aggregate").mockResolvedValue({
+				_sum: { amount: null }
+			} as never)
+
+			const result = await expenseService.sumPersonalExpenses({
+				ownerId: "user_id",
+				endDate
+			} as GetExpensesRequest)
+
+			expect(result).toBe(0)
+			expect(databaseService.expense.aggregate).toHaveBeenCalledWith({
+				where: { ...personalWhere, dueDate: { lte: endDate } },
+				_sum: { amount: true }
+			})
+		})
+	})
+
+	describe("sumSharedExpensesByOwner", () => {
+		const startDate = new Date(2024, 0, 1)
+		const endDate = new Date(2024, 0, 31)
+
+		const sharedWhere = {
+			deletedAt: null,
+			personal: false,
+			dueDate: { lte: endDate, gte: startDate }
+		}
+
+		it("should return one total per owner, treating null sums as 0", async () => {
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ ownerId: "owner-1", _sum: { amount: 40 } },
+				{ ownerId: "owner-2", _sum: { amount: null } }
+			] as never)
+
+			const result = await expenseService.sumSharedExpensesByOwner({
+				startDate,
+				endDate
+			} as GetExpensesRequest)
+
+			expect(result).toEqual([
+				{ ownerId: "owner-1", total: 40 },
+				{ ownerId: "owner-2", total: 0 }
+			])
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith({
+				by: ["ownerId"],
+				where: sharedWhere,
+				_sum: { amount: true }
+			})
+		})
+
+		it("should apply filterBy and filterValue", async () => {
+			await expenseService.sumSharedExpensesByOwner({
+				startDate,
+				endDate,
+				filterBy: "bank",
+				filterValue: "bank_id"
+			} as GetExpensesRequest)
+
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith({
+				by: ["ownerId"],
+				where: { ...sharedWhere, bankId: "bank_id" },
+				_sum: { amount: true }
+			})
+		})
+
+		it("should return an empty list and omit the lower bound with no start date", async () => {
+			const result = await expenseService.sumSharedExpensesByOwner({
+				endDate
+			} as GetExpensesRequest)
+
+			expect(result).toEqual([])
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith({
+				by: ["ownerId"],
+				where: { ...sharedWhere, dueDate: { lte: endDate } },
+				_sum: { amount: true }
+			})
 		})
 	})
 })

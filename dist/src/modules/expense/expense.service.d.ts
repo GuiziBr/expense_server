@@ -12,6 +12,7 @@ export declare class ExpenseService {
     private calculateNetAmount;
     private getOrderByClause;
     private buildPersonalExpensesWhere;
+    private buildSharedExpensesWhere;
     private getFilterLabels;
     private calculateDueDate;
     createExpense(data: CreateExpenseDTO, userId: string): Promise<Expense>;
@@ -20,5 +21,10 @@ export declare class ExpenseService {
     getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     sumPersonalExpensesBy(ownerId: string, filterBy: FilterBy, startDate: Date, endDate: Date): Promise<ExpenseTotal[]>;
     getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
+    sumPersonalExpenses({ ownerId, startDate, endDate, filterBy, filterValue }: GetExpensesRequest): Promise<number>;
+    sumSharedExpensesByOwner({ startDate, endDate, filterBy, filterValue }: GetExpensesRequest): Promise<Array<{
+        ownerId: string;
+        total: number;
+    }>>;
     getExpensesByDateRange(personal: boolean, startDate: Date, endDate: Date): Promise<Expense[]>;
 }
