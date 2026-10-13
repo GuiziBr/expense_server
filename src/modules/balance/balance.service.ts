@@ -12,6 +12,7 @@ import {
 } from "../../domains/balance.domain.js"
 import { Expense } from "../../domains/expense.domain.js"
 import { ExpenseService } from "../expense/expense.service.js"
+import { errorMessage } from "../utils/error-message.js"
 import {
 	GetBalanceBreakdownRequest,
 	GetBalanceBreakdownResponse,
@@ -103,7 +104,7 @@ export class BalanceService {
 				}
 			}
 		} catch (error) {
-			this.logger.error(`Error - ${error.message || error} - getting balance`)
+			this.logger.error(`Error - ${errorMessage(error)} - getting balance`)
 			throw new InternalServerErrorException("Error getting balance")
 		}
 	}
@@ -135,7 +136,7 @@ export class BalanceService {
 			)
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting balance breakdown`
+				`Error - ${errorMessage(error)} - getting balance breakdown`
 			)
 			throw new InternalServerErrorException("Error getting balance breakdown")
 		}
@@ -239,7 +240,7 @@ export class BalanceService {
 			}
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting consolidated balance`
+				`Error - ${errorMessage(error)} - getting consolidated balance`
 			)
 			throw new InternalServerErrorException(
 				"Error getting consolidated balance"

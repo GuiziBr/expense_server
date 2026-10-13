@@ -10,6 +10,7 @@ import { PaymentType } from "../../domains/payment-type.domain.js"
 import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class PaymentTypeService {
@@ -34,7 +35,7 @@ export class PaymentTypeService {
 			return paymentTypes
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting all payment types`
+				`Error - ${errorMessage(error)} - getting all payment types`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -54,7 +55,7 @@ export class PaymentTypeService {
 			return paymentType
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting payment type by id ${id}`
+				`Error - ${errorMessage(error)} - getting payment type by id ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -82,7 +83,7 @@ export class PaymentTypeService {
 			return paymentType
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - creating payment type ${description}`
+				`Error - ${errorMessage(error)} - creating payment type ${description}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -155,7 +156,7 @@ export class PaymentTypeService {
 				throw error
 			}
 			this.logger.error(
-				`Error - ${error.message || error} - updating payment type ${id}`
+				`Error - ${errorMessage(error)} - updating payment type ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -183,7 +184,7 @@ export class PaymentTypeService {
 				return
 			}
 			this.logger.error(
-				`Error - ${error.message || error} - deleting payment type ${id}`
+				`Error - ${errorMessage(error)} - deleting payment type ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -214,7 +215,7 @@ export class PaymentTypeService {
 			return reactivatedPaymentType
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`
+				`Error - ${errorMessage(error)} - reactivating payment type ${paymentTypeIdToDelete}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}

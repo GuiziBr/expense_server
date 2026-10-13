@@ -11,6 +11,7 @@ var UserService_1;
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
+import { errorMessage } from "../utils/error-message.js";
 let UserService = UserService_1 = class UserService {
     databaseService;
     logger = new Logger(UserService_1.name);
@@ -37,7 +38,7 @@ let UserService = UserService_1 = class UserService {
             });
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - updating user avatar ${userId}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating user avatar ${userId}`);
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 throw new BadRequestException("Error updating user avatar");
             }

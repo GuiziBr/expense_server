@@ -12,6 +12,7 @@ import { BadRequestException, HttpException, Injectable, InternalServerErrorExce
 import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
+import { errorMessage } from "../utils/error-message.js";
 let BankService = BankService_1 = class BankService {
     databaseService;
     logger = new Logger(BankService_1.name);
@@ -29,7 +30,7 @@ let BankService = BankService_1 = class BankService {
             return banks;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting all banks`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting all banks`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -41,7 +42,7 @@ let BankService = BankService_1 = class BankService {
             return bank;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting bank by id ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting bank by id ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -55,7 +56,7 @@ let BankService = BankService_1 = class BankService {
             return bank;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - creating bank ${name}`);
+            this.logger.error(`Error - ${errorMessage(error)} - creating bank ${name}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -101,7 +102,7 @@ let BankService = BankService_1 = class BankService {
                 this.logger.error(`Bank with name "${name}" already exists`);
                 throw new BadRequestException("There is already a bank with same name");
             }
-            this.logger.error(`Error - ${error.message || error} - updating bank ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating bank ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -117,7 +118,7 @@ let BankService = BankService_1 = class BankService {
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error.message || error} - deleting bank ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - deleting bank ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }

@@ -10,6 +10,7 @@ import { Category } from "../../domains/category.domain.js"
 import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class CategoryService {
@@ -35,7 +36,7 @@ export class CategoryService {
 			return categories
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting all categories`
+				`Error - ${errorMessage(error)} - getting all categories`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -55,7 +56,7 @@ export class CategoryService {
 			return category
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting category by id ${id}`
+				`Error - ${errorMessage(error)} - getting category by id ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -78,7 +79,7 @@ export class CategoryService {
 			return category
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - creating category ${description}`
+				`Error - ${errorMessage(error)} - creating category ${description}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -139,7 +140,7 @@ export class CategoryService {
 				throw error
 			}
 			this.logger.error(
-				`Error - ${error.message || error} - updating category ${id}`
+				`Error - ${errorMessage(error)} - updating category ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -167,7 +168,7 @@ export class CategoryService {
 				return
 			}
 			this.logger.error(
-				`Error - ${error.message || error} - deleting category ${id}`
+				`Error - ${errorMessage(error)} - deleting category ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -197,7 +198,7 @@ export class CategoryService {
 			return reactivatedCategory
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - reactivating category ${categoryIdToDelete}`
+				`Error - ${errorMessage(error)} - reactivating category ${categoryIdToDelete}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}

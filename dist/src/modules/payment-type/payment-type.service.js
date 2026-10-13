@@ -12,6 +12,7 @@ import { BadRequestException, HttpException, Injectable, InternalServerErrorExce
 import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
+import { errorMessage } from "../utils/error-message.js";
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
     databaseService;
     logger = new Logger(PaymentTypeService_1.name);
@@ -29,7 +30,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             return paymentTypes;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting all payment types`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting all payment types`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -41,7 +42,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             return paymentType;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting payment type by id ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting payment type by id ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -55,7 +56,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             return paymentType;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - creating payment type ${description}`);
+            this.logger.error(`Error - ${errorMessage(error)} - creating payment type ${description}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -90,7 +91,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             if (error instanceof HttpException) {
                 throw error;
             }
-            this.logger.error(`Error - ${error.message || error} - updating payment type ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating payment type ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -106,7 +107,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error.message || error} - deleting payment type ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - deleting payment type ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -122,7 +123,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
             return reactivatedPaymentType;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - reactivating payment type ${paymentTypeIdToDelete}`);
+            this.logger.error(`Error - ${errorMessage(error)} - reactivating payment type ${paymentTypeIdToDelete}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
