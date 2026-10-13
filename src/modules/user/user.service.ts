@@ -7,6 +7,7 @@ import {
 import { User } from "../../domains/user.domain.js"
 import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class UserService {
@@ -49,7 +50,7 @@ export class UserService {
 			})
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - updating user avatar ${userId}`
+				`Error - ${errorMessage(error)} - updating user avatar ${userId}`
 			)
 
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {

@@ -15,6 +15,7 @@ import { DatabaseService } from "../../infra/database/database.service.js";
 import { PaymentTypeService } from "../payment-type/payment-type.service.js";
 import { StatementPeriodService } from "../statement-period/statement-period.service.js";
 import { constants } from "../utils/constants.js";
+import { errorMessage } from "../utils/error-message.js";
 let ExpenseService = ExpenseService_1 = class ExpenseService {
     databaseService;
     paymentTypeService;
@@ -162,7 +163,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     throw new BadRequestException(constants.uniqueConstraintMessages.duplicatedExpenses);
                 }
             }
-            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - creating expense`);
+            this.logger.error(`Error - ${errorMessage(error)} - creating expense`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -230,7 +231,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                     throw new BadRequestException(constants.uniqueConstraintMessages.duplicatedExpenses);
                 }
             }
-            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating expense ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -255,7 +256,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - deleting expense ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }

@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common"
 import { StatementPeriod } from "../../domains/statement-period.domain.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class StatementPeriodService {
@@ -38,7 +39,7 @@ export class StatementPeriodService {
 			return statementPeriod
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting statement period`
+				`Error - ${errorMessage(error)} - getting statement period`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}

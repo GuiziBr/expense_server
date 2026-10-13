@@ -11,6 +11,7 @@ var BalanceService_1;
 import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { endOfMonth } from "date-fns";
 import { ExpenseService } from "../expense/expense.service.js";
+import { errorMessage } from "../utils/error-message.js";
 let BalanceService = BalanceService_1 = class BalanceService {
     expensesService;
     logger = new Logger(BalanceService_1.name);
@@ -59,7 +60,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
             };
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting balance`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting balance`);
             throw new InternalServerErrorException("Error getting balance");
         }
     }
@@ -70,7 +71,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
             return await this.expensesService.sumPersonalExpensesBy(userId, filterBy, initialDate, finalDate);
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting balance breakdown`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting balance breakdown`);
             throw new InternalServerErrorException("Error getting balance breakdown");
         }
     }
@@ -131,7 +132,7 @@ let BalanceService = BalanceService_1 = class BalanceService {
             };
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting consolidated balance`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting consolidated balance`);
             throw new InternalServerErrorException("Error getting consolidated balance");
         }
     }
