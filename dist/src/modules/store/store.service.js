@@ -12,6 +12,7 @@ import { BadRequestException, HttpException, Injectable, InternalServerErrorExce
 import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
+import { errorMessage } from "../utils/error-message.js";
 let StoreService = StoreService_1 = class StoreService {
     databaseService;
     logger = new Logger(StoreService_1.name);
@@ -29,7 +30,7 @@ let StoreService = StoreService_1 = class StoreService {
             return stores;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting all stores`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting all stores`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -41,7 +42,7 @@ let StoreService = StoreService_1 = class StoreService {
             return store;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting store by id ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting store by id ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -55,7 +56,7 @@ let StoreService = StoreService_1 = class StoreService {
             return store;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - creating store ${name}`);
+            this.logger.error(`Error - ${errorMessage(error)} - creating store ${name}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -87,7 +88,7 @@ let StoreService = StoreService_1 = class StoreService {
             if (error instanceof HttpException) {
                 throw error;
             }
-            this.logger.error(`Error - ${error.message || error} - updating store ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating store ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -103,7 +104,7 @@ let StoreService = StoreService_1 = class StoreService {
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error.message || error} - deleting store ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - deleting store ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -119,7 +120,7 @@ let StoreService = StoreService_1 = class StoreService {
             return reactivatedStore;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - reactivating store ${storeIdToDelete}`);
+            this.logger.error(`Error - ${errorMessage(error)} - reactivating store ${storeIdToDelete}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }

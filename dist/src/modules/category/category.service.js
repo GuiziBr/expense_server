@@ -12,6 +12,7 @@ import { BadRequestException, HttpException, Injectable, InternalServerErrorExce
 import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
+import { errorMessage } from "../utils/error-message.js";
 let CategoryService = CategoryService_1 = class CategoryService {
     databaseService;
     logger = new Logger(CategoryService_1.name);
@@ -29,7 +30,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             return categories;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting all categories`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting all categories`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -41,7 +42,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             return category;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting category by id ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting category by id ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -55,7 +56,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             return category;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - creating category ${description}`);
+            this.logger.error(`Error - ${errorMessage(error)} - creating category ${description}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -88,7 +89,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             if (error instanceof HttpException) {
                 throw error;
             }
-            this.logger.error(`Error - ${error.message || error} - updating category ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - updating category ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -104,7 +105,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
                 error.code === constants.RECORD_NOT_FOUND) {
                 return;
             }
-            this.logger.error(`Error - ${error.message || error} - deleting category ${id}`);
+            this.logger.error(`Error - ${errorMessage(error)} - deleting category ${id}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
@@ -120,7 +121,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             return reactivatedCategory;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - reactivating category ${categoryIdToDelete}`);
+            this.logger.error(`Error - ${errorMessage(error)} - reactivating category ${categoryIdToDelete}`);
             throw new InternalServerErrorException("Internal server error");
         }
     }

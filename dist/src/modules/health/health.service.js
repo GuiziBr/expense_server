@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var HealthService_1;
 import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common";
 import { DatabaseService } from "../../infra/database/database.service.js";
+import { errorMessage } from "../utils/error-message.js";
 let HealthService = HealthService_1 = class HealthService {
     databaseService;
     logger = new Logger(HealthService_1.name);
@@ -22,7 +23,7 @@ let HealthService = HealthService_1 = class HealthService {
             return true;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - checking health`);
+            this.logger.error(`Error - ${errorMessage(error)} - checking health`);
             throw new ServiceUnavailableException("Server unavailable");
         }
     }

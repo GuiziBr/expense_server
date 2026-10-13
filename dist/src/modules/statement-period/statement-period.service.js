@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var StatementPeriodService_1;
 import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { DatabaseService } from "../../infra/database/database.service.js";
+import { errorMessage } from "../utils/error-message.js";
 let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodService {
     databaseService;
     logger = new Logger(StatementPeriodService_1.name);
@@ -28,7 +29,7 @@ let StatementPeriodService = StatementPeriodService_1 = class StatementPeriodSer
             return statementPeriod;
         }
         catch (error) {
-            this.logger.error(`Error - ${error.message || error} - getting statement period`);
+            this.logger.error(`Error - ${errorMessage(error)} - getting statement period`);
             throw new InternalServerErrorException("Internal server error");
         }
     }
