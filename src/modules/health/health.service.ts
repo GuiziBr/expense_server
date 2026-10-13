@@ -1,5 +1,6 @@
 import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common"
 import { DatabaseService } from "../../infra/database/database.service.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class HealthService {
@@ -17,7 +18,7 @@ export class HealthService {
 			await this.databaseService.$queryRaw`SELECT 1`
 			return true
 		} catch (error) {
-			this.logger.error(`Error - ${error.message || error} - checking health`)
+			this.logger.error(`Error - ${errorMessage(error)} - checking health`)
 			throw new ServiceUnavailableException("Server unavailable")
 		}
 	}

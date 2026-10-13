@@ -21,6 +21,7 @@ import { DatabaseService } from "../../infra/database/database.service.js"
 import { PaymentTypeService } from "../payment-type/payment-type.service.js"
 import { StatementPeriodService } from "../statement-period/statement-period.service.js"
 import { constants } from "../utils/constants.js"
+import { errorMessage } from "../utils/error-message.js"
 import {
 	CreateExpenseDTO,
 	ExpenseTotal,
@@ -325,9 +326,7 @@ export class ExpenseService {
 				}
 			}
 
-			this.logger.error(
-				`Error - ${error instanceof Error ? error.message : error} - creating expense`
-			)
+			this.logger.error(`Error - ${errorMessage(error)} - creating expense`)
 			throw new InternalServerErrorException("Internal server error")
 		}
 	}
@@ -442,7 +441,7 @@ export class ExpenseService {
 			}
 
 			this.logger.error(
-				`Error - ${error instanceof Error ? error.message : error} - updating expense ${id}`
+				`Error - ${errorMessage(error)} - updating expense ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -485,7 +484,7 @@ export class ExpenseService {
 				return
 			}
 			this.logger.error(
-				`Error - ${error instanceof Error ? error.message : error} - deleting expense ${id}`
+				`Error - ${errorMessage(error)} - deleting expense ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}

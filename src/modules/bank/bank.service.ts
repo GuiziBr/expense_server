@@ -10,6 +10,7 @@ import { Bank } from "../../domains/bank.domain.js"
 import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
+import { errorMessage } from "../utils/error-message.js"
 
 @Injectable()
 export class BankService {
@@ -34,7 +35,7 @@ export class BankService {
 			})
 			return banks
 		} catch (error) {
-			this.logger.error(`Error - ${error.message || error} - getting all banks`)
+			this.logger.error(`Error - ${errorMessage(error)} - getting all banks`)
 			throw new InternalServerErrorException("Internal server error")
 		}
 	}
@@ -53,7 +54,7 @@ export class BankService {
 			return bank
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - getting bank by id ${id}`
+				`Error - ${errorMessage(error)} - getting bank by id ${id}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -77,7 +78,7 @@ export class BankService {
 			return bank
 		} catch (error) {
 			this.logger.error(
-				`Error - ${error.message || error} - creating bank ${name}`
+				`Error - ${errorMessage(error)} - creating bank ${name}`
 			)
 			throw new InternalServerErrorException("Internal server error")
 		}
@@ -144,9 +145,7 @@ export class BankService {
 				this.logger.error(`Bank with name "${name}" already exists`)
 				throw new BadRequestException("There is already a bank with same name")
 			}
-			this.logger.error(
-				`Error - ${error.message || error} - updating bank ${id}`
-			)
+			this.logger.error(`Error - ${errorMessage(error)} - updating bank ${id}`)
 			throw new InternalServerErrorException("Internal server error")
 		}
 	}
@@ -171,9 +170,7 @@ export class BankService {
 			) {
 				return
 			}
-			this.logger.error(
-				`Error - ${error.message || error} - deleting bank ${id}`
-			)
+			this.logger.error(`Error - ${errorMessage(error)} - deleting bank ${id}`)
 			throw new InternalServerErrorException("Internal server error")
 		}
 	}
