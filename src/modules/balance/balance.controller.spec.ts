@@ -112,7 +112,7 @@ describe("BalanceController", () => {
 				endDate: new Date()
 			}
 
-			await balanceController.getBalance({ userId: 1 }, query)
+			await balanceController.getBalance(1, query)
 
 			expect(balanceService.getBalance).toHaveBeenCalledWith({
 				ownerId: 1,
@@ -129,10 +129,7 @@ describe("BalanceController", () => {
 				year: 2022
 			}
 
-			const result = await balanceController.getConsolidatedBalance(
-				{ userId: 1 },
-				params
-			)
+			const result = await balanceController.getConsolidatedBalance(1, params)
 
 			expect(result).toEqual({
 				requester: {
@@ -165,7 +162,7 @@ describe("BalanceController", () => {
 	describe("getBalanceBreakdown", () => {
 		it("should get balance breakdown with a zero-indexed month", async () => {
 			const result = await balanceController.getBalanceBreakdown(
-				{ userId: 1 },
+				1,
 				{ month: 1, year: 2022 },
 				{ filterBy: "category" }
 			)

@@ -1,11 +1,5 @@
-import {
-	Controller,
-	Get,
-	Param,
-	Query,
-	Request,
-	UseInterceptors
-} from "@nestjs/common"
+import { Controller, Get, Param, Query, UseInterceptors } from "@nestjs/common"
+import { CurrentUser } from "../../infra/auth/current-user.decorator.js"
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js"
@@ -39,7 +33,7 @@ export class BalanceController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get()
 	async getBalance(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Query(new ZodValidationPipe(queryBalanceSchema)) query: QueryBalanceDTO
 	): Promise<GetBalanceResponse> {
 		return this.balanceService.getBalance({
@@ -63,7 +57,7 @@ export class BalanceController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get("/consolidated/:year/:month")
 	async getConsolidatedBalance(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))
 		params: QueryConsolidatedBalanceDTO
 	): Promise<ConsolidatedBalanceDTO> {
@@ -92,7 +86,7 @@ export class BalanceController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get("/breakdown/:year/:month")
 	async getBalanceBreakdown(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))
 		params: QueryConsolidatedBalanceDTO,
 		@Query(new ZodValidationPipe(queryBalanceBreakdownSchema))

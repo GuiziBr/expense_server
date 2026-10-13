@@ -54,10 +54,7 @@ describe("ExpenseController", () => {
 				current_month: true
 			}
 
-			const result = await expenseController.createExpense(
-				{ userId: "userId" },
-				payload
-			)
+			const result = await expenseController.createExpense("userId", payload)
 
 			expect(result).toEqual({
 				id: fakeExpense.id,
@@ -105,7 +102,7 @@ describe("ExpenseController", () => {
 			} as QueryExpenseDTO
 
 			const result = await expenseController.getPersonalExpenses(
-				{ userId: "userId" },
+				"userId",
 				query,
 				{ setHeader: vi.fn() } as unknown as Res
 			)
@@ -144,10 +141,7 @@ describe("ExpenseController", () => {
 
 	describe("deleteExpense", () => {
 		it("should call deleteExpense with id and userId", async () => {
-			await expenseController.deleteExpense(
-				{ userId: "userId" },
-				{ id: fakeExpense.id }
-			)
+			await expenseController.deleteExpense("userId", { id: fakeExpense.id })
 
 			expect(expenseService.deleteExpense).toBeCalledWith(
 				fakeExpense.id,
@@ -172,7 +166,7 @@ describe("ExpenseController", () => {
 			}
 
 			const result = await expenseController.updateExpense(
-				{ userId: "userId" },
+				"userId",
 				{ id: fakeExpense.id },
 				body
 			)
@@ -227,7 +221,7 @@ describe("ExpenseController", () => {
 			} as QueryExpenseDTO
 
 			const result = await expenseController.getSharedExpenses(
-				{ userId: "userId" },
+				"userId",
 				query,
 				{ setHeader: vi.fn() } as unknown as Res
 			)

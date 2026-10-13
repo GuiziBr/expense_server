@@ -103,7 +103,7 @@ export class ExpenseService {
 		ownerId: string,
 		endDate: Date,
 		startDate?: Date
-	) {
+	): Prisma.ExpenseWhereInput {
 		return {
 			deletedAt: null,
 			OR: [
@@ -124,7 +124,10 @@ export class ExpenseService {
 	 * @param startDate - Optional inclusive lower bound on `dueDate`.
 	 * @returns A Prisma-compatible `where` object.
 	 */
-	private buildSharedExpensesWhere(endDate: Date, startDate?: Date) {
+	private buildSharedExpensesWhere(
+		endDate: Date,
+		startDate?: Date
+	): Prisma.ExpenseWhereInput {
 		return {
 			deletedAt: null,
 			personal: false,
