@@ -1,8 +1,8 @@
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { createExpense } from "../test-utils/expense.factory"
-import { BalanceController } from "./balance.controller"
-import { BalanceService } from "./balance.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { BalanceController } from "./balance.controller.js"
+import { BalanceService } from "./balance.service.js"
 
 describe("BalanceController", () => {
 	let balanceController: BalanceController
@@ -26,8 +26,8 @@ describe("BalanceController", () => {
 					description: fakeExpenses[0].paymentType.description,
 					banks: [
 						{
-							id: fakeExpenses[0].bank.id,
-							name: fakeExpenses[0].bank.name,
+							id: fakeExpenses[0].bank?.id,
+							name: fakeExpenses[0].bank?.name,
 							total: fakeExpenses[0].amount
 						}
 					],
@@ -52,8 +52,8 @@ describe("BalanceController", () => {
 					description: fakeExpenses[1].paymentType.description,
 					banks: [
 						{
-							id: fakeExpenses[1].bank.id,
-							name: fakeExpenses[1].bank.name,
+							id: fakeExpenses[1].bank?.id,
+							name: fakeExpenses[1].bank?.name,
 							total: fakeExpenses[1].amount
 						}
 					],
@@ -112,10 +112,10 @@ describe("BalanceController", () => {
 				endDate: new Date()
 			}
 
-			await balanceController.getBalance(1, query)
+			await balanceController.getBalance("user-id", query)
 
 			expect(balanceService.getBalance).toHaveBeenCalledWith({
-				ownerId: 1,
+				ownerId: "user-id",
 				startDate: query.startDate,
 				endDate: query.endDate
 			})
@@ -129,7 +129,10 @@ describe("BalanceController", () => {
 				year: 2022
 			}
 
-			const result = await balanceController.getConsolidatedBalance(1, params)
+			const result = await balanceController.getConsolidatedBalance(
+				"user-id",
+				params
+			)
 
 			expect(result).toEqual({
 				requester: {
@@ -152,7 +155,7 @@ describe("BalanceController", () => {
 			})
 
 			expect(balanceService.getConsolidatedBalance).toHaveBeenCalledWith({
-				userId: 1,
+				userId: "user-id",
 				month: 0,
 				year: 2022
 			})
@@ -162,14 +165,14 @@ describe("BalanceController", () => {
 	describe("getBalanceBreakdown", () => {
 		it("should get balance breakdown with a zero-indexed month", async () => {
 			const result = await balanceController.getBalanceBreakdown(
-				1,
+				"user-id",
 				{ month: 1, year: 2022 },
 				{ filterBy: "category" }
 			)
 
 			expect(result).toEqual(fakeBalanceBreakdown)
 			expect(balanceService.getBalanceBreakdown).toHaveBeenCalledWith({
-				userId: 1,
+				userId: "user-id",
 				month: 0,
 				year: 2022,
 				filterBy: "category"

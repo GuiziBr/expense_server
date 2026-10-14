@@ -1,10 +1,10 @@
 import { Test } from "@nestjs/testing"
 import { Response as Res } from "express"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { createExpense } from "../test-utils/expense.factory"
-import { ExpenseController } from "./expense.controller"
-import { QueryExpenseDTO } from "./expense.dto"
-import { ExpenseService } from "./expense.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { ExpenseController } from "./expense.controller.js"
+import { QueryExpenseDTO } from "./expense.dto.js"
+import { ExpenseService } from "./expense.service.js"
 
 describe("ExpenseController", () => {
 	let expenseController: ExpenseController
@@ -75,10 +75,10 @@ describe("ExpenseController", () => {
 					description: fakeExpense.paymentType.description
 				},
 				bank: {
-					name: fakeExpense.bank.name
+					name: fakeExpense.bank?.name
 				},
 				store: {
-					name: fakeExpense.store.name
+					name: fakeExpense.store?.name
 				},
 				owner_id: fakeExpense.ownerId,
 				due_date: fakeExpense.dueDate
@@ -128,10 +128,10 @@ describe("ExpenseController", () => {
 					description: fakeExpense.paymentType.description
 				},
 				bank: {
-					name: fakeExpense.bank.name
+					name: fakeExpense.bank?.name
 				},
 				store: {
-					name: fakeExpense.store.name
+					name: fakeExpense.store?.name
 				},
 				owner_id: fakeExpense.ownerId,
 				due_date: fakeExpense.dueDate
@@ -190,10 +190,10 @@ describe("ExpenseController", () => {
 					description: fakeExpense.paymentType.description
 				},
 				bank: {
-					name: fakeExpense.bank.name
+					name: fakeExpense.bank?.name
 				},
 				store: {
-					name: fakeExpense.store.name
+					name: fakeExpense.store?.name
 				},
 				owner_id: fakeExpense.ownerId,
 				due_date: fakeExpense.dueDate
@@ -247,10 +247,10 @@ describe("ExpenseController", () => {
 					description: fakeExpense.paymentType.description
 				},
 				bank: {
-					name: fakeExpense.bank.name
+					name: fakeExpense.bank?.name
 				},
 				store: {
-					name: fakeExpense.store.name
+					name: fakeExpense.store?.name
 				},
 				owner_id: fakeExpense.ownerId,
 				due_date: fakeExpense.dueDate,

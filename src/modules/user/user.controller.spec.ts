@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { UserController } from "./user.controller"
-import { UserService } from "./user.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { UserController } from "./user.controller.js"
+import { UserService } from "./user.service.js"
 
 describe("UserController", () => {
 	let userService: UserService

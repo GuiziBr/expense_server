@@ -1,9 +1,9 @@
 import { JwtService } from "@nestjs/jwt"
 import { Test } from "@nestjs/testing"
 import * as bcrypt from "bcrypt"
-import { User } from "@/domains/user.domain"
-import { UserService } from "../user/user.service"
-import { AuthService } from "./auth.service"
+import { User } from "@/domains/user.domain.js"
+import { UserService } from "../user/user.service.js"
+import { AuthService } from "./auth.service.js"
 
 vi.mock("bcrypt", () => ({
 	compare: vi.fn()

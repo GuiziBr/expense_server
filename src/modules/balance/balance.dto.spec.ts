@@ -1,4 +1,7 @@
-import { queryBalanceBreakdownSchema, queryBalanceSchema } from "./balance.dto"
+import {
+	queryBalanceBreakdownSchema,
+	queryBalanceSchema
+} from "./balance.dto.js"
 
 describe("queryBalanceSchema", () => {
 	const baseQuery = {
