@@ -124,10 +124,7 @@ export class PaymentTypeService {
 				throw new NotFoundException("Payment type not found")
 			}
 
-			if (
-				(paymentType && !sameDescriptionPaymentType) ||
-				sameDescriptionPaymentType?.id === id
-			) {
+			if (!sameDescriptionPaymentType || sameDescriptionPaymentType.id === id) {
 				const updatedPaymentType =
 					await this.databaseService.paymentType.update({
 						where: { id },

@@ -214,6 +214,49 @@ describe("BalanceService", () => {
 			expect(result.requesterBalance).toBe(fakeExpenses[0].amount)
 		})
 
+		it("should count expenses without a bank but omit them from the banks list", async () => {
+			const paymentType = createPaymentType({ description: "Cash" })
+			const bank = createBank({ name: "Bank A" })
+
+			const expenses = [
+				createExpense({
+					ownerId: "owner-id",
+					amount: 10,
+					paymentType,
+					paymentTypeId: paymentType.id,
+					bank: null,
+					bankId: null
+				}),
+				createExpense({
+					ownerId: "owner-id",
+					amount: 5,
+					paymentType,
+					paymentTypeId: paymentType.id,
+					bank,
+					bankId: bank.id
+				})
+			]
+
+			vi.spyOn(expenseService, "getExpensesByDateRange").mockResolvedValue(
+				expenses
+			)
+
+			const result = await balanceService.getConsolidatedBalance({
+				year: 2022,
+				month: 1,
+				userId: "owner-id"
+			})
+
+			expect(result.requester?.payments).toEqual([
+				{
+					id: paymentType.id,
+					description: "Cash",
+					banks: [{ id: bank.id, name: "Bank A", total: 5 }],
+					total: 15
+				}
+			])
+		})
+
 		it("should merge multiple expenses belonging to the same owner", async () => {
 			const category = createCategory({ description: "Food" })
 			const otherCategory = createCategory({ description: "Transport" })

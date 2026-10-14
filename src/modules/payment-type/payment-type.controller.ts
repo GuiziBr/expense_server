@@ -35,7 +35,7 @@ export class PaymentTypeController {
 	@Get()
 	async listPaymentTypes(
 		@Query(new ZodValidationPipe(listPaymentTypesSchema))
-		query?: ListPaymentTypesDTO
+		query: ListPaymentTypesDTO
 	) {
 		const { offset, limit } = query
 		const paymentTypes = await this.paymentTypeService.getAll(offset, limit)
