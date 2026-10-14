@@ -101,7 +101,7 @@ export interface GetExpensesRequest {
     limit?: number;
     orderBy?: string;
     orderType?: OrderByType;
-    filterBy?: string;
+    filterBy?: FilterBy;
     filterValue?: string;
 }
 export interface GetExpensesResponse {

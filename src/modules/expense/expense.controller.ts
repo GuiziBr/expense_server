@@ -8,11 +8,11 @@ import {
 	Post,
 	Put,
 	Query,
-	Request,
 	Response,
 	UseInterceptors
 } from "@nestjs/common"
 import { Response as Res } from "express"
+import { CurrentUser } from "../../infra/auth/current-user.decorator.js"
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { ExpensePresenter } from "../../infra/http/presenters/expense.presenter.js"
@@ -42,7 +42,7 @@ export class ExpenseController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Post()
 	async createExpense(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Body(new ZodValidationPipe(createExpenseSchema)) body: CreateExpenseDTO
 	): Promise<ExpenseDTO> {
 		const expense = await this.expenseService.createExpense(body, userId)
@@ -61,7 +61,7 @@ export class ExpenseController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get("/personal")
 	async getPersonalExpenses(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Query(new ZodValidationPipe(queryExpenseSchema)) query: QueryExpenseDTO,
 		@Response({ passthrough: true }) res: Res
 	): Promise<ExpenseDTO[]> {
@@ -94,7 +94,7 @@ export class ExpenseController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Put(":id")
 	async updateExpense(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Param(new ZodValidationPipe(expenseByIdSchema)) params: ExpenseByIdDTO,
 		@Body(new ZodValidationPipe(updateExpenseSchema)) body: UpdateExpenseDTO
 	): Promise<ExpenseDTO> {
@@ -118,7 +118,7 @@ export class ExpenseController {
 	@HttpCode(204)
 	@Delete(":id")
 	async deleteExpense(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Param(new ZodValidationPipe(expenseByIdSchema)) params: ExpenseByIdDTO
 	): Promise<void> {
 		return this.expenseService.deleteExpense(params.id, userId)
@@ -137,7 +137,7 @@ export class ExpenseController {
 	@UseInterceptors(CurrentUserInterceptor)
 	@Get("/shared")
 	async getSharedExpenses(
-		@Request() { userId },
+		@CurrentUser() userId: string,
 		@Query(new ZodValidationPipe(queryExpenseSchema)) query: QueryExpenseDTO,
 		@Response({ passthrough: true }) res: Res
 	): Promise<(ExpenseDTO & { type: "income" | "outcome" })[]> {

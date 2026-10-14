@@ -10,7 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, Patch, Request, UseInterceptors, UsePipes } from "@nestjs/common";
+import { Body, Controller, Patch, UseInterceptors, UsePipes } from "@nestjs/common";
+import { CurrentUser } from "../../infra/auth/current-user.decorator.js";
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { updateUserAvatarSchema } from "./user.dto.js";
@@ -20,7 +21,7 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    async updateAvatar({ userId }, { avatar }) {
+    async updateAvatar(userId, { avatar }) {
         return this.userService.updateUserAvatar(userId, avatar);
     }
 };
@@ -28,10 +29,10 @@ __decorate([
     UseInterceptors(CurrentUserInterceptor),
     UsePipes(new ZodValidationPipe(updateUserAvatarSchema)),
     Patch("avatar"),
-    __param(0, Request()),
+    __param(0, CurrentUser()),
     __param(1, Body()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateAvatar", null);
 UserController = __decorate([

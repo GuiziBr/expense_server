@@ -10,7 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Controller, Get, Param, Query, Request, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseInterceptors } from "@nestjs/common";
+import { CurrentUser } from "../../infra/auth/current-user.decorator.js";
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js";
@@ -21,7 +22,7 @@ let BalanceController = class BalanceController {
     constructor(balanceService) {
         this.balanceService = balanceService;
     }
-    async getBalance({ userId }, query) {
+    async getBalance(userId, query) {
         return this.balanceService.getBalance({
             ownerId: userId,
             startDate: query.startDate,
@@ -30,7 +31,7 @@ let BalanceController = class BalanceController {
             filterValue: query.filterValue
         });
     }
-    async getConsolidatedBalance({ userId }, params) {
+    async getConsolidatedBalance(userId, params) {
         const monthValue = Number(params.month) - 1;
         const yearValue = Number(params.year);
         const consolidatedBalance = await this.balanceService.getConsolidatedBalance({
@@ -40,7 +41,7 @@ let BalanceController = class BalanceController {
         });
         return BalancePresenter.toConsolidatedBalanceDTO(consolidatedBalance);
     }
-    async getBalanceBreakdown({ userId }, params, query) {
+    async getBalanceBreakdown(userId, params, query) {
         return this.balanceService.getBalanceBreakdown({
             userId,
             month: Number(params.month) - 1,
@@ -52,29 +53,29 @@ let BalanceController = class BalanceController {
 __decorate([
     UseInterceptors(CurrentUserInterceptor),
     Get(),
-    __param(0, Request()),
+    __param(0, CurrentUser()),
     __param(1, Query(new ZodValidationPipe(queryBalanceSchema))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getBalance", null);
 __decorate([
     UseInterceptors(CurrentUserInterceptor),
     Get("/consolidated/:year/:month"),
-    __param(0, Request()),
+    __param(0, CurrentUser()),
     __param(1, Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getConsolidatedBalance", null);
 __decorate([
     UseInterceptors(CurrentUserInterceptor),
     Get("/breakdown/:year/:month"),
-    __param(0, Request()),
+    __param(0, CurrentUser()),
     __param(1, Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))),
     __param(2, Query(new ZodValidationPipe(queryBalanceBreakdownSchema))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getBalanceBreakdown", null);
 BalanceController = __decorate([

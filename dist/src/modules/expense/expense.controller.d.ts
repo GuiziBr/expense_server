@@ -4,21 +4,11 @@ import { ExpenseService } from "./expense.service.js";
 export declare class ExpenseController {
     private readonly expenseService;
     constructor(expenseService: ExpenseService);
-    createExpense({ userId }: {
-        userId: any;
-    }, body: CreateExpenseDTO): Promise<ExpenseDTO>;
-    getPersonalExpenses({ userId }: {
-        userId: any;
-    }, query: QueryExpenseDTO, res: Res): Promise<ExpenseDTO[]>;
-    updateExpense({ userId }: {
-        userId: any;
-    }, params: ExpenseByIdDTO, body: UpdateExpenseDTO): Promise<ExpenseDTO>;
-    deleteExpense({ userId }: {
-        userId: any;
-    }, params: ExpenseByIdDTO): Promise<void>;
-    getSharedExpenses({ userId }: {
-        userId: any;
-    }, query: QueryExpenseDTO, res: Res): Promise<(ExpenseDTO & {
+    createExpense(userId: string, body: CreateExpenseDTO): Promise<ExpenseDTO>;
+    getPersonalExpenses(userId: string, query: QueryExpenseDTO, res: Res): Promise<ExpenseDTO[]>;
+    updateExpense(userId: string, params: ExpenseByIdDTO, body: UpdateExpenseDTO): Promise<ExpenseDTO>;
+    deleteExpense(userId: string, params: ExpenseByIdDTO): Promise<void>;
+    getSharedExpenses(userId: string, query: QueryExpenseDTO, res: Res): Promise<(ExpenseDTO & {
         type: "income" | "outcome";
     })[]>;
 }

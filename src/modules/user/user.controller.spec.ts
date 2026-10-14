@@ -29,10 +29,7 @@ describe("UserController", () => {
 
 	describe("updateAvatar", () => {
 		it("should return void", async () => {
-			await userController.updateAvatar(
-				{ userId: "user_id" },
-				{ avatar: "avatar" }
-			)
+			await userController.updateAvatar("user_id", { avatar: "avatar" })
 			expect(userService.updateUserAvatar).toBeCalledWith("user_id", "avatar")
 		})
 	})

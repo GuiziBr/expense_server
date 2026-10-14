@@ -6,6 +6,7 @@ import {
 	NotFoundException
 } from "@nestjs/common"
 import { DatabaseService } from "../database/database.service.js"
+import { AuthenticatedRequest } from "./authenticated-request.js"
 
 @Injectable()
 export class CurrentUserInterceptor {
@@ -14,7 +15,7 @@ export class CurrentUserInterceptor {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async intercept(context: ExecutionContext, next: CallHandler) {
-		const request = context.switchToHttp().getRequest()
+		const request = context.switchToHttp().getRequest<AuthenticatedRequest>()
 		const { sub } = request.user
 
 		const currentUser = await this.databaseService.user.findUnique({
