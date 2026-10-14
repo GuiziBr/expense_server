@@ -21,7 +21,7 @@ export class UserService {
 	 * @returns The matching {@link User}, or `null` if none is found.
 	 * @throws {InternalServerErrorException} If the database lookup fails.
 	 */
-	async findUserByEmail(email: string): Promise<User> {
+	async findUserByEmail(email: string): Promise<User | null> {
 		try {
 			const user = await this.databaseService.user.findUnique({
 				where: { email }

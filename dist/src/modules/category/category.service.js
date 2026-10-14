@@ -70,8 +70,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
                 this.logger.error(`Category ${id} not found`);
                 throw new NotFoundException("Category not found");
             }
-            if ((category && !sameDescriptionCategory) ||
-                sameDescriptionCategory?.id === id) {
+            if (!sameDescriptionCategory || sameDescriptionCategory.id === id) {
                 const updatedCategory = await this.databaseService.category.update({
                     where: { id },
                     data: { description, deletedAt: null }

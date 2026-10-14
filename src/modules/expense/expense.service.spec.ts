@@ -7,21 +7,21 @@ import {
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { addDays, addMonths, endOfMonth, setDate } from "date-fns"
-import { StatementPeriod } from "@/domains/statement-period.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import { PaymentTypeService } from "../payment-type/payment-type.service"
-import { StatementPeriodService } from "../statement-period/statement-period.service"
-import { createPrismaError } from "../test-utils/errors.factory"
-import { createExpense } from "../test-utils/expense.factory"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { createStatementPeriod } from "../test-utils/statement-period.factory"
-import { constants } from "../utils/constants"
+import { StatementPeriod } from "@/domains/statement-period.domain.js"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { PaymentTypeService } from "../payment-type/payment-type.service.js"
+import { StatementPeriodService } from "../statement-period/statement-period.service.js"
+import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { createStatementPeriod } from "../test-utils/statement-period.factory.js"
+import { constants } from "../utils/constants.js"
 import {
 	CreateExpenseDTO,
 	GetExpensesRequest,
 	UpdateExpenseDTO
-} from "./expense.dto"
-import { ExpenseService } from "./expense.service"
+} from "./expense.dto.js"
+import { ExpenseService } from "./expense.service.js"
 
 const createPayload = (
 	expenseDate: Date,
@@ -433,6 +433,18 @@ describe("ExpenseService", () => {
 				"bank-id",
 				"payment-type-id"
 			)
+		})
+
+		it("should throw internal server error on a foreign key violation without field metadata", async () => {
+			const prismaError = createPrismaError(constants.FOREIGN_KEY_VIOLATION)
+
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(InternalServerErrorException)
 		})
 
 		it("should throw error if category not found", async () => {

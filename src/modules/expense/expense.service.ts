@@ -77,7 +77,8 @@ export class ExpenseService {
 		orderType: OrderByType = "asc"
 	): Record<string, OrderByType> | Record<string, Record<string, OrderByType>> {
 		const orderByColumn =
-			constants.orderColumns[orderBy] || constants.orderColumns.date
+			(orderBy && constants.orderColumns[orderBy]) ||
+			constants.orderColumns.date
 
 		const orderByClause =
 			typeof orderByColumn === "string"
@@ -103,7 +104,7 @@ export class ExpenseService {
 		ownerId: string,
 		endDate: Date,
 		startDate?: Date
-	) {
+	): Prisma.ExpenseWhereInput {
 		return {
 			deletedAt: null,
 			OR: [
@@ -124,7 +125,10 @@ export class ExpenseService {
 	 * @param startDate - Optional inclusive lower bound on `dueDate`.
 	 * @returns A Prisma-compatible `where` object.
 	 */
-	private buildSharedExpensesWhere(endDate: Date, startDate?: Date) {
+	private buildSharedExpensesWhere(
+		endDate: Date,
+		startDate?: Date
+	): Prisma.ExpenseWhereInput {
 		return {
 			deletedAt: null,
 			personal: false,
@@ -180,7 +184,7 @@ export class ExpenseService {
 		return new Map(
 			records.map((record): [string, string] => [
 				record.id,
-				record.description ?? record.name
+				record.description ?? record.name ?? ""
 			])
 		)
 	}
@@ -217,7 +221,7 @@ export class ExpenseService {
 			return endOfMonth(referenceDate)
 		}
 
-		if (paymentType?.hasStatement && !bankId) {
+		if (!bankId) {
 			throw new BadRequestException("This payment type must have a bank")
 		}
 
@@ -312,8 +316,11 @@ export class ExpenseService {
 
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				this.logger.error(`Error - ${error.code || error} - creating expense`)
-				if (error.code === constants.FOREIGN_KEY_VIOLATION) {
-					const dbField = error.meta.field_name as string
+				const dbField = error.meta?.field_name
+				if (
+					error.code === constants.FOREIGN_KEY_VIOLATION &&
+					typeof dbField === "string"
+				) {
 					const fieldName = dbField.split("_")[1]
 					const errorMessage = constants.foreignKeyMessages[fieldName]
 
@@ -426,8 +433,11 @@ export class ExpenseService {
 
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				this.logger.error(`Error - ${error.code || error} - updating expense`)
-				if (error.code === constants.FOREIGN_KEY_VIOLATION) {
-					const dbField = error.meta.field_name as string
+				const dbField = error.meta?.field_name
+				if (
+					error.code === constants.FOREIGN_KEY_VIOLATION &&
+					typeof dbField === "string"
+				) {
 					const fieldName = dbField.split("_")[1]
 					const errorMessage = constants.foreignKeyMessages[fieldName]
 
@@ -580,7 +590,9 @@ export class ExpenseService {
 			_sum: { amount: true }
 		})
 
-		const ids = groups.map((group) => group[column]).filter(Boolean)
+		const ids = groups
+			.map((group) => group[column])
+			.filter((id): id is string => Boolean(id))
 		const labels = await this.getFilterLabels(filterBy, ids)
 		const hasDescription =
 			filterBy === "category" || filterBy === "payment_type"
@@ -590,9 +602,12 @@ export class ExpenseService {
 				const id = group[column] ?? null
 				const total = group._sum.amount ?? 0
 
-				return hasDescription
-					? { id, description: labels.get(id), total }
-					: { id, name: id ? (labels.get(id) ?? null) : null, total }
+				// category and payment type columns are non-nullable in the schema
+				if (hasDescription && id) {
+					return { id, description: labels.get(id) ?? "", total }
+				}
+
+				return { id, name: id ? (labels.get(id) ?? null) : null, total }
 			})
 			.sort((a, b) => b.total - a.total)
 	}

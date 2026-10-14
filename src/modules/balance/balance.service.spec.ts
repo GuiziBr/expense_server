@@ -1,12 +1,12 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { endOfMonth } from "date-fns"
-import { ExpenseService } from "../expense/expense.service"
-import { createBank } from "../test-utils/bank.factory"
-import { createCategory } from "../test-utils/category.factory"
-import { createExpense } from "../test-utils/expense.factory"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { BalanceService } from "./balance.service"
+import { ExpenseService } from "../expense/expense.service.js"
+import { createBank } from "../test-utils/bank.factory.js"
+import { createCategory } from "../test-utils/category.factory.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { BalanceService } from "./balance.service.js"
 
 describe("BalanceService", () => {
 	let balanceService: BalanceService
@@ -214,6 +214,49 @@ describe("BalanceService", () => {
 			expect(result.requesterBalance).toBe(fakeExpenses[0].amount)
 		})
 
+		it("should count expenses without a bank but omit them from the banks list", async () => {
+			const paymentType = createPaymentType({ description: "Cash" })
+			const bank = createBank({ name: "Bank A" })
+
+			const expenses = [
+				createExpense({
+					ownerId: "owner-id",
+					amount: 10,
+					paymentType,
+					paymentTypeId: paymentType.id,
+					bank: null,
+					bankId: null
+				}),
+				createExpense({
+					ownerId: "owner-id",
+					amount: 5,
+					paymentType,
+					paymentTypeId: paymentType.id,
+					bank,
+					bankId: bank.id
+				})
+			]
+
+			vi.spyOn(expenseService, "getExpensesByDateRange").mockResolvedValue(
+				expenses
+			)
+
+			const result = await balanceService.getConsolidatedBalance({
+				year: 2022,
+				month: 1,
+				userId: "owner-id"
+			})
+
+			expect(result.requester?.payments).toEqual([
+				{
+					id: paymentType.id,
+					description: "Cash",
+					banks: [{ id: bank.id, name: "Bank A", total: 5 }],
+					total: 15
+				}
+			])
+		})
+
 		it("should merge multiple expenses belonging to the same owner", async () => {
 			const category = createCategory({ description: "Food" })
 			const otherCategory = createCategory({ description: "Transport" })
@@ -328,8 +371,8 @@ describe("BalanceService", () => {
 							description: fakeExpenses[0].paymentType.description,
 							banks: [
 								{
-									id: fakeExpenses[0].bank.id,
-									name: fakeExpenses[0].bank.name,
+									id: fakeExpenses[0].bank?.id,
+									name: fakeExpenses[0].bank?.name,
 									total: fakeExpenses[0].amount
 								}
 							],
@@ -354,8 +397,8 @@ describe("BalanceService", () => {
 							description: fakeExpenses[1].paymentType.description,
 							banks: [
 								{
-									id: fakeExpenses[1].bank.id,
-									name: fakeExpenses[1].bank.name,
+									id: fakeExpenses[1].bank?.id,
+									name: fakeExpenses[1].bank?.name,
 									total: fakeExpenses[1].amount
 								}
 							],

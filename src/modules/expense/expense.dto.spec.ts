@@ -1,4 +1,4 @@
-import { queryExpenseSchema } from "./expense.dto"
+import { queryExpenseSchema } from "./expense.dto.js"
 
 describe("queryExpenseSchema", () => {
 	it("should pass when filterBy and filterValue are not provided", () => {

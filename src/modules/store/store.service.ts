@@ -109,7 +109,7 @@ export class StoreService {
 				throw new NotFoundException("Store not found")
 			}
 
-			if ((store && !sameNameStore) || sameNameStore?.id === id) {
+			if (!sameNameStore || sameNameStore.id === id) {
 				const updatedStore = await this.databaseService.store.update({
 					where: { id },
 					data: { name, deletedAt: null }

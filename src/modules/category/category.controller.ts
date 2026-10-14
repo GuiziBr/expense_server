@@ -34,7 +34,7 @@ export class CategoryController {
 	 */
 	@Get()
 	async listCategories(
-		@Query(new ZodValidationPipe(listCategoriesSchema)) query?: ListCategoryDTO
+		@Query(new ZodValidationPipe(listCategoriesSchema)) query: ListCategoryDTO
 	) {
 		const { offset, limit } = query
 		const categories = await this.categoryService.getAll(offset, limit)

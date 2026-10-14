@@ -64,8 +64,8 @@ export interface GetConsolidatedBalanceResponse {
 	userId: string
 	requesterBalance: number
 	partnerBalance: number
-	requester: ConsolidatedReport
-	partner: ConsolidatedReport
+	requester?: ConsolidatedReport
+	partner?: ConsolidatedReport
 }
 
 export const queryBalanceBreakdownSchema = z.object({

@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { UserController } from "./user.controller"
-import { UserService } from "./user.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { UserController } from "./user.controller.js"
+import { UserService } from "./user.service.js"
 
 describe("UserController", () => {
 	let userService: UserService
@@ -29,10 +29,7 @@ describe("UserController", () => {
 
 	describe("updateAvatar", () => {
 		it("should return void", async () => {
-			await userController.updateAvatar(
-				{ userId: "user_id" },
-				{ avatar: "avatar" }
-			)
+			await userController.updateAvatar("user_id", { avatar: "avatar" })
 			expect(userService.updateUserAvatar).toBeCalledWith("user_id", "avatar")
 		})
 	})

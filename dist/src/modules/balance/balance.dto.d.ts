@@ -37,8 +37,8 @@ export interface GetConsolidatedBalanceResponse {
     userId: string;
     requesterBalance: number;
     partnerBalance: number;
-    requester: ConsolidatedReport;
-    partner: ConsolidatedReport;
+    requester?: ConsolidatedReport;
+    partner?: ConsolidatedReport;
 }
 export declare const queryBalanceBreakdownSchema: z.ZodObject<{
     filterBy: z.ZodEnum<{

@@ -1,5 +1,5 @@
-import { createExpense } from "../../../modules/test-utils/expense.factory"
-import { ExpensePresenter } from "./expense.presenter"
+import { createExpense } from "../../../modules/test-utils/expense.factory.js"
+import { ExpensePresenter } from "./expense.presenter.js"
 
 describe("ExpensePresenter", () => {
 	describe("toSharedExpenseDTO", () => {

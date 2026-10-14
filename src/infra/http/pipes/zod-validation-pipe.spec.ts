@@ -1,6 +1,7 @@
 import { BadRequestException } from "@nestjs/common"
 import { z } from "zod"
-import { ZodValidationPipe } from "./zod-validation-pipe"
+import { errorMessage } from "../../../modules/utils/error-message.js"
+import { ZodValidationPipe } from "./zod-validation-pipe.js"
 
 describe("ZodValidationPipe", () => {
 	const schema = z.object({
@@ -23,7 +24,7 @@ describe("ZodValidationPipe", () => {
 		try {
 			pipe.transform({ name: 1 })
 		} catch (error) {
-			expect(error.message).toContain("name")
+			expect(errorMessage(error)).toContain("name")
 		}
 	})
 

@@ -1,9 +1,9 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { createCategory } from "../test-utils/category.factory"
-import { CategoryController } from "./category.controller"
-import { CategoryService } from "./category.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { createCategory } from "../test-utils/category.factory.js"
+import { CategoryController } from "./category.controller.js"
+import { CategoryService } from "./category.service.js"
 
 describe("CategoryController", () => {
 	let categoryController: CategoryController

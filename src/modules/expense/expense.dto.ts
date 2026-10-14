@@ -23,8 +23,8 @@ export interface ExpenseDTO {
 	amount: number
 	category_id: string
 	payment_type_id: string
-	bank_id: string
-	store_id: string
+	bank_id: string | null
+	store_id: string | null
 	category: {
 		description: string
 	}
@@ -110,7 +110,7 @@ export interface GetExpensesRequest {
 	limit?: number
 	orderBy?: string
 	orderType?: OrderByType
-	filterBy?: string
+	filterBy?: FilterBy
 	filterValue?: string
 }
 

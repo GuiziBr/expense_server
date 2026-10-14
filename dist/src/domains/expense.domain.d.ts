@@ -14,14 +14,14 @@ export interface Expense {
     ownerId: string;
     categoryId: string;
     paymentTypeId: string;
-    bankId: string;
-    storeId: string;
+    bankId: string | null;
+    storeId: string | null;
     createdAt: Date;
     updatedAt: Date | null;
     deletedAt: Date | null;
     category: Category;
     paymentType: PaymentType;
-    bank: Bank;
-    store: Store;
+    bank: Bank | null;
+    store: Store | null;
     user: User;
 }
