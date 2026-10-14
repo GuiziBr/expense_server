@@ -109,7 +109,7 @@ export class BankService {
 				throw new NotFoundException("Bank not found")
 			}
 
-			if ((bank && !sameNameBank) || sameNameBank?.id === id) {
+			if (!sameNameBank || sameNameBank.id === id) {
 				const updatedBank = await this.databaseService.bank.update({
 					where: { id },
 					data: { name, deletedAt: null }

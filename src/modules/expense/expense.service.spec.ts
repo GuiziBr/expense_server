@@ -435,6 +435,18 @@ describe("ExpenseService", () => {
 			)
 		})
 
+		it("should throw internal server error on a foreign key violation without field metadata", async () => {
+			const prismaError = createPrismaError(constants.FOREIGN_KEY_VIOLATION)
+
+			const payload = createPayload(new Date(), false, false)
+
+			vi.spyOn(databaseService.expense, "create").mockRejectedValue(prismaError)
+
+			await expect(
+				expenseService.createExpense(payload, "user_id")
+			).rejects.toThrow(InternalServerErrorException)
+		})
+
 		it("should throw error if category not found", async () => {
 			const prismaError = createPrismaError(constants.FOREIGN_KEY_VIOLATION, {
 				field_name: "error_category_id"

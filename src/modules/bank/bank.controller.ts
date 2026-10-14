@@ -34,7 +34,7 @@ export class BankController {
 	 */
 	@Get()
 	async listBanks(
-		@Query(new ZodValidationPipe(listBanksSchema)) query?: ListBankDTO
+		@Query(new ZodValidationPipe(listBanksSchema)) query: ListBankDTO
 	) {
 		const { offset, limit } = query
 		const banks = await this.bankService.getAll(offset, limit)

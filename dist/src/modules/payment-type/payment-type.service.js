@@ -72,8 +72,7 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
                 this.logger.error(`Payment type ${id} not found`);
                 throw new NotFoundException("Payment type not found");
             }
-            if ((paymentType && !sameDescriptionPaymentType) ||
-                sameDescriptionPaymentType?.id === id) {
+            if (!sameDescriptionPaymentType || sameDescriptionPaymentType.id === id) {
                 const updatedPaymentType = await this.databaseService.paymentType.update({
                     where: { id },
                     data: { description, hasStatement, deletedAt: null }

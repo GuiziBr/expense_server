@@ -51,7 +51,7 @@ export class BalanceService {
 		return {
 			id: expense.paymentTypeId,
 			description: expense.paymentType.description,
-			banks: [this.getBank(expense.bank, expense.amount)],
+			banks: expense.bank ? [this.getBank(expense.bank, expense.amount)] : [],
 			total: expense.amount
 		}
 	}
@@ -180,16 +180,18 @@ export class BalanceService {
 						)
 
 						if (paymentTypeIndex >= 0) {
-							const bankIndex = owner.payments[
-								paymentTypeIndex
-							].banks.findIndex((bank) => bank.id === expense.bankId)
-							if (bankIndex >= 0) {
-								owner.payments[paymentTypeIndex].banks[bankIndex].total +=
-									expense.amount
-							} else {
-								owner.payments[paymentTypeIndex].banks.push(
-									this.getBank(expense.bank, expense.amount)
-								)
+							if (expense.bank) {
+								const bankIndex = owner.payments[
+									paymentTypeIndex
+								].banks.findIndex((bank) => bank.id === expense.bankId)
+								if (bankIndex >= 0) {
+									owner.payments[paymentTypeIndex].banks[bankIndex].total +=
+										expense.amount
+								} else {
+									owner.payments[paymentTypeIndex].banks.push(
+										this.getBank(expense.bank, expense.amount)
+									)
+								}
 							}
 							owner.payments[paymentTypeIndex].total += expense.amount
 						} else {

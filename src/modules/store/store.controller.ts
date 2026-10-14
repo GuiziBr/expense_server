@@ -34,7 +34,7 @@ export class StoreController {
 	 */
 	@Get()
 	async listStores(
-		@Query(new ZodValidationPipe(listStoresSchema)) query?: ListStoreDTO
+		@Query(new ZodValidationPipe(listStoresSchema)) query: ListStoreDTO
 	) {
 		const { offset, limit } = query
 		const stores = await this.storeService.getAll(offset, limit)
