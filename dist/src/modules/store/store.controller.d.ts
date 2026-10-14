@@ -3,7 +3,7 @@ import { StoreService } from "./store.service.js";
 export declare class StoreController {
     private readonly storeService;
     constructor(storeService: StoreService);
-    listStores(query?: ListStoreDTO): Promise<StoreDTO[]>;
+    listStores(query: ListStoreDTO): Promise<StoreDTO[]>;
     getStoreById(params: StoreByIdDTO): Promise<StoreByIdDTO>;
     createStore(body: CreateStoreDTO): Promise<StoreDTO>;
     updateStore(params: StoreByIdDTO, body: CreateStoreDTO): Promise<StoreDTO>;

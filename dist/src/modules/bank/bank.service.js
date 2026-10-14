@@ -70,7 +70,7 @@ let BankService = BankService_1 = class BankService {
                 this.logger.error(`Bank ${id} not found`);
                 throw new NotFoundException("Bank not found");
             }
-            if ((bank && !sameNameBank) || sameNameBank?.id === id) {
+            if (!sameNameBank || sameNameBank.id === id) {
                 const updatedBank = await this.databaseService.bank.update({
                     where: { id },
                     data: { name, deletedAt: null }

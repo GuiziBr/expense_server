@@ -70,7 +70,7 @@ let StoreService = StoreService_1 = class StoreService {
                 this.logger.error(`Store ${id} not found`);
                 throw new NotFoundException("Store not found");
             }
-            if ((store && !sameNameStore) || sameNameStore?.id === id) {
+            if (!sameNameStore || sameNameStore.id === id) {
                 const updatedStore = await this.databaseService.store.update({
                     where: { id },
                     data: { name, deletedAt: null }

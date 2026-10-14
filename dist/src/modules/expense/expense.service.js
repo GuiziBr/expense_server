@@ -35,7 +35,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 : amountInCents;
     }
     getOrderByClause(orderBy, orderType = "asc") {
-        const orderByColumn = constants.orderColumns[orderBy] || constants.orderColumns.date;
+        const orderByColumn = (orderBy && constants.orderColumns[orderBy]) ||
+            constants.orderColumns.date;
         const orderByClause = typeof orderByColumn === "string"
             ? { [orderByColumn]: orderType }
             : {
@@ -91,7 +92,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         const records = await lookups[filterBy]();
         return new Map(records.map((record) => [
             record.id,
-            record.description ?? record.name
+            record.description ?? record.name ?? ""
         ]));
     }
     async calculateDueDate(transactionDate, paymentTypeId, userId, bankId, currentMonth) {
@@ -102,7 +103,7 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
                 : addMonths(transactionDate, 1);
             return endOfMonth(referenceDate);
         }
-        if (paymentType?.hasStatement && !bankId) {
+        if (!bankId) {
             throw new BadRequestException("This payment type must have a bank");
         }
         const statementPeriod = await this.statementPeriodService.findByUserAndBank(userId, bankId, paymentTypeId);
@@ -153,8 +154,9 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             }
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - creating expense`);
-                if (error.code === constants.FOREIGN_KEY_VIOLATION) {
-                    const dbField = error.meta.field_name;
+                const dbField = error.meta?.field_name;
+                if (error.code === constants.FOREIGN_KEY_VIOLATION &&
+                    typeof dbField === "string") {
                     const fieldName = dbField.split("_")[1];
                     const errorMessage = constants.foreignKeyMessages[fieldName];
                     throw new BadRequestException(errorMessage);
@@ -221,8 +223,9 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             }
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 this.logger.error(`Error - ${error.code || error} - updating expense`);
-                if (error.code === constants.FOREIGN_KEY_VIOLATION) {
-                    const dbField = error.meta.field_name;
+                const dbField = error.meta?.field_name;
+                if (error.code === constants.FOREIGN_KEY_VIOLATION &&
+                    typeof dbField === "string") {
                     const fieldName = dbField.split("_")[1];
                     const errorMessage = constants.foreignKeyMessages[fieldName];
                     throw new BadRequestException(errorMessage);
@@ -291,16 +294,19 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
             where: this.buildPersonalExpensesWhere(ownerId, endDate, startDate),
             _sum: { amount: true }
         });
-        const ids = groups.map((group) => group[column]).filter(Boolean);
+        const ids = groups
+            .map((group) => group[column])
+            .filter((id) => Boolean(id));
         const labels = await this.getFilterLabels(filterBy, ids);
         const hasDescription = filterBy === "category" || filterBy === "payment_type";
         return groups
             .map((group) => {
             const id = group[column] ?? null;
             const total = group._sum.amount ?? 0;
-            return hasDescription
-                ? { id, description: labels.get(id), total }
-                : { id, name: id ? (labels.get(id) ?? null) : null, total };
+            if (hasDescription && id) {
+                return { id, description: labels.get(id) ?? "", total };
+            }
+            return { id, name: id ? (labels.get(id) ?? null) : null, total };
         })
             .sort((a, b) => b.total - a.total);
     }
