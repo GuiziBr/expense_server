@@ -1,9 +1,9 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { createStore } from "../test-utils/store.factory"
-import { StoreController } from "./store.controller"
-import { StoreService } from "./store.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { createStore } from "../test-utils/store.factory.js"
+import { StoreController } from "./store.controller.js"
+import { StoreService } from "./store.service.js"
 
 describe("StoreController", () => {
 	let storeController: StoreController

@@ -1,8 +1,8 @@
 import { Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { DatabaseService } from "@/infra/database/database.service"
-import { createStatementPeriod } from "../test-utils/statement-period.factory"
-import { StatementPeriodService } from "./statement-period.service"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { createStatementPeriod } from "../test-utils/statement-period.factory.js"
+import { StatementPeriodService } from "./statement-period.service.js"
 
 describe("StatementPeriodService", () => {
 	let statementPeriodService: StatementPeriodService

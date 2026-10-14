@@ -7,21 +7,21 @@ import {
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { addDays, addMonths, endOfMonth, setDate } from "date-fns"
-import { StatementPeriod } from "@/domains/statement-period.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import { PaymentTypeService } from "../payment-type/payment-type.service"
-import { StatementPeriodService } from "../statement-period/statement-period.service"
-import { createPrismaError } from "../test-utils/errors.factory"
-import { createExpense } from "../test-utils/expense.factory"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { createStatementPeriod } from "../test-utils/statement-period.factory"
-import { constants } from "../utils/constants"
+import { StatementPeriod } from "@/domains/statement-period.domain.js"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { PaymentTypeService } from "../payment-type/payment-type.service.js"
+import { StatementPeriodService } from "../statement-period/statement-period.service.js"
+import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { createStatementPeriod } from "../test-utils/statement-period.factory.js"
+import { constants } from "../utils/constants.js"
 import {
 	CreateExpenseDTO,
 	GetExpensesRequest,
 	UpdateExpenseDTO
-} from "./expense.dto"
-import { ExpenseService } from "./expense.service"
+} from "./expense.dto.js"
+import { ExpenseService } from "./expense.service.js"
 
 const createPayload = (
 	expenseDate: Date,

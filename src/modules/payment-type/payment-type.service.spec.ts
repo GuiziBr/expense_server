@@ -5,11 +5,11 @@ import {
 	NotFoundException
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { DatabaseService } from "@/infra/database/database.service"
-import { createPrismaError } from "../test-utils/errors.factory"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { constants } from "../utils/constants"
-import { PaymentTypeService } from "./payment-type.service"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { constants } from "../utils/constants.js"
+import { PaymentTypeService } from "./payment-type.service.js"
 
 describe("PaymentTypeService", () => {
 	let paymentTypeService: PaymentTypeService

@@ -5,11 +5,11 @@ import {
 	NotFoundException
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { DatabaseService } from "@/infra/database/database.service"
-import { createPrismaError } from "../test-utils/errors.factory"
-import { createStore } from "../test-utils/store.factory"
-import { constants } from "../utils/constants"
-import { StoreService } from "./store.service"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createStore } from "../test-utils/store.factory.js"
+import { constants } from "../utils/constants.js"
+import { StoreService } from "./store.service.js"
 
 describe("StoreService", () => {
 	let storeService: StoreService

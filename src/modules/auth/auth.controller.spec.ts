@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { AuthController } from "./auth.controller"
-import { AuthService } from "./auth.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { AuthController } from "./auth.controller.js"
+import { AuthService } from "./auth.service.js"
 
 describe("AuthController", () => {
 	let authController: AuthController

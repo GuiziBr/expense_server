@@ -1,7 +1,7 @@
 import { ExecutionContext, Logger, NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { DatabaseService } from "@/infra/database/database.service"
-import { CurrentUserInterceptor } from "./current-user.interceptor"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { CurrentUserInterceptor } from "./current-user.interceptor.js"
 
 describe("CurrentUserInterceptor", () => {
 	let interceptor: CurrentUserInterceptor

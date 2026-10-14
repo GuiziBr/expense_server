@@ -1,5 +1,5 @@
-import { GetConsolidatedBalanceResponse } from "../../../modules/balance/balance.dto"
-import { BalancePresenter } from "./balance.presenter"
+import { GetConsolidatedBalanceResponse } from "../../../modules/balance/balance.dto.js"
+import { BalancePresenter } from "./balance.presenter.js"
 
 describe("BalancePresenter", () => {
 	const requester = {

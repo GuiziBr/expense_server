@@ -1,12 +1,12 @@
 import { InternalServerErrorException, Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { endOfMonth } from "date-fns"
-import { ExpenseService } from "../expense/expense.service"
-import { createBank } from "../test-utils/bank.factory"
-import { createCategory } from "../test-utils/category.factory"
-import { createExpense } from "../test-utils/expense.factory"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { BalanceService } from "./balance.service"
+import { ExpenseService } from "../expense/expense.service.js"
+import { createBank } from "../test-utils/bank.factory.js"
+import { createCategory } from "../test-utils/category.factory.js"
+import { createExpense } from "../test-utils/expense.factory.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { BalanceService } from "./balance.service.js"
 
 describe("BalanceService", () => {
 	let balanceService: BalanceService
@@ -371,8 +371,8 @@ describe("BalanceService", () => {
 							description: fakeExpenses[0].paymentType.description,
 							banks: [
 								{
-									id: fakeExpenses[0].bank.id,
-									name: fakeExpenses[0].bank.name,
+									id: fakeExpenses[0].bank?.id,
+									name: fakeExpenses[0].bank?.name,
 									total: fakeExpenses[0].amount
 								}
 							],
@@ -397,8 +397,8 @@ describe("BalanceService", () => {
 							description: fakeExpenses[1].paymentType.description,
 							banks: [
 								{
-									id: fakeExpenses[1].bank.id,
-									name: fakeExpenses[1].bank.name,
+									id: fakeExpenses[1].bank?.id,
+									name: fakeExpenses[1].bank?.name,
 									total: fakeExpenses[1].amount
 								}
 							],

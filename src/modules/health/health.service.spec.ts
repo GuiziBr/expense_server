@@ -1,7 +1,7 @@
 import { Logger } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { DatabaseService } from "@/infra/database/database.service"
-import { HealthService } from "./health.service"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { HealthService } from "./health.service.js"
 
 describe("HealthService", () => {
 	let healthService: HealthService

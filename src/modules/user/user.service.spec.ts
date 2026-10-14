@@ -4,10 +4,10 @@ import {
 	Logger
 } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { User } from "@/domains/user.domain"
-import { DatabaseService } from "@/infra/database/database.service"
-import { createPrismaError } from "../test-utils/errors.factory"
-import { UserService } from "./user.service"
+import { User } from "@/domains/user.domain.js"
+import { DatabaseService } from "@/infra/database/database.service.js"
+import { createPrismaError } from "../test-utils/errors.factory.js"
+import { UserService } from "./user.service.js"
 
 describe("UserService", () => {
 	let userService: UserService

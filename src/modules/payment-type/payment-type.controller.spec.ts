@@ -1,9 +1,9 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
-import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor"
-import { createPaymentType } from "../test-utils/payment-type.factory"
-import { PaymentTypeController } from "./payment-type.controller"
-import { PaymentTypeService } from "./payment-type.service"
+import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
+import { createPaymentType } from "../test-utils/payment-type.factory.js"
+import { PaymentTypeController } from "./payment-type.controller.js"
+import { PaymentTypeService } from "./payment-type.service.js"
 
 describe("PaymentTypeController", () => {
 	let paymentTypeController: PaymentTypeController
