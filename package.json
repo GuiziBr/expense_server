@@ -15,6 +15,7 @@
 		"start:prod": "node dist/src/main.js",
 		"lint": "npx @biomejs/biome lint",
 		"check": "npx @biomejs/biome check",
+		"typecheck": "tsc --noEmit --incremental false -p tsconfig.json",
 		"fix": "npx @biomejs/biome check --write",
 		"migrate": "npx prisma migrate dev",
 		"docker:up": "docker compose up",
