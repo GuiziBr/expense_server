@@ -43,7 +43,7 @@ describe("PaymentTypeController", () => {
 	describe("listPaymentTypes", () => {
 		it("should return list of payment types", async () => {
 			const result = await paymentTypeController.listPaymentTypes(
-				{ offset: 0, limit: 10 },
+				{ offset: 0, limit: 10, orderBy: "description", orderType: "asc" },
 				res
 			)
 
@@ -57,7 +57,12 @@ describe("PaymentTypeController", () => {
 				has_statement: fakePaymentType.hasStatement
 			})
 
-			expect(paymentTypeService.getAll).toBeCalledWith(0, 10)
+			expect(paymentTypeService.getAll).toBeCalledWith(
+				0,
+				10,
+				"description",
+				"asc"
+			)
 			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})

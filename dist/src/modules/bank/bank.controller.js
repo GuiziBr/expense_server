@@ -21,8 +21,8 @@ let BankController = class BankController {
         this.bankService = bankService;
     }
     async listBanks(query, res) {
-        const { offset, limit } = query;
-        const { banks, totalCount } = await this.bankService.getAll(offset, limit);
+        const { offset, limit, orderBy, orderType } = query;
+        const { banks, totalCount } = await this.bankService.getAll(offset, limit, orderBy, orderType);
         res.setHeader("X-Total-Count", totalCount);
         return banks.map(BankPresenter.toHttp);
     }

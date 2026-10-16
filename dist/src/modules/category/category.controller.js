@@ -21,8 +21,8 @@ let CategoryController = class CategoryController {
         this.categoryService = categoryService;
     }
     async listCategories(query, res) {
-        const { offset, limit } = query;
-        const { categories, totalCount } = await this.categoryService.getAll(offset, limit);
+        const { offset, limit, orderBy, orderType } = query;
+        const { categories, totalCount } = await this.categoryService.getAll(offset, limit, orderBy, orderType);
         res.setHeader("X-Total-Count", totalCount);
         return categories.map(CategoryPresenter.toHttp);
     }

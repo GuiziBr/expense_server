@@ -21,8 +21,8 @@ let StoreController = class StoreController {
         this.storeService = storeService;
     }
     async listStores(query, res) {
-        const { offset, limit } = query;
-        const { stores, totalCount } = await this.storeService.getAll(offset, limit);
+        const { offset, limit, orderBy, orderType } = query;
+        const { stores, totalCount } = await this.storeService.getAll(offset, limit, orderBy, orderType);
         res.setHeader("X-Total-Count", totalCount);
         return stores.map(StorePresenter.toHttp);
     }

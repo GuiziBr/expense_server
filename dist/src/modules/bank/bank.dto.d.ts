@@ -8,6 +8,14 @@ export interface BankDTO {
 export declare const listBanksSchema: z.ZodObject<{
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    orderBy: z.ZodDefault<z.ZodEnum<{
+        name: "name";
+        created_at: "created_at";
+    }>>;
+    orderType: z.ZodDefault<z.ZodEnum<{
+        asc: "asc";
+        desc: "desc";
+    }>>;
 }, z.core.$strip>;
 export type ListBankDTO = z.infer<typeof listBanksSchema>;
 export declare const bankByIdSchema: z.ZodObject<{

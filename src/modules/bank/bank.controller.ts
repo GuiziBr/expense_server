@@ -31,7 +31,7 @@ export class BankController {
 
 	/**
 	 * Lists banks, ordered by name ascending, excluding soft-deleted records.
-	 * @param query - Optional pagination query, validated against `listBanksSchema` (`offset`, `limit`).
+	 * @param query - Optional pagination query, validated against `listBanksSchema` (`offset`, `limit`, `orderBy`, `orderType`).
 	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of banks mapped to their HTTP representation.
 	 */
@@ -40,8 +40,13 @@ export class BankController {
 		@Query(new ZodValidationPipe(listBanksSchema)) query: ListBankDTO,
 		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
-		const { banks, totalCount } = await this.bankService.getAll(offset, limit)
+		const { offset, limit, orderBy, orderType } = query
+		const { banks, totalCount } = await this.bankService.getAll(
+			offset,
+			limit,
+			orderBy,
+			orderType
+		)
 		res.setHeader("X-Total-Count", totalCount)
 		return banks.map(BankPresenter.toHttp)
 	}

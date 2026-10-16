@@ -11,6 +11,15 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListPaymentTypesDTO } from "./payment-type.dto.js"
+
+type ListPaymentTypeOrderBy = ListPaymentTypesDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListPaymentTypeOrderBy, string> = {
+	description: "description",
+	has_statement: "hasStatement",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class PaymentTypeService {
@@ -21,21 +30,26 @@ export class PaymentTypeService {
 	 * Retrieves all non-deleted payment types, ordered by description ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
 	 * @returns The matching payment types and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getAll(
 		offset?: number,
-		limit?: number
+		limit?: number,
+		orderBy: ListPaymentTypeOrderBy = "description",
+		orderType: "asc" | "desc" = "asc"
 	): Promise<{ paymentTypes: PaymentType[]; totalCount: number }> {
 		try {
 			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
 			const [paymentTypes, totalCount] = await Promise.all([
 				this.databaseService.paymentType.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { description: "asc" }
+					orderBy: { [field]: orderType }
 				}),
 				this.databaseService.paymentType.count({ where })
 			])

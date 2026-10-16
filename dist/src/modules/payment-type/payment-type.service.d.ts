@@ -1,10 +1,12 @@
 import { PaymentType } from "../../domains/payment-type.domain.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
+import type { ListPaymentTypesDTO } from "./payment-type.dto.js";
+type ListPaymentTypeOrderBy = ListPaymentTypesDTO["orderBy"];
 export declare class PaymentTypeService {
     private readonly databaseService;
     private readonly logger;
     constructor(databaseService: DatabaseService);
-    getAll(offset?: number, limit?: number): Promise<{
+    getAll(offset?: number, limit?: number, orderBy?: ListPaymentTypeOrderBy, orderType?: "asc" | "desc"): Promise<{
         paymentTypes: PaymentType[];
         totalCount: number;
     }>;
@@ -14,3 +16,4 @@ export declare class PaymentTypeService {
     delete(id: string): Promise<void>;
     private reactivatePaymentType;
 }
+export {};

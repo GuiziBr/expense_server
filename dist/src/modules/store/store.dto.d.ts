@@ -8,6 +8,14 @@ export interface StoreDTO {
 export declare const listStoresSchema: z.ZodObject<{
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    orderBy: z.ZodDefault<z.ZodEnum<{
+        name: "name";
+        created_at: "created_at";
+    }>>;
+    orderType: z.ZodDefault<z.ZodEnum<{
+        asc: "asc";
+        desc: "desc";
+    }>>;
 }, z.core.$strip>;
 export type ListStoreDTO = z.infer<typeof listStoresSchema>;
 export declare const storeByIdSchema: z.ZodObject<{

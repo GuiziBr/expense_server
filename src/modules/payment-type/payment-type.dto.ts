@@ -10,7 +10,11 @@ export interface PaymentTypeDTO {
 
 export const listPaymentTypesSchema = z.object({
 	offset: z.coerce.number().min(0).default(0),
-	limit: z.coerce.number().min(1).max(20).default(20)
+	limit: z.coerce.number().min(1).max(20).default(20),
+	orderBy: z
+		.enum(["description", "has_statement", "created_at"])
+		.default("description"),
+	orderType: z.enum(["asc", "desc"]).default("asc")
 })
 
 export type ListPaymentTypesDTO = z.infer<typeof listPaymentTypesSchema>

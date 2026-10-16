@@ -8,6 +8,14 @@ export interface CategoryDTO {
 export declare const listCategoriesSchema: z.ZodObject<{
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    orderBy: z.ZodDefault<z.ZodEnum<{
+        description: "description";
+        created_at: "created_at";
+    }>>;
+    orderType: z.ZodDefault<z.ZodEnum<{
+        asc: "asc";
+        desc: "desc";
+    }>>;
 }, z.core.$strip>;
 export type ListCategoryDTO = z.infer<typeof listCategoriesSchema>;
 export declare const categoryByIdSchema: z.ZodObject<{

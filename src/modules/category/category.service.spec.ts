@@ -77,6 +77,17 @@ describe("CategoryService", () => {
 				where: { deletedAt: null }
 			})
 		})
+
+		it("should apply the given ordering", async () => {
+			await categoryService.getAll(0, 5, "created_at", "desc")
+
+			expect(databaseService.category.findMany).toBeCalledWith({
+				where: { deletedAt: null },
+				skip: 0,
+				take: 5,
+				orderBy: { createdAt: "desc" }
+			})
+		})
 	})
 
 	describe("getById", () => {

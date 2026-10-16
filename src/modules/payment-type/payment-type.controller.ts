@@ -31,7 +31,7 @@ export class PaymentTypeController {
 
 	/**
 	 * Lists payment types, optionally paginated.
-	 * @param query - Validated query params containing `offset` and `limit` for pagination.
+	 * @param query - Validated query params containing `offset`, `limit`, `orderBy` and `orderType`.
 	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of payment types mapped to their HTTP representation.
 	 */
@@ -41,10 +41,12 @@ export class PaymentTypeController {
 		query: ListPaymentTypesDTO,
 		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
+		const { offset, limit, orderBy, orderType } = query
 		const { paymentTypes, totalCount } = await this.paymentTypeService.getAll(
 			offset,
-			limit
+			limit,
+			orderBy,
+			orderType
 		)
 		res.setHeader("X-Total-Count", totalCount)
 		return paymentTypes.map(PaymentTypePresenter.toHttp)

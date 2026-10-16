@@ -21,8 +21,8 @@ let PaymentTypeController = class PaymentTypeController {
         this.paymentTypeService = paymentTypeService;
     }
     async listPaymentTypes(query, res) {
-        const { offset, limit } = query;
-        const { paymentTypes, totalCount } = await this.paymentTypeService.getAll(offset, limit);
+        const { offset, limit, orderBy, orderType } = query;
+        const { paymentTypes, totalCount } = await this.paymentTypeService.getAll(offset, limit, orderBy, orderType);
         res.setHeader("X-Total-Count", totalCount);
         return paymentTypes.map(PaymentTypePresenter.toHttp);
     }

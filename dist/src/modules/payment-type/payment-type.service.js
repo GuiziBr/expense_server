@@ -13,21 +13,27 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 import { errorMessage } from "../utils/error-message.js";
+const ORDER_FIELDS = {
+    description: "description",
+    has_statement: "hasStatement",
+    created_at: "createdAt"
+};
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
     databaseService;
     logger = new Logger(PaymentTypeService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
     }
-    async getAll(offset, limit) {
+    async getAll(offset, limit, orderBy = "description", orderType = "asc") {
         try {
             const where = { deletedAt: null };
+            const field = ORDER_FIELDS[orderBy];
             const [paymentTypes, totalCount] = await Promise.all([
                 this.databaseService.paymentType.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { description: "asc" }
+                    orderBy: { [field]: orderType }
                 }),
                 this.databaseService.paymentType.count({ where })
             ]);

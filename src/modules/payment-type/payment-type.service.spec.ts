@@ -79,6 +79,17 @@ describe("PaymentTypeService", () => {
 				where: { deletedAt: null }
 			})
 		})
+
+		it("should apply the given ordering", async () => {
+			await paymentTypeService.getAll(0, 5, "has_statement", "desc")
+
+			expect(databaseService.paymentType.findMany).toBeCalledWith({
+				where: { deletedAt: null },
+				skip: 0,
+				take: 5,
+				orderBy: { hasStatement: "desc" }
+			})
+		})
 	})
 
 	describe("getById", () => {

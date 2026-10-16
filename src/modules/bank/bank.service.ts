@@ -11,6 +11,14 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListBankDTO } from "./bank.dto.js"
+
+type ListBankOrderBy = ListBankDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListBankOrderBy, string> = {
+	name: "name",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class BankService {
@@ -22,21 +30,26 @@ export class BankService {
 	 * Fetches all non-deleted banks, ordered by name ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
 	 * @returns The matching banks and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getAll(
 		offset?: number,
-		limit?: number
+		limit?: number,
+		orderBy: ListBankOrderBy = "name",
+		orderType: "asc" | "desc" = "asc"
 	): Promise<{ banks: Bank[]; totalCount: number }> {
 		try {
 			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
 			const [banks, totalCount] = await Promise.all([
 				this.databaseService.bank.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { name: "asc" }
+					orderBy: { [field]: orderType }
 				}),
 				this.databaseService.bank.count({ where })
 			])

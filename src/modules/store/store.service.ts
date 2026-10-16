@@ -11,6 +11,14 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListStoreDTO } from "./store.dto.js"
+
+type ListStoreOrderBy = ListStoreDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListStoreOrderBy, string> = {
+	name: "name",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class StoreService {
@@ -22,21 +30,26 @@ export class StoreService {
 	 * Fetches all non-deleted stores, ordered by name ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
 	 * @returns The matching stores and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
 	async getAll(
 		offset?: number,
-		limit?: number
+		limit?: number,
+		orderBy: ListStoreOrderBy = "name",
+		orderType: "asc" | "desc" = "asc"
 	): Promise<{ stores: Store[]; totalCount: number }> {
 		try {
 			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
 			const [stores, totalCount] = await Promise.all([
 				this.databaseService.store.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { name: "asc" }
+					orderBy: { [field]: orderType }
 				}),
 				this.databaseService.store.count({ where })
 			])

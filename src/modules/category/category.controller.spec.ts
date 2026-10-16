@@ -42,7 +42,7 @@ describe("CategoryController", () => {
 	describe("listCategories", () => {
 		it("should return list of categories", async () => {
 			const result = await categoryController.listCategories(
-				{ offset: 0, limit: 10 },
+				{ offset: 0, limit: 10, orderBy: "description", orderType: "asc" },
 				res
 			)
 
@@ -55,7 +55,7 @@ describe("CategoryController", () => {
 				updated_at: fakeCategory.updatedAt
 			})
 
-			expect(categoryService.getAll).toBeCalledWith(0, 10)
+			expect(categoryService.getAll).toBeCalledWith(0, 10, "description", "asc")
 			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})

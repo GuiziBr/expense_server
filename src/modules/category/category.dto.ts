@@ -9,7 +9,9 @@ export interface CategoryDTO {
 
 export const listCategoriesSchema = z.object({
 	offset: z.coerce.number().int().min(0).default(0),
-	limit: z.coerce.number().int().min(1).max(20).default(20)
+	limit: z.coerce.number().int().min(1).max(20).default(20),
+	orderBy: z.enum(["description", "created_at"]).default("description"),
+	orderType: z.enum(["asc", "desc"]).default("asc")
 })
 
 export type ListCategoryDTO = z.infer<typeof listCategoriesSchema>

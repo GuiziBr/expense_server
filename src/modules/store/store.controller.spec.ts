@@ -42,7 +42,7 @@ describe("StoreController", () => {
 	describe("listStores", () => {
 		it("should return list of stores", async () => {
 			const result = await storeController.listStores(
-				{ offset: 0, limit: 10 },
+				{ offset: 0, limit: 10, orderBy: "name", orderType: "asc" },
 				res
 			)
 
@@ -55,7 +55,7 @@ describe("StoreController", () => {
 				updated_at: fakeStore.updatedAt
 			})
 
-			expect(storeService.getAll).toBeCalledWith(0, 10)
+			expect(storeService.getAll).toBeCalledWith(0, 10, "name", "asc")
 			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})

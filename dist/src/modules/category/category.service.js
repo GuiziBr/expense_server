@@ -13,21 +13,26 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 import { errorMessage } from "../utils/error-message.js";
+const ORDER_FIELDS = {
+    description: "description",
+    created_at: "createdAt"
+};
 let CategoryService = CategoryService_1 = class CategoryService {
     databaseService;
     logger = new Logger(CategoryService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
     }
-    async getAll(offset, limit) {
+    async getAll(offset, limit, orderBy = "description", orderType = "asc") {
         try {
             const where = { deletedAt: null };
+            const field = ORDER_FIELDS[orderBy];
             const [categories, totalCount] = await Promise.all([
                 this.databaseService.category.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { description: "asc" }
+                    orderBy: { [field]: orderType }
                 }),
                 this.databaseService.category.count({ where })
             ]);

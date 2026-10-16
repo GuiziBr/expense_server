@@ -11,6 +11,14 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListCategoryDTO } from "./category.dto.js"
+
+type ListCategoryOrderBy = ListCategoryDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListCategoryOrderBy, string> = {
+	description: "description",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class CategoryService {
@@ -22,21 +30,26 @@ export class CategoryService {
 	 * Retrieves all non-deleted categories, ordered by description ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
 	 * @returns The matching categories and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} If the query fails.
 	 */
 	async getAll(
 		offset?: number,
-		limit?: number
+		limit?: number,
+		orderBy: ListCategoryOrderBy = "description",
+		orderType: "asc" | "desc" = "asc"
 	): Promise<{ categories: Category[]; totalCount: number }> {
 		try {
 			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
 			const [categories, totalCount] = await Promise.all([
 				this.databaseService.category.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { description: "asc" }
+					orderBy: { [field]: orderType }
 				}),
 				this.databaseService.category.count({ where })
 			])

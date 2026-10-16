@@ -31,7 +31,7 @@ export class StoreController {
 
 	/**
 	 * Lists stores, ordered by name ascending, excluding soft-deleted records.
-	 * @param query - Optional pagination query, validated against `listStoresSchema` (`offset`, `limit`).
+	 * @param query - Optional pagination query, validated against `listStoresSchema` (`offset`, `limit`, `orderBy`, `orderType`).
 	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of stores mapped to their HTTP representation.
 	 */
@@ -40,8 +40,13 @@ export class StoreController {
 		@Query(new ZodValidationPipe(listStoresSchema)) query: ListStoreDTO,
 		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
-		const { stores, totalCount } = await this.storeService.getAll(offset, limit)
+		const { offset, limit, orderBy, orderType } = query
+		const { stores, totalCount } = await this.storeService.getAll(
+			offset,
+			limit,
+			orderBy,
+			orderType
+		)
 		res.setHeader("X-Total-Count", totalCount)
 		return stores.map(StorePresenter.toHttp)
 	}

@@ -42,7 +42,7 @@ describe("BankController", () => {
 	describe("listBanks", () => {
 		it("should return list of banks", async () => {
 			const result = await bankController.listBanks(
-				{ offset: 0, limit: 10 },
+				{ offset: 0, limit: 10, orderBy: "name", orderType: "asc" },
 				res
 			)
 
@@ -55,7 +55,7 @@ describe("BankController", () => {
 				updated_at: fakeBank.updatedAt
 			})
 
-			expect(bankService.getAll).toBeCalledWith(0, 10)
+			expect(bankService.getAll).toBeCalledWith(0, 10, "name", "asc")
 			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})
