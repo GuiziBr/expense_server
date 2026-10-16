@@ -8,8 +8,10 @@ import {
 	Param,
 	Patch,
 	Post,
-	Query
+	Query,
+	Response
 } from "@nestjs/common"
+import { Response as Res } from "express"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { PaymentTypePresenter } from "../../infra/http/presenters/paymentType.presenter.js"
 import {
@@ -29,16 +31,24 @@ export class PaymentTypeController {
 
 	/**
 	 * Lists payment types, optionally paginated.
-	 * @param query - Validated query params containing `offset` and `limit` for pagination.
+	 * @param query - Validated query params containing `offset`, `limit`, `orderBy` and `orderType`.
+	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of payment types mapped to their HTTP representation.
 	 */
 	@Get()
 	async listPaymentTypes(
 		@Query(new ZodValidationPipe(listPaymentTypesSchema))
-		query: ListPaymentTypesDTO
+		query: ListPaymentTypesDTO,
+		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
-		const paymentTypes = await this.paymentTypeService.getAll(offset, limit)
+		const { offset, limit, orderBy, orderType } = query
+		const { paymentTypes, totalCount } = await this.paymentTypeService.getAll(
+			offset,
+			limit,
+			orderBy,
+			orderType
+		)
+		res.setHeader("X-Total-Count", totalCount)
 		return paymentTypes.map(PaymentTypePresenter.toHttp)
 	}
 

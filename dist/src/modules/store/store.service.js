@@ -13,21 +13,33 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 import { errorMessage } from "../utils/error-message.js";
+const ORDER_FIELDS = {
+    name: "name",
+    created_at: "createdAt"
+};
 let StoreService = StoreService_1 = class StoreService {
     databaseService;
     logger = new Logger(StoreService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
     }
-    async getAll(offset, limit) {
+    async getAll(offset, limit, orderBy = "name", orderType = "asc") {
         try {
-            const stores = await this.databaseService.store.findMany({
-                where: { deletedAt: null },
-                skip: offset,
-                take: limit,
-                orderBy: { name: "asc" }
-            });
-            return stores;
+            const where = { deletedAt: null };
+            const field = ORDER_FIELDS[orderBy];
+            const order = orderBy === "created_at"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
+            const [stores, totalCount] = await Promise.all([
+                this.databaseService.store.findMany({
+                    where,
+                    skip: offset,
+                    take: limit,
+                    orderBy: order
+                }),
+                this.databaseService.store.count({ where })
+            ]);
+            return { stores, totalCount };
         }
         catch (error) {
             this.logger.error(`Error - ${errorMessage(error)} - getting all stores`);

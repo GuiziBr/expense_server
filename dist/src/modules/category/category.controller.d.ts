@@ -1,9 +1,10 @@
+import { Response as Res } from "express";
 import { CategoryByIdDTO, CategoryDTO, CreateCategoryDTO, ListCategoryDTO } from "./category.dto.js";
 import { CategoryService } from "./category.service.js";
 export declare class CategoryController {
     private readonly categoryService;
     constructor(categoryService: CategoryService);
-    listCategories(query: ListCategoryDTO): Promise<CategoryDTO[]>;
+    listCategories(query: ListCategoryDTO, res: Res): Promise<CategoryDTO[]>;
     getCategoryById(params: CategoryByIdDTO): Promise<CategoryByIdDTO>;
     createCategory(body: CreateCategoryDTO): Promise<CategoryDTO>;
     updateCategory(params: CategoryByIdDTO, body: CreateCategoryDTO): Promise<CategoryDTO>;

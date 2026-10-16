@@ -9,7 +9,9 @@ export interface StoreDTO {
 
 export const listStoresSchema = z.object({
 	offset: z.coerce.number().min(0).default(0),
-	limit: z.coerce.number().min(1).max(20).default(20)
+	limit: z.coerce.number().min(1).max(20).default(20),
+	orderBy: z.enum(["name", "created_at"]).default("name"),
+	orderType: z.enum(["asc", "desc"]).default("asc")
 })
 
 export type ListStoreDTO = z.infer<typeof listStoresSchema>

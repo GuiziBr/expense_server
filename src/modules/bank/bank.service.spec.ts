@@ -8,6 +8,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service.js"
 import { createBank } from "../test-utils/bank.factory.js"
 import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaginatedFindMany } from "../test-utils/paginated-find-many.js"
 import { constants } from "../utils/constants.js"
 import { BankService } from "./bank.service.js"
 
@@ -26,6 +27,7 @@ describe("BankService", () => {
 					useValue: {
 						bank: {
 							findMany: vi.fn().mockResolvedValue([fakeBank]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeBank),
 							update: vi.fn().mockResolvedValue(fakeBank),
 							delete: vi.fn().mockResolvedValue(undefined),
@@ -63,13 +65,46 @@ describe("BankService", () => {
 		it("should return bank", async () => {
 			const result = await bankService.getAll(1, 2)
 
-			expect(result).toEqual([fakeBank])
+			expect(result).toEqual({ banks: [fakeBank], totalCount: 1 })
 
 			expect(databaseService.bank.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { name: "asc" }
+			})
+			expect(databaseService.bank.count).toBeCalledWith({
+				where: { deletedAt: null }
+			})
+		})
+
+		it("should not repeat or omit records across pages when the sort field ties", async () => {
+			const rows = Array.from({ length: 5 }, () =>
+				createBank({ createdAt: new Date("2026-01-01") })
+			)
+			vi.spyOn(databaseService.bank, "findMany").mockImplementation(
+				createPaginatedFindMany(rows) as never
+			)
+
+			const pages = await Promise.all(
+				[0, 2, 4].map((offset) =>
+					bankService.getAll(offset, 2, "created_at", "asc")
+				)
+			)
+
+			const ids = pages.flatMap((page) => page.banks.map((bank) => bank.id))
+			expect(ids).toHaveLength(rows.length)
+			expect(new Set(ids)).toEqual(new Set(rows.map((bank) => bank.id)))
+		})
+
+		it("should apply the given ordering", async () => {
+			await bankService.getAll(0, 5, "created_at", "desc")
+
+			expect(databaseService.bank.findMany).toBeCalledWith({
+				where: { deletedAt: null },
+				skip: 0,
+				take: 5,
+				orderBy: [{ createdAt: "desc" }, { id: "asc" }]
 			})
 		})
 	})

@@ -11,6 +11,14 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListCategoryDTO } from "./category.dto.js"
+
+type ListCategoryOrderBy = ListCategoryDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListCategoryOrderBy, string> = {
+	description: "description",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class CategoryService {
@@ -22,18 +30,35 @@ export class CategoryService {
 	 * Retrieves all non-deleted categories, ordered by description ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
-	 * @returns The list of matching categories.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
+	 * @returns The matching categories and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} If the query fails.
 	 */
-	async getAll(offset?: number, limit?: number): Promise<Category[]> {
+	async getAll(
+		offset?: number,
+		limit?: number,
+		orderBy: ListCategoryOrderBy = "description",
+		orderType: "asc" | "desc" = "asc"
+	): Promise<{ categories: Category[]; totalCount: number }> {
 		try {
-			const categories = await this.databaseService.category.findMany({
-				where: { deletedAt: null },
-				skip: offset,
-				take: limit,
-				orderBy: { description: "asc" }
-			})
-			return categories
+			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
+			// Non-unique sort fields need `id` as a tie-breaker so offset pages stay stable
+			const order =
+				orderBy === "created_at"
+					? [{ [field]: orderType }, { id: "asc" as const }]
+					: { [field]: orderType }
+			const [categories, totalCount] = await Promise.all([
+				this.databaseService.category.findMany({
+					where,
+					skip: offset,
+					take: limit,
+					orderBy: order
+				}),
+				this.databaseService.category.count({ where })
+			])
+			return { categories, totalCount }
 		} catch (error) {
 			this.logger.error(
 				`Error - ${errorMessage(error)} - getting all categories`
