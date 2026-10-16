@@ -27,12 +27,15 @@ let BankService = BankService_1 = class BankService {
         try {
             const where = { deletedAt: null };
             const field = ORDER_FIELDS[orderBy];
+            const order = orderBy === "created_at"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
             const [banks, totalCount] = await Promise.all([
                 this.databaseService.bank.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { [field]: orderType }
+                    orderBy: order
                 }),
                 this.databaseService.bank.count({ where })
             ]);

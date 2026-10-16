@@ -28,12 +28,15 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
         try {
             const where = { deletedAt: null };
             const field = ORDER_FIELDS[orderBy];
+            const order = orderBy !== "description"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
             const [paymentTypes, totalCount] = await Promise.all([
                 this.databaseService.paymentType.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { [field]: orderType }
+                    orderBy: order
                 }),
                 this.databaseService.paymentType.count({ where })
             ]);

@@ -84,7 +84,7 @@ describe("BankService", () => {
 				where: { deletedAt: null },
 				skip: 0,
 				take: 5,
-				orderBy: { createdAt: "desc" }
+				orderBy: [{ createdAt: "desc" }, { id: "asc" }]
 			})
 		})
 	})

@@ -27,12 +27,15 @@ let StoreService = StoreService_1 = class StoreService {
         try {
             const where = { deletedAt: null };
             const field = ORDER_FIELDS[orderBy];
+            const order = orderBy === "created_at"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
             const [stores, totalCount] = await Promise.all([
                 this.databaseService.store.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { [field]: orderType }
+                    orderBy: order
                 }),
                 this.databaseService.store.count({ where })
             ]);

@@ -27,12 +27,15 @@ let CategoryService = CategoryService_1 = class CategoryService {
         try {
             const where = { deletedAt: null };
             const field = ORDER_FIELDS[orderBy];
+            const order = orderBy === "created_at"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
             const [categories, totalCount] = await Promise.all([
                 this.databaseService.category.findMany({
                     where,
                     skip: offset,
                     take: limit,
-                    orderBy: { [field]: orderType }
+                    orderBy: order
                 }),
                 this.databaseService.category.count({ where })
             ]);

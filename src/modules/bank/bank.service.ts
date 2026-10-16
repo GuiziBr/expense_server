@@ -44,12 +44,17 @@ export class BankService {
 		try {
 			const where = { deletedAt: null }
 			const field = ORDER_FIELDS[orderBy]
+			// Non-unique sort fields need `id` as a tie-breaker so offset pages stay stable
+			const order =
+				orderBy === "created_at"
+					? [{ [field]: orderType }, { id: "asc" as const }]
+					: { [field]: orderType }
 			const [banks, totalCount] = await Promise.all([
 				this.databaseService.bank.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { [field]: orderType }
+					orderBy: order
 				}),
 				this.databaseService.bank.count({ where })
 			])

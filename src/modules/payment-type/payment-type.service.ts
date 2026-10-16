@@ -44,12 +44,17 @@ export class PaymentTypeService {
 		try {
 			const where = { deletedAt: null }
 			const field = ORDER_FIELDS[orderBy]
+			// Non-unique sort fields need `id` as a tie-breaker so offset pages stay stable
+			const order =
+				orderBy !== "description"
+					? [{ [field]: orderType }, { id: "asc" as const }]
+					: { [field]: orderType }
 			const [paymentTypes, totalCount] = await Promise.all([
 				this.databaseService.paymentType.findMany({
 					where,
 					skip: offset,
 					take: limit,
-					orderBy: { [field]: orderType }
+					orderBy: order
 				}),
 				this.databaseService.paymentType.count({ where })
 			])

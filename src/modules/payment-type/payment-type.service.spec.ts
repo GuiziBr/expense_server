@@ -87,7 +87,7 @@ describe("PaymentTypeService", () => {
 				where: { deletedAt: null },
 				skip: 0,
 				take: 5,
-				orderBy: { hasStatement: "desc" }
+				orderBy: [{ hasStatement: "desc" }, { id: "asc" }]
 			})
 		})
 	})
