@@ -26,6 +26,7 @@ describe("BankService", () => {
 					useValue: {
 						bank: {
 							findMany: vi.fn().mockResolvedValue([fakeBank]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeBank),
 							update: vi.fn().mockResolvedValue(fakeBank),
 							delete: vi.fn().mockResolvedValue(undefined),
@@ -63,13 +64,16 @@ describe("BankService", () => {
 		it("should return bank", async () => {
 			const result = await bankService.getAll(1, 2)
 
-			expect(result).toEqual([fakeBank])
+			expect(result).toEqual({ banks: [fakeBank], totalCount: 1 })
 
 			expect(databaseService.bank.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { name: "asc" }
+			})
+			expect(databaseService.bank.count).toBeCalledWith({
+				where: { deletedAt: null }
 			})
 		})
 	})

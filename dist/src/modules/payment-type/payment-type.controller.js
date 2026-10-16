@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Response } from "@nestjs/common";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { PaymentTypePresenter } from "../../infra/http/presenters/paymentType.presenter.js";
 import { createPaymentTypeSchema, listPaymentTypesSchema, paymentTypeByIdSchema } from "./payment-type.dto.js";
@@ -20,9 +20,10 @@ let PaymentTypeController = class PaymentTypeController {
     constructor(paymentTypeService) {
         this.paymentTypeService = paymentTypeService;
     }
-    async listPaymentTypes(query) {
+    async listPaymentTypes(query, res) {
         const { offset, limit } = query;
-        const paymentTypes = await this.paymentTypeService.getAll(offset, limit);
+        const { paymentTypes, totalCount } = await this.paymentTypeService.getAll(offset, limit);
+        res.setHeader("X-Total-Count", totalCount);
         return paymentTypes.map(PaymentTypePresenter.toHttp);
     }
     async getPaymentTypeById(params) {
@@ -52,8 +53,9 @@ let PaymentTypeController = class PaymentTypeController {
 __decorate([
     Get(),
     __param(0, Query(new ZodValidationPipe(listPaymentTypesSchema))),
+    __param(1, Response({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PaymentTypeController.prototype, "listPaymentTypes", null);
 __decorate([

@@ -21,13 +21,17 @@ let BankService = BankService_1 = class BankService {
     }
     async getAll(offset, limit) {
         try {
-            const banks = await this.databaseService.bank.findMany({
-                where: { deletedAt: null },
-                skip: offset,
-                take: limit,
-                orderBy: { name: "asc" }
-            });
-            return banks;
+            const where = { deletedAt: null };
+            const [banks, totalCount] = await Promise.all([
+                this.databaseService.bank.findMany({
+                    where,
+                    skip: offset,
+                    take: limit,
+                    orderBy: { name: "asc" }
+                }),
+                this.databaseService.bank.count({ where })
+            ]);
+            return { banks, totalCount };
         }
         catch (error) {
             this.logger.error(`Error - ${errorMessage(error)} - getting all banks`);

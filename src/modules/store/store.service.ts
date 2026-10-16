@@ -22,18 +22,25 @@ export class StoreService {
 	 * Fetches all non-deleted stores, ordered by name ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
-	 * @returns The matching stores.
+	 * @returns The matching stores and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
-	async getAll(offset?: number, limit?: number): Promise<Store[]> {
+	async getAll(
+		offset?: number,
+		limit?: number
+	): Promise<{ stores: Store[]; totalCount: number }> {
 		try {
-			const stores = await this.databaseService.store.findMany({
-				where: { deletedAt: null },
-				skip: offset,
-				take: limit,
-				orderBy: { name: "asc" }
-			})
-			return stores
+			const where = { deletedAt: null }
+			const [stores, totalCount] = await Promise.all([
+				this.databaseService.store.findMany({
+					where,
+					skip: offset,
+					take: limit,
+					orderBy: { name: "asc" }
+				}),
+				this.databaseService.store.count({ where })
+			])
+			return { stores, totalCount }
 		} catch (error) {
 			this.logger.error(`Error - ${errorMessage(error)} - getting all stores`)
 			throw new InternalServerErrorException("Internal server error")

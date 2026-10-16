@@ -21,13 +21,17 @@ let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
     }
     async getAll(offset, limit) {
         try {
-            const paymentTypes = await this.databaseService.paymentType.findMany({
-                where: { deletedAt: null },
-                skip: offset,
-                take: limit,
-                orderBy: { description: "asc" }
-            });
-            return paymentTypes;
+            const where = { deletedAt: null };
+            const [paymentTypes, totalCount] = await Promise.all([
+                this.databaseService.paymentType.findMany({
+                    where,
+                    skip: offset,
+                    take: limit,
+                    orderBy: { description: "asc" }
+                }),
+                this.databaseService.paymentType.count({ where })
+            ]);
+            return { paymentTypes, totalCount };
         }
         catch (error) {
             this.logger.error(`Error - ${errorMessage(error)} - getting all payment types`);

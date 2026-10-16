@@ -22,18 +22,25 @@ export class BankService {
 	 * Fetches all non-deleted banks, ordered by name ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
-	 * @returns The matching banks.
+	 * @returns The matching banks and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
-	async getAll(offset?: number, limit?: number): Promise<Bank[]> {
+	async getAll(
+		offset?: number,
+		limit?: number
+	): Promise<{ banks: Bank[]; totalCount: number }> {
 		try {
-			const banks = await this.databaseService.bank.findMany({
-				where: { deletedAt: null },
-				skip: offset,
-				take: limit,
-				orderBy: { name: "asc" }
-			})
-			return banks
+			const where = { deletedAt: null }
+			const [banks, totalCount] = await Promise.all([
+				this.databaseService.bank.findMany({
+					where,
+					skip: offset,
+					take: limit,
+					orderBy: { name: "asc" }
+				}),
+				this.databaseService.bank.count({ where })
+			])
+			return { banks, totalCount }
 		} catch (error) {
 			this.logger.error(`Error - ${errorMessage(error)} - getting all banks`)
 			throw new InternalServerErrorException("Internal server error")

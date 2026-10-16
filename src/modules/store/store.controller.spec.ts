@@ -1,5 +1,6 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
+import { Response } from "express"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
 import { createStore } from "../test-utils/store.factory.js"
 import { StoreController } from "./store.controller.js"
@@ -10,6 +11,8 @@ describe("StoreController", () => {
 	let storeService: StoreService
 	const fakeStore = createStore()
 
+	const res = { setHeader: vi.fn() } as unknown as Response
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			controllers: [StoreController],
@@ -17,7 +20,9 @@ describe("StoreController", () => {
 				{
 					provide: StoreService,
 					useValue: {
-						getAll: vi.fn().mockResolvedValue([fakeStore]),
+						getAll: vi
+							.fn()
+							.mockResolvedValue({ stores: [fakeStore], totalCount: 1 }),
 						getById: vi.fn().mockResolvedValue(fakeStore),
 						create: vi.fn().mockResolvedValue(fakeStore),
 						update: vi.fn().mockResolvedValue(fakeStore),
@@ -36,7 +41,10 @@ describe("StoreController", () => {
 
 	describe("listStores", () => {
 		it("should return list of stores", async () => {
-			const result = await storeController.listStores({ offset: 0, limit: 10 })
+			const result = await storeController.listStores(
+				{ offset: 0, limit: 10 },
+				res
+			)
 
 			expect(result).toHaveLength(1)
 
@@ -48,6 +56,7 @@ describe("StoreController", () => {
 			})
 
 			expect(storeService.getAll).toBeCalledWith(0, 10)
+			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})
 

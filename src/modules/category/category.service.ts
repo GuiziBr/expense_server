@@ -22,18 +22,25 @@ export class CategoryService {
 	 * Retrieves all non-deleted categories, ordered by description ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
-	 * @returns The list of matching categories.
+	 * @returns The matching categories and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} If the query fails.
 	 */
-	async getAll(offset?: number, limit?: number): Promise<Category[]> {
+	async getAll(
+		offset?: number,
+		limit?: number
+	): Promise<{ categories: Category[]; totalCount: number }> {
 		try {
-			const categories = await this.databaseService.category.findMany({
-				where: { deletedAt: null },
-				skip: offset,
-				take: limit,
-				orderBy: { description: "asc" }
-			})
-			return categories
+			const where = { deletedAt: null }
+			const [categories, totalCount] = await Promise.all([
+				this.databaseService.category.findMany({
+					where,
+					skip: offset,
+					take: limit,
+					orderBy: { description: "asc" }
+				}),
+				this.databaseService.category.count({ where })
+			])
+			return { categories, totalCount }
 		} catch (error) {
 			this.logger.error(
 				`Error - ${errorMessage(error)} - getting all categories`

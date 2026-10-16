@@ -26,6 +26,7 @@ describe("PaymentTypeService", () => {
 					useValue: {
 						paymentType: {
 							findMany: vi.fn().mockResolvedValue([fakePaymentType]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakePaymentType),
 							upsert: vi.fn().mockResolvedValue(fakePaymentType),
 							update: vi.fn().mockResolvedValue(fakePaymentType),
@@ -66,13 +67,16 @@ describe("PaymentTypeService", () => {
 		it("should return payment types", async () => {
 			const result = await paymentTypeService.getAll(1, 2)
 
-			expect(result).toEqual([fakePaymentType])
+			expect(result).toEqual({ paymentTypes: [fakePaymentType], totalCount: 1 })
 
 			expect(databaseService.paymentType.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { description: "asc" }
+			})
+			expect(databaseService.paymentType.count).toBeCalledWith({
+				where: { deletedAt: null }
 			})
 		})
 	})

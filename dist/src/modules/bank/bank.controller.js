@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Response } from "@nestjs/common";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { BankPresenter } from "../../infra/http/presenters/bank.presenter.js";
 import { bankByIdSchema, createBankSchema, listBanksSchema } from "./bank.dto.js";
@@ -20,9 +20,10 @@ let BankController = class BankController {
     constructor(bankService) {
         this.bankService = bankService;
     }
-    async listBanks(query) {
+    async listBanks(query, res) {
         const { offset, limit } = query;
-        const banks = await this.bankService.getAll(offset, limit);
+        const { banks, totalCount } = await this.bankService.getAll(offset, limit);
+        res.setHeader("X-Total-Count", totalCount);
         return banks.map(BankPresenter.toHttp);
     }
     async getBankById(params) {
@@ -52,8 +53,9 @@ let BankController = class BankController {
 __decorate([
     Get(),
     __param(0, Query(new ZodValidationPipe(listBanksSchema))),
+    __param(1, Response({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BankController.prototype, "listBanks", null);
 __decorate([

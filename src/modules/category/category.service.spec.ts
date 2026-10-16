@@ -26,6 +26,7 @@ describe("CategoryService", () => {
 					useValue: {
 						category: {
 							findMany: vi.fn().mockResolvedValue([fakeCategory]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeCategory),
 							update: vi.fn().mockResolvedValue(fakeCategory),
 							delete: vi.fn(),
@@ -64,13 +65,16 @@ describe("CategoryService", () => {
 		it("should return category", async () => {
 			const result = await categoryService.getAll(1, 2)
 
-			expect(result).toEqual([fakeCategory])
+			expect(result).toEqual({ categories: [fakeCategory], totalCount: 1 })
 
 			expect(databaseService.category.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { description: "asc" }
+			})
+			expect(databaseService.category.count).toBeCalledWith({
+				where: { deletedAt: null }
 			})
 		})
 	})

@@ -26,6 +26,7 @@ describe("StoreService", () => {
 					useValue: {
 						store: {
 							findMany: vi.fn().mockResolvedValue([fakeStore]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeStore),
 							update: vi.fn().mockResolvedValue(fakeStore),
 							delete: vi.fn(),
@@ -62,13 +63,16 @@ describe("StoreService", () => {
 		it("should return Store", async () => {
 			const result = await storeService.getAll(1, 2)
 
-			expect(result).toEqual([fakeStore])
+			expect(result).toEqual({ stores: [fakeStore], totalCount: 1 })
 
 			expect(databaseService.store.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { name: "asc" }
+			})
+			expect(databaseService.store.count).toBeCalledWith({
+				where: { deletedAt: null }
 			})
 		})
 	})

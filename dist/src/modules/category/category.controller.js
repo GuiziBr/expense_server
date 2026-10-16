@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Response } from "@nestjs/common";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { CategoryPresenter } from "../../infra/http/presenters/category.presenter.js";
 import { categoryByIdSchema, createCategorySchema, listCategoriesSchema } from "./category.dto.js";
@@ -20,9 +20,10 @@ let CategoryController = class CategoryController {
     constructor(categoryService) {
         this.categoryService = categoryService;
     }
-    async listCategories(query) {
+    async listCategories(query, res) {
         const { offset, limit } = query;
-        const categories = await this.categoryService.getAll(offset, limit);
+        const { categories, totalCount } = await this.categoryService.getAll(offset, limit);
+        res.setHeader("X-Total-Count", totalCount);
         return categories.map(CategoryPresenter.toHttp);
     }
     async getCategoryById(params) {
@@ -52,8 +53,9 @@ let CategoryController = class CategoryController {
 __decorate([
     Get(),
     __param(0, Query(new ZodValidationPipe(listCategoriesSchema))),
+    __param(1, Response({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "listCategories", null);
 __decorate([

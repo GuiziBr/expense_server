@@ -4,7 +4,10 @@ export declare class CategoryService {
     private readonly databaseService;
     private readonly logger;
     constructor(databaseService: DatabaseService);
-    getAll(offset?: number, limit?: number): Promise<Category[]>;
+    getAll(offset?: number, limit?: number): Promise<{
+        categories: Category[];
+        totalCount: number;
+    }>;
     getById(id: string): Promise<Category | null>;
     create(description: string): Promise<Category>;
     update(id: string, description: string): Promise<Category>;

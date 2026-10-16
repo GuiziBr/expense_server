@@ -1,5 +1,6 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
+import { Response } from "express"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
 import { createCategory } from "../test-utils/category.factory.js"
 import { CategoryController } from "./category.controller.js"
@@ -10,6 +11,8 @@ describe("CategoryController", () => {
 	let categoryService: CategoryService
 	const fakeCategory = createCategory()
 
+	const res = { setHeader: vi.fn() } as unknown as Response
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			controllers: [CategoryController],
@@ -17,7 +20,9 @@ describe("CategoryController", () => {
 				{
 					provide: CategoryService,
 					useValue: {
-						getAll: vi.fn().mockResolvedValue([fakeCategory]),
+						getAll: vi
+							.fn()
+							.mockResolvedValue({ categories: [fakeCategory], totalCount: 1 }),
 						getById: vi.fn().mockResolvedValue(fakeCategory),
 						create: vi.fn().mockResolvedValue(fakeCategory),
 						update: vi.fn().mockResolvedValue(fakeCategory),
@@ -36,10 +41,10 @@ describe("CategoryController", () => {
 
 	describe("listCategories", () => {
 		it("should return list of categories", async () => {
-			const result = await categoryController.listCategories({
-				offset: 0,
-				limit: 10
-			})
+			const result = await categoryController.listCategories(
+				{ offset: 0, limit: 10 },
+				res
+			)
 
 			expect(result).toHaveLength(1)
 
@@ -51,6 +56,7 @@ describe("CategoryController", () => {
 			})
 
 			expect(categoryService.getAll).toBeCalledWith(0, 10)
+			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})
 

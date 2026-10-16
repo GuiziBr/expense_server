@@ -4,7 +4,10 @@ export declare class BankService {
     private readonly databaseService;
     private readonly logger;
     constructor(databaseService: DatabaseService);
-    getAll(offset?: number, limit?: number): Promise<Bank[]>;
+    getAll(offset?: number, limit?: number): Promise<{
+        banks: Bank[];
+        totalCount: number;
+    }>;
     getById(id: string): Promise<Bank | null>;
     create(name: string): Promise<Bank>;
     update(id: string, name: string): Promise<Bank>;

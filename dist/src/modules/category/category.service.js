@@ -21,13 +21,17 @@ let CategoryService = CategoryService_1 = class CategoryService {
     }
     async getAll(offset, limit) {
         try {
-            const categories = await this.databaseService.category.findMany({
-                where: { deletedAt: null },
-                skip: offset,
-                take: limit,
-                orderBy: { description: "asc" }
-            });
-            return categories;
+            const where = { deletedAt: null };
+            const [categories, totalCount] = await Promise.all([
+                this.databaseService.category.findMany({
+                    where,
+                    skip: offset,
+                    take: limit,
+                    orderBy: { description: "asc" }
+                }),
+                this.databaseService.category.count({ where })
+            ]);
+            return { categories, totalCount };
         }
         catch (error) {
             this.logger.error(`Error - ${errorMessage(error)} - getting all categories`);

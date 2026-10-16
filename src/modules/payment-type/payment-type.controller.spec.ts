@@ -1,5 +1,6 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
+import { Response } from "express"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
 import { createPaymentType } from "../test-utils/payment-type.factory.js"
 import { PaymentTypeController } from "./payment-type.controller.js"
@@ -10,6 +11,8 @@ describe("PaymentTypeController", () => {
 	let paymentTypeService: PaymentTypeService
 	const fakePaymentType = createPaymentType()
 
+	const res = { setHeader: vi.fn() } as unknown as Response
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			controllers: [PaymentTypeController],
@@ -17,7 +20,10 @@ describe("PaymentTypeController", () => {
 				{
 					provide: PaymentTypeService,
 					useValue: {
-						getAll: vi.fn().mockResolvedValue([fakePaymentType]),
+						getAll: vi.fn().mockResolvedValue({
+							paymentTypes: [fakePaymentType],
+							totalCount: 1
+						}),
 						getById: vi.fn().mockResolvedValue(fakePaymentType),
 						create: vi.fn().mockResolvedValue(fakePaymentType),
 						update: vi.fn().mockResolvedValue(fakePaymentType),
@@ -36,10 +42,10 @@ describe("PaymentTypeController", () => {
 
 	describe("listPaymentTypes", () => {
 		it("should return list of payment types", async () => {
-			const result = await paymentTypeController.listPaymentTypes({
-				offset: 0,
-				limit: 10
-			})
+			const result = await paymentTypeController.listPaymentTypes(
+				{ offset: 0, limit: 10 },
+				res
+			)
 
 			expect(result).toHaveLength(1)
 
@@ -52,6 +58,7 @@ describe("PaymentTypeController", () => {
 			})
 
 			expect(paymentTypeService.getAll).toBeCalledWith(0, 10)
+			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})
 
