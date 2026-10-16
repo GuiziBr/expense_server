@@ -1,13 +1,19 @@
 import { Category } from "../../domains/category.domain.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
+import type { ListCategoryDTO } from "./category.dto.js";
+type ListCategoryOrderBy = ListCategoryDTO["orderBy"];
 export declare class CategoryService {
     private readonly databaseService;
     private readonly logger;
     constructor(databaseService: DatabaseService);
-    getAll(offset?: number, limit?: number): Promise<Category[]>;
+    getAll(offset?: number, limit?: number, orderBy?: ListCategoryOrderBy, orderType?: "asc" | "desc"): Promise<{
+        categories: Category[];
+        totalCount: number;
+    }>;
     getById(id: string): Promise<Category | null>;
     create(description: string): Promise<Category>;
     update(id: string, description: string): Promise<Category>;
     delete(id: string): Promise<void>;
     private reactivateCategory;
 }
+export {};

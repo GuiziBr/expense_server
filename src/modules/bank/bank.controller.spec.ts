@@ -1,5 +1,6 @@
 import { NotFoundException } from "@nestjs/common"
 import { Test } from "@nestjs/testing"
+import { Response } from "express"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
 import { createBank } from "../test-utils/bank.factory.js"
 import { BankController } from "./bank.controller.js"
@@ -10,6 +11,8 @@ describe("BankController", () => {
 	let bankService: BankService
 	const fakeBank = createBank()
 
+	const res = { setHeader: vi.fn() } as unknown as Response
+
 	beforeEach(async () => {
 		const module = await Test.createTestingModule({
 			controllers: [BankController],
@@ -17,7 +20,9 @@ describe("BankController", () => {
 				{
 					provide: BankService,
 					useValue: {
-						getAll: vi.fn().mockResolvedValue([fakeBank]),
+						getAll: vi
+							.fn()
+							.mockResolvedValue({ banks: [fakeBank], totalCount: 1 }),
 						getById: vi.fn().mockResolvedValue(fakeBank),
 						create: vi.fn().mockResolvedValue(fakeBank),
 						update: vi.fn().mockResolvedValue(fakeBank),
@@ -36,7 +41,10 @@ describe("BankController", () => {
 
 	describe("listBanks", () => {
 		it("should return list of banks", async () => {
-			const result = await bankController.listBanks({ offset: 0, limit: 10 })
+			const result = await bankController.listBanks(
+				{ offset: 0, limit: 10, orderBy: "name", orderType: "asc" },
+				res
+			)
 
 			expect(result).toHaveLength(1)
 
@@ -47,7 +55,8 @@ describe("BankController", () => {
 				updated_at: fakeBank.updatedAt
 			})
 
-			expect(bankService.getAll).toBeCalledWith(0, 10)
+			expect(bankService.getAll).toBeCalledWith(0, 10, "name", "asc")
+			expect(res.setHeader).toBeCalledWith("X-Total-Count", 1)
 		})
 	})
 

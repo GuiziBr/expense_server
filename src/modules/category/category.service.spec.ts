@@ -8,6 +8,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service.js"
 import { createCategory } from "../test-utils/category.factory.js"
 import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaginatedFindMany } from "../test-utils/paginated-find-many.js"
 import { constants } from "../utils/constants.js"
 import { CategoryService } from "./category.service.js"
 
@@ -26,6 +27,7 @@ describe("CategoryService", () => {
 					useValue: {
 						category: {
 							findMany: vi.fn().mockResolvedValue([fakeCategory]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeCategory),
 							update: vi.fn().mockResolvedValue(fakeCategory),
 							delete: vi.fn(),
@@ -64,13 +66,48 @@ describe("CategoryService", () => {
 		it("should return category", async () => {
 			const result = await categoryService.getAll(1, 2)
 
-			expect(result).toEqual([fakeCategory])
+			expect(result).toEqual({ categories: [fakeCategory], totalCount: 1 })
 
 			expect(databaseService.category.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { description: "asc" }
+			})
+			expect(databaseService.category.count).toBeCalledWith({
+				where: { deletedAt: null }
+			})
+		})
+
+		it("should not repeat or omit records across pages when the sort field ties", async () => {
+			const rows = Array.from({ length: 5 }, () =>
+				createCategory({ createdAt: new Date("2026-01-01") })
+			)
+			vi.spyOn(databaseService.category, "findMany").mockImplementation(
+				createPaginatedFindMany(rows) as never
+			)
+
+			const pages = await Promise.all(
+				[0, 2, 4].map((offset) =>
+					categoryService.getAll(offset, 2, "created_at", "asc")
+				)
+			)
+
+			const ids = pages.flatMap((page) =>
+				page.categories.map((category) => category.id)
+			)
+			expect(ids).toHaveLength(rows.length)
+			expect(new Set(ids)).toEqual(new Set(rows.map((category) => category.id)))
+		})
+
+		it("should apply the given ordering", async () => {
+			await categoryService.getAll(0, 5, "created_at", "desc")
+
+			expect(databaseService.category.findMany).toBeCalledWith({
+				where: { deletedAt: null },
+				skip: 0,
+				take: 5,
+				orderBy: [{ createdAt: "desc" }, { id: "asc" }]
 			})
 		})
 	})

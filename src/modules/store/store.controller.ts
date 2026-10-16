@@ -8,8 +8,10 @@ import {
 	Param,
 	Patch,
 	Post,
-	Query
+	Query,
+	Response
 } from "@nestjs/common"
+import { Response as Res } from "express"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { StorePresenter } from "../../infra/http/presenters/store.presenter.js"
 import {
@@ -29,15 +31,23 @@ export class StoreController {
 
 	/**
 	 * Lists stores, ordered by name ascending, excluding soft-deleted records.
-	 * @param query - Optional pagination query, validated against `listStoresSchema` (`offset`, `limit`).
+	 * @param query - Optional pagination query, validated against `listStoresSchema` (`offset`, `limit`, `orderBy`, `orderType`).
+	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of stores mapped to their HTTP representation.
 	 */
 	@Get()
 	async listStores(
-		@Query(new ZodValidationPipe(listStoresSchema)) query: ListStoreDTO
+		@Query(new ZodValidationPipe(listStoresSchema)) query: ListStoreDTO,
+		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
-		const stores = await this.storeService.getAll(offset, limit)
+		const { offset, limit, orderBy, orderType } = query
+		const { stores, totalCount } = await this.storeService.getAll(
+			offset,
+			limit,
+			orderBy,
+			orderType
+		)
+		res.setHeader("X-Total-Count", totalCount)
 		return stores.map(StorePresenter.toHttp)
 	}
 

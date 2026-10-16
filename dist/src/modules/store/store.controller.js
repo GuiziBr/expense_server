@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, Response } from "@nestjs/common";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { StorePresenter } from "../../infra/http/presenters/store.presenter.js";
 import { createStoreSchema, listStoresSchema, storeByIdSchema } from "./store.dto.js";
@@ -20,9 +20,10 @@ let StoreController = class StoreController {
     constructor(storeService) {
         this.storeService = storeService;
     }
-    async listStores(query) {
-        const { offset, limit } = query;
-        const stores = await this.storeService.getAll(offset, limit);
+    async listStores(query, res) {
+        const { offset, limit, orderBy, orderType } = query;
+        const { stores, totalCount } = await this.storeService.getAll(offset, limit, orderBy, orderType);
+        res.setHeader("X-Total-Count", totalCount);
         return stores.map(StorePresenter.toHttp);
     }
     async getStoreById(params) {
@@ -52,8 +53,9 @@ let StoreController = class StoreController {
 __decorate([
     Get(),
     __param(0, Query(new ZodValidationPipe(listStoresSchema))),
+    __param(1, Response({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], StoreController.prototype, "listStores", null);
 __decorate([

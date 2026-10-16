@@ -9,6 +9,15 @@ export interface PaymentTypeDTO {
 export declare const listPaymentTypesSchema: z.ZodObject<{
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    orderBy: z.ZodDefault<z.ZodEnum<{
+        description: "description";
+        has_statement: "has_statement";
+        created_at: "created_at";
+    }>>;
+    orderType: z.ZodDefault<z.ZodEnum<{
+        asc: "asc";
+        desc: "desc";
+    }>>;
 }, z.core.$strip>;
 export type ListPaymentTypesDTO = z.infer<typeof listPaymentTypesSchema>;
 export declare const paymentTypeByIdSchema: z.ZodObject<{

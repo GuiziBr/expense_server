@@ -7,6 +7,7 @@ import {
 import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service.js"
 import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaginatedFindMany } from "../test-utils/paginated-find-many.js"
 import { createStore } from "../test-utils/store.factory.js"
 import { constants } from "../utils/constants.js"
 import { StoreService } from "./store.service.js"
@@ -26,6 +27,7 @@ describe("StoreService", () => {
 					useValue: {
 						store: {
 							findMany: vi.fn().mockResolvedValue([fakeStore]),
+							count: vi.fn().mockResolvedValue(1),
 							findUnique: vi.fn().mockResolvedValue(fakeStore),
 							update: vi.fn().mockResolvedValue(fakeStore),
 							delete: vi.fn(),
@@ -62,13 +64,46 @@ describe("StoreService", () => {
 		it("should return Store", async () => {
 			const result = await storeService.getAll(1, 2)
 
-			expect(result).toEqual([fakeStore])
+			expect(result).toEqual({ stores: [fakeStore], totalCount: 1 })
 
 			expect(databaseService.store.findMany).toBeCalledWith({
 				where: { deletedAt: null },
 				skip: 1,
 				take: 2,
 				orderBy: { name: "asc" }
+			})
+			expect(databaseService.store.count).toBeCalledWith({
+				where: { deletedAt: null }
+			})
+		})
+
+		it("should not repeat or omit records across pages when the sort field ties", async () => {
+			const rows = Array.from({ length: 5 }, () =>
+				createStore({ createdAt: new Date("2026-01-01") })
+			)
+			vi.spyOn(databaseService.store, "findMany").mockImplementation(
+				createPaginatedFindMany(rows) as never
+			)
+
+			const pages = await Promise.all(
+				[0, 2, 4].map((offset) =>
+					storeService.getAll(offset, 2, "created_at", "asc")
+				)
+			)
+
+			const ids = pages.flatMap((page) => page.stores.map((store) => store.id))
+			expect(ids).toHaveLength(rows.length)
+			expect(new Set(ids)).toEqual(new Set(rows.map((store) => store.id)))
+		})
+
+		it("should apply the given ordering", async () => {
+			await storeService.getAll(0, 5, "created_at", "desc")
+
+			expect(databaseService.store.findMany).toBeCalledWith({
+				where: { deletedAt: null },
+				skip: 0,
+				take: 5,
+				orderBy: [{ createdAt: "desc" }, { id: "asc" }]
 			})
 		})
 	})

@@ -11,6 +11,14 @@ import { Prisma } from "../../generated/prisma/client.js"
 import { DatabaseService } from "../../infra/database/database.service.js"
 import { constants } from "../utils/constants.js"
 import { errorMessage } from "../utils/error-message.js"
+import type { ListStoreDTO } from "./store.dto.js"
+
+type ListStoreOrderBy = ListStoreDTO["orderBy"]
+
+const ORDER_FIELDS: Record<ListStoreOrderBy, string> = {
+	name: "name",
+	created_at: "createdAt"
+}
 
 @Injectable()
 export class StoreService {
@@ -22,18 +30,35 @@ export class StoreService {
 	 * Fetches all non-deleted stores, ordered by name ascending.
 	 * @param offset - Number of records to skip, for pagination.
 	 * @param limit - Maximum number of records to return.
-	 * @returns The matching stores.
+	 * @param orderBy - Field to sort by.
+	 * @param orderType - Sort direction.
+	 * @returns The matching stores and the total count ignoring pagination.
 	 * @throws {InternalServerErrorException} On unexpected database errors.
 	 */
-	async getAll(offset?: number, limit?: number): Promise<Store[]> {
+	async getAll(
+		offset?: number,
+		limit?: number,
+		orderBy: ListStoreOrderBy = "name",
+		orderType: "asc" | "desc" = "asc"
+	): Promise<{ stores: Store[]; totalCount: number }> {
 		try {
-			const stores = await this.databaseService.store.findMany({
-				where: { deletedAt: null },
-				skip: offset,
-				take: limit,
-				orderBy: { name: "asc" }
-			})
-			return stores
+			const where = { deletedAt: null }
+			const field = ORDER_FIELDS[orderBy]
+			// Non-unique sort fields need `id` as a tie-breaker so offset pages stay stable
+			const order =
+				orderBy === "created_at"
+					? [{ [field]: orderType }, { id: "asc" as const }]
+					: { [field]: orderType }
+			const [stores, totalCount] = await Promise.all([
+				this.databaseService.store.findMany({
+					where,
+					skip: offset,
+					take: limit,
+					orderBy: order
+				}),
+				this.databaseService.store.count({ where })
+			])
+			return { stores, totalCount }
 		} catch (error) {
 			this.logger.error(`Error - ${errorMessage(error)} - getting all stores`)
 			throw new InternalServerErrorException("Internal server error")

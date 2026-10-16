@@ -13,21 +13,34 @@ import { Prisma } from "../../generated/prisma/client.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { constants } from "../utils/constants.js";
 import { errorMessage } from "../utils/error-message.js";
+const ORDER_FIELDS = {
+    description: "description",
+    has_statement: "hasStatement",
+    created_at: "createdAt"
+};
 let PaymentTypeService = PaymentTypeService_1 = class PaymentTypeService {
     databaseService;
     logger = new Logger(PaymentTypeService_1.name);
     constructor(databaseService) {
         this.databaseService = databaseService;
     }
-    async getAll(offset, limit) {
+    async getAll(offset, limit, orderBy = "description", orderType = "asc") {
         try {
-            const paymentTypes = await this.databaseService.paymentType.findMany({
-                where: { deletedAt: null },
-                skip: offset,
-                take: limit,
-                orderBy: { description: "asc" }
-            });
-            return paymentTypes;
+            const where = { deletedAt: null };
+            const field = ORDER_FIELDS[orderBy];
+            const order = orderBy !== "description"
+                ? [{ [field]: orderType }, { id: "asc" }]
+                : { [field]: orderType };
+            const [paymentTypes, totalCount] = await Promise.all([
+                this.databaseService.paymentType.findMany({
+                    where,
+                    skip: offset,
+                    take: limit,
+                    orderBy: order
+                }),
+                this.databaseService.paymentType.count({ where })
+            ]);
+            return { paymentTypes, totalCount };
         }
         catch (error) {
             this.logger.error(`Error - ${errorMessage(error)} - getting all payment types`);

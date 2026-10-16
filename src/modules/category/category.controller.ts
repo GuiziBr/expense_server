@@ -8,8 +8,10 @@ import {
 	Param,
 	Patch,
 	Post,
-	Query
+	Query,
+	Response
 } from "@nestjs/common"
+import { Response as Res } from "express"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { CategoryPresenter } from "../../infra/http/presenters/category.presenter.js"
 import {
@@ -29,15 +31,23 @@ export class CategoryController {
 
 	/**
 	 * Lists categories, optionally paginated.
-	 * @param query - Validated query params containing `offset` and `limit` for pagination.
+	 * @param query - Validated query params containing `offset`, `limit`, `orderBy` and `orderType`.
+	 * @param res - Express response used to set the `X-Total-Count` header (side effect).
 	 * @returns The list of categories mapped to their HTTP representation.
 	 */
 	@Get()
 	async listCategories(
-		@Query(new ZodValidationPipe(listCategoriesSchema)) query: ListCategoryDTO
+		@Query(new ZodValidationPipe(listCategoriesSchema)) query: ListCategoryDTO,
+		@Response({ passthrough: true }) res: Res
 	) {
-		const { offset, limit } = query
-		const categories = await this.categoryService.getAll(offset, limit)
+		const { offset, limit, orderBy, orderType } = query
+		const { categories, totalCount } = await this.categoryService.getAll(
+			offset,
+			limit,
+			orderBy,
+			orderType
+		)
+		res.setHeader("X-Total-Count", totalCount)
 		return categories.map(CategoryPresenter.toHttp)
 	}
 
