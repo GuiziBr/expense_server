@@ -8,6 +8,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service.js"
 import { createCategory } from "../test-utils/category.factory.js"
 import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaginatedFindMany } from "../test-utils/paginated-find-many.js"
 import { constants } from "../utils/constants.js"
 import { CategoryService } from "./category.service.js"
 
@@ -76,6 +77,27 @@ describe("CategoryService", () => {
 			expect(databaseService.category.count).toBeCalledWith({
 				where: { deletedAt: null }
 			})
+		})
+
+		it("should not repeat or omit records across pages when the sort field ties", async () => {
+			const rows = Array.from({ length: 5 }, () =>
+				createCategory({ createdAt: new Date("2026-01-01") })
+			)
+			vi.spyOn(databaseService.category, "findMany").mockImplementation(
+				createPaginatedFindMany(rows) as never
+			)
+
+			const pages = await Promise.all(
+				[0, 2, 4].map((offset) =>
+					categoryService.getAll(offset, 2, "created_at", "asc")
+				)
+			)
+
+			const ids = pages.flatMap((page) =>
+				page.categories.map((category) => category.id)
+			)
+			expect(ids).toHaveLength(rows.length)
+			expect(new Set(ids)).toEqual(new Set(rows.map((category) => category.id)))
 		})
 
 		it("should apply the given ordering", async () => {

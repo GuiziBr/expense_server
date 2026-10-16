@@ -8,6 +8,7 @@ import { Test } from "@nestjs/testing"
 import { DatabaseService } from "@/infra/database/database.service.js"
 import { createBank } from "../test-utils/bank.factory.js"
 import { createPrismaError } from "../test-utils/errors.factory.js"
+import { createPaginatedFindMany } from "../test-utils/paginated-find-many.js"
 import { constants } from "../utils/constants.js"
 import { BankService } from "./bank.service.js"
 
@@ -75,6 +76,25 @@ describe("BankService", () => {
 			expect(databaseService.bank.count).toBeCalledWith({
 				where: { deletedAt: null }
 			})
+		})
+
+		it("should not repeat or omit records across pages when the sort field ties", async () => {
+			const rows = Array.from({ length: 5 }, () =>
+				createBank({ createdAt: new Date("2026-01-01") })
+			)
+			vi.spyOn(databaseService.bank, "findMany").mockImplementation(
+				createPaginatedFindMany(rows) as never
+			)
+
+			const pages = await Promise.all(
+				[0, 2, 4].map((offset) =>
+					bankService.getAll(offset, 2, "created_at", "asc")
+				)
+			)
+
+			const ids = pages.flatMap((page) => page.banks.map((bank) => bank.id))
+			expect(ids).toHaveLength(rows.length)
+			expect(new Set(ids)).toEqual(new Set(rows.map((bank) => bank.id)))
 		})
 
 		it("should apply the given ordering", async () => {
