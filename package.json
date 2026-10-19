@@ -64,7 +64,7 @@
 		"typescript": "^6.0.3",
 		"ultracite": "^8.0.0",
 		"unplugin-swc": "^2.0.0",
-		"vitest": "^5.0.4"
+		"vitest": "^5.0.5"
 	},
 	"engines": {
 		"node": ">=24.15"
