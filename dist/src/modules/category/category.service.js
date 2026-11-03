@@ -93,7 +93,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
                 this.logger.error(`Category with description "${description}" already exists`);
                 throw new BadRequestException("There is already a category with same description");
             }
-            const reactivatedCategory = await this.reactivateCategory(id, sameDescriptionCategory.id, isEnvelope);
+            const reactivatedCategory = await this.reactivateCategory(id, sameDescriptionCategory.id, isEnvelope ?? category.isEnvelope);
             return reactivatedCategory;
         }
         catch (error) {
