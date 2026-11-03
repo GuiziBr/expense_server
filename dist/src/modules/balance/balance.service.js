@@ -8,15 +8,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var BalanceService_1;
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { endOfMonth } from "date-fns";
+import { DatabaseService } from "../../infra/database/database.service.js";
 import { ExpenseService } from "../expense/expense.service.js";
 import { errorMessage } from "../utils/error-message.js";
 let BalanceService = BalanceService_1 = class BalanceService {
     expensesService;
+    databaseService;
     logger = new Logger(BalanceService_1.name);
-    constructor(expensesService) {
+    constructor(expensesService, databaseService) {
         this.expensesService = expensesService;
+        this.databaseService = databaseService;
     }
     getBank(bank, amount) {
         return { id: bank.id, name: bank.name, total: amount };
@@ -77,11 +80,22 @@ let BalanceService = BalanceService_1 = class BalanceService {
     }
     async getEnvelopeBalance({ year, month, userId }) {
         try {
+            const user = await this.databaseService.user.findUnique({
+                where: { id: userId },
+                select: { id: true }
+            });
+            if (!user) {
+                this.logger.error(`Error - User not found - ${userId}`);
+                throw new NotFoundException("User not found");
+            }
             const initialDate = new Date(year, month, 1);
             const finalDate = endOfMonth(initialDate);
             return await this.expensesService.sumPersonalExpensesByEnvelopeCategory(userId, initialDate, finalDate);
         }
         catch (error) {
+            if (error instanceof HttpException) {
+                throw error;
+            }
             this.logger.error(`Error - ${errorMessage(error)} - getting envelope balance`);
             throw new InternalServerErrorException("Error getting envelope balance");
         }
@@ -152,7 +166,8 @@ let BalanceService = BalanceService_1 = class BalanceService {
 };
 BalanceService = BalanceService_1 = __decorate([
     Injectable(),
-    __metadata("design:paramtypes", [ExpenseService])
+    __metadata("design:paramtypes", [ExpenseService,
+        DatabaseService])
 ], BalanceService);
 export { BalanceService };
 //# sourceMappingURL=balance.service.js.map
