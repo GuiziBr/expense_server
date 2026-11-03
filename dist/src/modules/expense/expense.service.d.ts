@@ -2,7 +2,7 @@ import { Expense } from "../../domains/expense.domain.js";
 import { DatabaseService } from "../../infra/database/database.service.js";
 import { PaymentTypeService } from "../payment-type/payment-type.service.js";
 import { StatementPeriodService } from "../statement-period/statement-period.service.js";
-import { CreateExpenseDTO, ExpenseTotal, FilterBy, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto.js";
+import { CreateExpenseDTO, ExpenseTotal, ExpenseTotalByDescription, FilterBy, GetExpensesRequest, GetExpensesResponse, UpdateExpenseDTO } from "./expense.dto.js";
 export declare class ExpenseService {
     private readonly databaseService;
     private readonly paymentTypeService;
@@ -20,6 +20,7 @@ export declare class ExpenseService {
     deleteExpense(id: string, userId: string): Promise<void>;
     getPersonalExpenses({ ownerId, startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     sumPersonalExpensesBy(ownerId: string, filterBy: FilterBy, startDate: Date, endDate: Date): Promise<ExpenseTotal[]>;
+    sumPersonalExpensesByEnvelopeCategory(ownerId: string, startDate: Date, endDate: Date): Promise<ExpenseTotalByDescription[]>;
     getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }: GetExpensesRequest): Promise<GetExpensesResponse>;
     sumPersonalExpenses({ ownerId, startDate, endDate, filterBy, filterValue }: GetExpensesRequest): Promise<number>;
     sumSharedExpensesByOwner({ startDate, endDate, filterBy, filterValue }: GetExpensesRequest): Promise<Array<{

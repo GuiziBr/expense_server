@@ -10,12 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Controller, Get, Param, Query, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiKeyGuard } from "../../infra/auth/api-key.guard.js";
 import { CurrentUser } from "../../infra/auth/current-user.decorator.js";
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js";
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js";
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js";
-import { queryBalanceBreakdownSchema, queryBalanceSchema, queryConsolidatedBalanceSchema } from "./balance.dto.js";
+import { Public } from "../auth/public.decorator.js";
+import { queryBalanceBreakdownSchema, queryBalanceSchema, queryConsolidatedBalanceSchema, queryEnvelopeBalanceSchema } from "./balance.dto.js";
 import { BalanceService } from "./balance.service.js";
 let BalanceController = class BalanceController {
     balanceService;
@@ -49,6 +51,13 @@ let BalanceController = class BalanceController {
             filterBy: query.filterBy
         });
     }
+    async getEnvelopeBalance(params, query) {
+        return this.balanceService.getEnvelopeBalance({
+            userId: query.userId,
+            month: Number(params.month) - 1,
+            year: Number(params.year)
+        });
+    }
 };
 __decorate([
     UseInterceptors(CurrentUserInterceptor),
@@ -78,6 +87,16 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], BalanceController.prototype, "getBalanceBreakdown", null);
+__decorate([
+    Public(),
+    UseGuards(ApiKeyGuard),
+    Get("/envelopes/:year/:month"),
+    __param(0, Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))),
+    __param(1, Query(new ZodValidationPipe(queryEnvelopeBalanceSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], BalanceController.prototype, "getEnvelopeBalance", null);
 BalanceController = __decorate([
     Controller("balance"),
     __metadata("design:paramtypes", [BalanceService])

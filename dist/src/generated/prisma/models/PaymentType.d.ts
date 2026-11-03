@@ -244,9 +244,6 @@ export type PaymentTypeScalarRelationFilter = {
     is?: Prisma.PaymentTypeWhereInput;
     isNot?: Prisma.PaymentTypeWhereInput;
 };
-export type BoolFieldUpdateOperationsInput = {
-    set?: boolean;
-};
 export type PaymentTypeCreateNestedOneWithoutStatementPeriodInput = {
     create?: Prisma.XOR<Prisma.PaymentTypeCreateWithoutStatementPeriodInput, Prisma.PaymentTypeUncheckedCreateWithoutStatementPeriodInput>;
     connectOrCreate?: Prisma.PaymentTypeCreateOrConnectWithoutStatementPeriodInput;

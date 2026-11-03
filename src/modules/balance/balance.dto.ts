@@ -6,6 +6,7 @@ import {
 } from "../../domains/balance.domain.js"
 import {
 	ExpenseTotal,
+	ExpenseTotalByDescription,
 	FilterBy,
 	filterBySchema,
 	GetExpensesRequest
@@ -84,6 +85,20 @@ export interface GetBalanceBreakdownRequest {
 }
 
 export type GetBalanceBreakdownResponse = Array<ExpenseTotal>
+
+export const queryEnvelopeBalanceSchema = z.object({
+	userId: z.uuid()
+})
+
+export type QueryEnvelopeBalanceDTO = z.infer<typeof queryEnvelopeBalanceSchema>
+
+export interface GetEnvelopeBalanceRequest {
+	userId: string
+	month: number
+	year: number
+}
+
+export type GetEnvelopeBalanceResponse = Array<ExpenseTotalByDescription>
 
 interface BalanceOwner {
 	id?: string

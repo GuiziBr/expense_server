@@ -91,15 +91,16 @@ export class CategoryService {
 	 * Creates a category with the given description, or, if a soft-deleted category
 	 * with the same description already exists, reactivates it (upsert on `description`).
 	 * @param description - The category description; must be unique among active categories.
+	 * @param isEnvelope - Optional envelope flag; when omitted, new categories default to `false` and reactivated ones keep their current value.
 	 * @returns The created or reactivated category.
 	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
-	async create(description: string): Promise<Category> {
+	async create(description: string, isEnvelope?: boolean): Promise<Category> {
 		try {
 			const category = await this.databaseService.category.upsert({
 				where: { description },
-				update: { description, deletedAt: null },
-				create: { description }
+				update: { description, deletedAt: null, isEnvelope },
+				create: { description, isEnvelope }
 			})
 			return category
 		} catch (error) {
@@ -114,15 +115,21 @@ export class CategoryService {
 	 * Updates a category's description. If another category already has the target
 	 * description, the update is only allowed when that other category is soft-deleted,
 	 * in which case this category is soft-deleted and the other one is reactivated
-	 * with the new description via {@link reactivateCategory}.
+	 * with the new description via {@link reactivateCategory}. The reactivated category
+	 * takes over the envelope flag of the edited one unless `isEnvelope` is provided.
 	 * @param id - The id of the category to update.
 	 * @param description - The new description to apply.
+	 * @param isEnvelope - Optional envelope flag; when omitted, the current value of the edited category is kept (also when another category is reactivated in its place).
 	 * @returns The updated (or reactivated) category.
 	 * @throws {NotFoundException} If the category is not found.
 	 * @throws {BadRequestException} If an active category already has the same description.
 	 * @throws {InternalServerErrorException} On unexpected errors.
 	 */
-	async update(id: string, description: string): Promise<Category> {
+	async update(
+		id: string,
+		description: string,
+		isEnvelope?: boolean
+	): Promise<Category> {
 		try {
 			const [category, sameDescriptionCategory] = await Promise.all([
 				this.databaseService.category.findUnique({ where: { id } }),
@@ -137,7 +144,7 @@ export class CategoryService {
 			if (!sameDescriptionCategory || sameDescriptionCategory.id === id) {
 				const updatedCategory = await this.databaseService.category.update({
 					where: { id },
-					data: { description, deletedAt: null }
+					data: { description, deletedAt: null, isEnvelope }
 				})
 				return updatedCategory
 			}
@@ -153,7 +160,8 @@ export class CategoryService {
 
 			const reactivatedCategory = await this.reactivateCategory(
 				id,
-				sameDescriptionCategory.id
+				sameDescriptionCategory.id,
+				isEnvelope ?? category.isEnvelope
 			)
 
 			return reactivatedCategory
@@ -202,19 +210,21 @@ export class CategoryService {
 	 * updating a category's description to match a previously soft-deleted one.
 	 * @param categoryIdToDelete - The id of the category to soft-delete.
 	 * @param categoryIdToRestore - The id of the soft-deleted category to reactivate.
+	 * @param isEnvelope - Optional envelope flag to apply to the reactivated category.
 	 * @returns The reactivated category.
 	 * @throws {InternalServerErrorException} If the operation fails.
 	 */
 	private async reactivateCategory(
 		categoryIdToDelete: string,
-		categoryIdToRestore: string
+		categoryIdToRestore: string,
+		isEnvelope?: boolean
 	): Promise<Category> {
 		try {
 			const [, reactivatedCategory] = await Promise.all([
 				this.delete(categoryIdToDelete),
 				this.databaseService.category.update({
 					where: { id: categoryIdToRestore },
-					data: { deletedAt: null }
+					data: { deletedAt: null, isEnvelope }
 				})
 			])
 			return reactivatedCategory

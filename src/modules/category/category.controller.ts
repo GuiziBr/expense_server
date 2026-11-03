@@ -71,22 +71,22 @@ export class CategoryController {
 
 	/**
 	 * Creates a new category, or reactivates a soft-deleted one with the same description.
-	 * @param body - Validated request body containing the category `description`.
+	 * @param body - Validated request body containing the category `description` and optional `isEnvelope`.
 	 * @returns The created (or reactivated) category mapped to its HTTP representation.
 	 */
 	@Post()
 	async createCategory(
 		@Body(new ZodValidationPipe(createCategorySchema)) body: CreateCategoryDTO
 	): Promise<CategoryDTO> {
-		const { description } = body
-		const category = await this.categoryService.create(description)
+		const { description, isEnvelope } = body
+		const category = await this.categoryService.create(description, isEnvelope)
 		return CategoryPresenter.toHttp(category)
 	}
 
 	/**
-	 * Updates an existing category's description.
+	 * Updates an existing category's description and, optionally, its envelope flag.
 	 * @param params - Validated route params containing the category `id`.
-	 * @param body - Validated request body containing the new `description`.
+	 * @param body - Validated request body containing the new `description` and optional `isEnvelope`.
 	 * @returns The updated category mapped to its HTTP representation.
 	 * @throws {NotFoundException} If the category is not found.
 	 * @throws {BadRequestException} If another active category already has the same description.
@@ -97,8 +97,12 @@ export class CategoryController {
 		@Body(new ZodValidationPipe(createCategorySchema)) body: CreateCategoryDTO
 	): Promise<CategoryDTO> {
 		const { id } = params
-		const { description } = body
-		const category = await this.categoryService.update(id, description)
+		const { description, isEnvelope } = body
+		const category = await this.categoryService.update(
+			id,
+			description,
+			isEnvelope
+		)
 		return CategoryPresenter.toHttp(category)
 	}
 

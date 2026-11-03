@@ -25,4 +25,7 @@ export const queryConsolidatedBalanceSchema = z.object({
 export const queryBalanceBreakdownSchema = z.object({
     filterBy: filterBySchema
 });
+export const queryEnvelopeBalanceSchema = z.object({
+    userId: z.uuid()
+});
 //# sourceMappingURL=balance.dto.js.map

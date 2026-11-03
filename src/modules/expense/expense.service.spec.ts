@@ -1469,6 +1469,71 @@ describe("ExpenseService", () => {
 		})
 	})
 
+	describe("sumPersonalExpensesByEnvelopeCategory", () => {
+		const startDate = new Date(2024, 0, 1)
+		const endDate = new Date(2024, 0, 31)
+
+		it("should sum expenses per envelope category, including envelopes with no expenses", async () => {
+			vi.spyOn(databaseService.category, "findMany").mockResolvedValue([
+				{ id: "cat-1", description: "Groceries" },
+				{ id: "cat-2", description: "Rent" },
+				{ id: "cat-3", description: "Fun" }
+			] as never)
+			vi.spyOn(databaseService.expense, "groupBy").mockResolvedValue([
+				{ categoryId: "cat-1", _sum: { amount: 100 } },
+				{ categoryId: "cat-2", _sum: { amount: null } }
+			] as never)
+
+			const result = await expenseService.sumPersonalExpensesByEnvelopeCategory(
+				"user_id",
+				startDate,
+				endDate
+			)
+
+			expect(databaseService.category.findMany).toHaveBeenCalledWith({
+				where: { isEnvelope: true, deletedAt: null },
+				select: { id: true, description: true }
+			})
+			expect(databaseService.expense.groupBy).toHaveBeenCalledWith({
+				by: ["categoryId"],
+				where: {
+					deletedAt: null,
+					OR: [
+						{
+							AND: [
+								{ ownerId: "user_id" },
+								{ OR: [{ personal: true }, { split: true }] }
+							]
+						},
+						{ AND: [{ NOT: { ownerId: "user_id" } }, { personal: false }] }
+					],
+					dueDate: { lte: endDate, gte: startDate },
+					categoryId: { in: ["cat-1", "cat-2", "cat-3"] }
+				},
+				_sum: { amount: true }
+			})
+			expect(result).toEqual([
+				{ id: "cat-1", description: "Groceries", total: 100 },
+				{ id: "cat-2", description: "Rent", total: 0 },
+				{ id: "cat-3", description: "Fun", total: 0 }
+			])
+		})
+
+		it("should return an empty list without querying expenses when there are no envelope categories", async () => {
+			vi.spyOn(databaseService.category, "findMany").mockResolvedValue([])
+			const groupBy = vi.spyOn(databaseService.expense, "groupBy")
+
+			const result = await expenseService.sumPersonalExpensesByEnvelopeCategory(
+				"user_id",
+				startDate,
+				endDate
+			)
+
+			expect(result).toEqual([])
+			expect(groupBy).not.toHaveBeenCalled()
+		})
+	})
+
 	describe("sumPersonalExpenses", () => {
 		const startDate = new Date(2024, 0, 1)
 		const endDate = new Date(2024, 0, 31)

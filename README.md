@@ -38,6 +38,7 @@ This is the backend server for an expense tracking application. It is a NestJS-b
     ```bash
     DATABASE_URL="postgresql://user:password@localhost:5432/mydatabase?schema=public"
     JWT_SECRET="your-secret-key"
+    SERVICE_API_KEY="at-least-32-characters-long-api-key"
     ```
 
 4.  Start the Docker containers:
@@ -142,6 +143,7 @@ The database schema is defined in the `prisma/schema.prisma` file. It consists o
 - `DATABASE_URL`: The connection string for the PostgreSQL database.
 - `PORT`: The port on which the application will run (default: 3000).
 - `JWT_SECRET`: The secret key for signing JWT tokens.
+- `SERVICE_API_KEY`: Shared secret (min 32 characters) that other backends send in the `x-api-key` header to call service-to-service endpoints such as `GET /balance/envelopes/:year/:month`.
 
 ## Contributing
 

@@ -25,6 +25,7 @@ import { errorMessage } from "../utils/error-message.js"
 import {
 	CreateExpenseDTO,
 	ExpenseTotal,
+	ExpenseTotalByDescription,
 	FilterBy,
 	GetExpensesRequest,
 	GetExpensesResponse,
@@ -609,6 +610,49 @@ export class ExpenseService {
 
 				return { id, name: id ? (labels.get(id) ?? null) : null, total }
 			})
+			.sort((a, b) => b.total - a.total)
+	}
+
+	/**
+	 * Sums the expenses visible to a user (same filter as {@link sumPersonalExpensesBy})
+	 * per envelope category, within the given due date range. Envelope categories with
+	 * no matching expenses are included with a total of zero.
+	 * @param ownerId - The user the expenses are summed for.
+	 * @param startDate - Inclusive lower bound on `dueDate`.
+	 * @param endDate - Inclusive upper bound on `dueDate`.
+	 * @returns One entry per non-deleted envelope category, sorted by total descending.
+	 */
+	async sumPersonalExpensesByEnvelopeCategory(
+		ownerId: string,
+		startDate: Date,
+		endDate: Date
+	): Promise<ExpenseTotalByDescription[]> {
+		const envelopes = await this.databaseService.category.findMany({
+			where: { isEnvelope: true, deletedAt: null },
+			select: { id: true, description: true }
+		})
+
+		if (envelopes.length === 0) return []
+
+		const groups = await this.databaseService.expense.groupBy({
+			by: ["categoryId"],
+			where: {
+				...this.buildPersonalExpensesWhere(ownerId, endDate, startDate),
+				categoryId: { in: envelopes.map(({ id }) => id) }
+			},
+			_sum: { amount: true }
+		})
+
+		const totals = new Map(
+			groups.map((group) => [group.categoryId, group._sum.amount ?? 0])
+		)
+
+		return envelopes
+			.map(({ id, description }) => ({
+				id,
+				description,
+				total: totals.get(id) ?? 0
+			}))
 			.sort((a, b) => b.total - a.total)
 	}
 
