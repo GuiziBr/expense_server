@@ -1,7 +1,9 @@
 import {
+	HttpException,
 	Injectable,
 	InternalServerErrorException,
-	Logger
+	Logger,
+	NotFoundException
 } from "@nestjs/common"
 import { endOfMonth } from "date-fns"
 import {
@@ -11,6 +13,7 @@ import {
 	ReportPayment
 } from "../../domains/balance.domain.js"
 import { Expense } from "../../domains/expense.domain.js"
+import { DatabaseService } from "../../infra/database/database.service.js"
 import { ExpenseService } from "../expense/expense.service.js"
 import { errorMessage } from "../utils/error-message.js"
 import {
@@ -28,7 +31,10 @@ import {
 export class BalanceService {
 	private readonly logger = new Logger(BalanceService.name)
 
-	constructor(private readonly expensesService: ExpenseService) {}
+	constructor(
+		private readonly expensesService: ExpenseService,
+		private readonly databaseService: DatabaseService
+	) {}
 
 	/**
 	 * Builds a bank report entry with the given total amount.
@@ -147,9 +153,13 @@ export class BalanceService {
 	/**
 	 * Computes a user's expense totals for a given month/year, per envelope
 	 * category. Uses the same expense filter as {@link getBalanceBreakdown}.
+	 * The `userId` is client-supplied, so it is verified first: the expense filter
+	 * also matches other owners' non-personal expenses, which would otherwise be
+	 * summed for a user that does not exist.
 	 * @param request - The target `year`, zero-indexed `month`, and `userId`.
 	 * @returns One entry per envelope category with its id, description, and total, sorted by total descending.
-	 * @throws {InternalServerErrorException} If the underlying aggregate query fails.
+	 * @throws {NotFoundException} If no user exists with the given `userId`.
+	 * @throws {InternalServerErrorException} If the underlying queries fail.
 	 */
 	async getEnvelopeBalance({
 		year,
@@ -157,6 +167,16 @@ export class BalanceService {
 		userId
 	}: GetEnvelopeBalanceRequest): Promise<GetEnvelopeBalanceResponse> {
 		try {
+			const user = await this.databaseService.user.findUnique({
+				where: { id: userId },
+				select: { id: true }
+			})
+
+			if (!user) {
+				this.logger.error(`Error - User not found - ${userId}`)
+				throw new NotFoundException("User not found")
+			}
+
 			const initialDate = new Date(year, month, 1)
 
 			const finalDate = endOfMonth(initialDate)
@@ -167,6 +187,9 @@ export class BalanceService {
 				finalDate
 			)
 		} catch (error) {
+			if (error instanceof HttpException) {
+				throw error
+			}
 			this.logger.error(
 				`Error - ${errorMessage(error)} - getting envelope balance`
 			)

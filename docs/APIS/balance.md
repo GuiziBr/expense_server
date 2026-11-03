@@ -195,4 +195,5 @@ A JSON array with one entry per non-deleted envelope category, sorted by `total`
 |--------|-----------|
 | `400 Bad Request` | Route params or query fail schema validation (e.g. `userId` is not a UUID, `month` outside `1`–`12`) |
 | `401 Unauthorized` | Missing or invalid `x-api-key` |
+| `404 Not Found` | No user exists with the given `userId` |
 | `500 Internal Server Error` | The underlying query fails |
