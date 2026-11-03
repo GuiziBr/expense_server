@@ -22,6 +22,7 @@ Lists categories, ordered by description ascending, excluding soft-deleted recor
   {
     "id": "b3c1e2f0-...",
     "description": "Groceries",
+    "is_envelope": false,
     "created_at": "2024-01-01T00:00:00.000Z",
     "updated_at": null
   }
@@ -48,6 +49,7 @@ Retrieves a single category by id.
 {
   "id": "b3c1e2f0-...",
   "description": "Groceries",
+  "is_envelope": false,
   "created_at": "2024-01-01T00:00:00.000Z",
   "updated_at": null
 }
@@ -73,6 +75,7 @@ Creates a new category. If a soft-deleted category already has the given descrip
 | Field         | Type   | Required | Notes |
 |---------------|--------|----------|-------|
 | `description` | string | yes      | Trimmed, non-empty |
+| `isEnvelope`  | boolean | no      | Marks the category as an envelope (see `GET /balance/envelopes/:year/:month`). When omitted, new categories default to `false` and existing ones keep their value |
 
 ### Response `201 Created`
 
@@ -90,7 +93,7 @@ Same shape as `GET /categories/:id`.
 
 ## PATCH /categories/:id
 
-Updates a category's description. If another active category already has the requested description, the update is rejected; if the description only exists on a soft-deleted category, that category is soft-deleted and the target category is updated and reactivated with the new description.
+Updates a category's description and, optionally, its envelope flag. If another active category already has the requested description, the update is rejected; if the description only exists on a soft-deleted category, that category is soft-deleted and the target category is updated and reactivated with the new description.
 
 ### Request body
 

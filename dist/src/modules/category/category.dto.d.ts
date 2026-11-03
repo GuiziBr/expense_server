@@ -2,6 +2,7 @@ import { z } from "zod";
 export interface CategoryDTO {
     id: string;
     description: string;
+    is_envelope: boolean;
     created_at: Date;
     updated_at: Date | null;
 }
@@ -24,5 +25,6 @@ export declare const categoryByIdSchema: z.ZodObject<{
 export type CategoryByIdDTO = z.infer<typeof categoryByIdSchema>;
 export declare const createCategorySchema: z.ZodObject<{
     description: z.ZodString;
+    isEnvelope: z.ZodOptional<z.ZodBoolean>;
 }, z.core.$strip>;
 export type CreateCategoryDTO = z.infer<typeof createCategorySchema>;

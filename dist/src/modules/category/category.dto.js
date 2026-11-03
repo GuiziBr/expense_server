@@ -9,6 +9,7 @@ export const categoryByIdSchema = z.object({
     id: z.uuid()
 });
 export const createCategorySchema = z.object({
-    description: z.string().trim().min(1)
+    description: z.string().trim().min(1),
+    isEnvelope: z.boolean().optional()
 });
 //# sourceMappingURL=category.dto.js.map

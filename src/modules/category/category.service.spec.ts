@@ -179,6 +179,17 @@ describe("CategoryService", () => {
 
 			expect(loggerSpy).not.toBeCalled()
 		})
+
+		it("should persist the envelope flag when provided", async () => {
+			const description = "category_description"
+			await categoryService.create(description, true)
+
+			expect(databaseService.category.upsert).toBeCalledWith({
+				where: { description },
+				update: { description, deletedAt: null, isEnvelope: true },
+				create: { description, isEnvelope: true }
+			})
+		})
 	})
 
 	describe("update", () => {
@@ -198,6 +209,19 @@ describe("CategoryService", () => {
 			})
 
 			expect(loggerSpy).toBeCalledWith("Category category-id not found")
+		})
+
+		it("should persist the envelope flag when provided", async () => {
+			await categoryService.update(fakeCategory.id, "updated-category", true)
+
+			expect(databaseService.category.update).toBeCalledWith({
+				where: { id: fakeCategory.id },
+				data: {
+					description: "updated-category",
+					deletedAt: null,
+					isEnvelope: true
+				}
+			})
 		})
 
 		it("should return updated category", async () => {
@@ -271,7 +295,46 @@ describe("CategoryService", () => {
 
 			expect(databaseService.category.update).toBeCalledWith({
 				where: { id: deletedCategory.id },
-				data: { deletedAt: null }
+				data: { deletedAt: null, isEnvelope: false }
+			})
+		})
+
+		describe("envelope flag on reactivation", () => {
+			const editedCategory = createCategory({ isEnvelope: true })
+			const deletedCategory = createCategory({
+				isEnvelope: false,
+				deletedAt: new Date()
+			})
+
+			beforeEach(() => {
+				vi.spyOn(databaseService.category, "findUnique").mockImplementation(
+					((args: { where: { id?: string } }) =>
+						Promise.resolve(
+							args.where.id ? editedCategory : deletedCategory
+						)) as never
+				)
+			})
+
+			it("should keep the edited category's flag when isEnvelope is omitted", async () => {
+				await categoryService.update(editedCategory.id, "updated-category")
+
+				expect(databaseService.category.update).toBeCalledWith({
+					where: { id: deletedCategory.id },
+					data: { deletedAt: null, isEnvelope: true }
+				})
+			})
+
+			it("should use the provided isEnvelope over the edited category's flag", async () => {
+				await categoryService.update(
+					editedCategory.id,
+					"updated-category",
+					false
+				)
+
+				expect(databaseService.category.update).toBeCalledWith({
+					where: { id: deletedCategory.id },
+					data: { deletedAt: null, isEnvelope: false }
+				})
 			})
 		})
 

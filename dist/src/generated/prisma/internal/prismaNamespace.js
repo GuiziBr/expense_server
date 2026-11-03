@@ -12,8 +12,8 @@ export const Sql = runtime.Sql;
 export const Decimal = runtime.Decimal;
 export const getExtensionContext = runtime.Extensions.getExtensionContext;
 export const prismaVersion = {
-    client: "7.10.0",
-    engine: "0edf323efd1d98336f3f0a68684b56f689b900d3"
+    client: "7.10.1",
+    engine: "d1b3f377ca835d73fd50954a5e22128b9ebdd6b8"
 };
 export const NullTypes = {
     DbNull: runtime.NullTypes.DbNull,
@@ -57,6 +57,7 @@ export const BankScalarFieldEnum = {
 export const CategoryScalarFieldEnum = {
     id: 'id',
     description: 'description',
+    isEnvelope: 'isEnvelope',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'

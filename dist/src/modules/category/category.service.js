@@ -58,12 +58,12 @@ let CategoryService = CategoryService_1 = class CategoryService {
             throw new InternalServerErrorException("Internal server error");
         }
     }
-    async create(description) {
+    async create(description, isEnvelope) {
         try {
             const category = await this.databaseService.category.upsert({
                 where: { description },
-                update: { description, deletedAt: null },
-                create: { description }
+                update: { description, deletedAt: null, isEnvelope },
+                create: { description, isEnvelope }
             });
             return category;
         }
@@ -72,7 +72,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             throw new InternalServerErrorException("Internal server error");
         }
     }
-    async update(id, description) {
+    async update(id, description, isEnvelope) {
         try {
             const [category, sameDescriptionCategory] = await Promise.all([
                 this.databaseService.category.findUnique({ where: { id } }),
@@ -85,7 +85,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
             if (!sameDescriptionCategory || sameDescriptionCategory.id === id) {
                 const updatedCategory = await this.databaseService.category.update({
                     where: { id },
-                    data: { description, deletedAt: null }
+                    data: { description, deletedAt: null, isEnvelope }
                 });
                 return updatedCategory;
             }
@@ -93,7 +93,7 @@ let CategoryService = CategoryService_1 = class CategoryService {
                 this.logger.error(`Category with description "${description}" already exists`);
                 throw new BadRequestException("There is already a category with same description");
             }
-            const reactivatedCategory = await this.reactivateCategory(id, sameDescriptionCategory.id);
+            const reactivatedCategory = await this.reactivateCategory(id, sameDescriptionCategory.id, isEnvelope ?? category.isEnvelope);
             return reactivatedCategory;
         }
         catch (error) {
@@ -120,13 +120,13 @@ let CategoryService = CategoryService_1 = class CategoryService {
             throw new InternalServerErrorException("Internal server error");
         }
     }
-    async reactivateCategory(categoryIdToDelete, categoryIdToRestore) {
+    async reactivateCategory(categoryIdToDelete, categoryIdToRestore, isEnvelope) {
         try {
             const [, reactivatedCategory] = await Promise.all([
                 this.delete(categoryIdToDelete),
                 this.databaseService.category.update({
                     where: { id: categoryIdToRestore },
-                    data: { deletedAt: null }
+                    data: { deletedAt: null, isEnvelope }
                 })
             ]);
             return reactivatedCategory;

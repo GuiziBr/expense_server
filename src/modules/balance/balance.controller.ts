@@ -1,18 +1,30 @@
-import { Controller, Get, Param, Query, UseInterceptors } from "@nestjs/common"
+import {
+	Controller,
+	Get,
+	Param,
+	Query,
+	UseGuards,
+	UseInterceptors
+} from "@nestjs/common"
+import { ApiKeyGuard } from "../../infra/auth/api-key.guard.js"
 import { CurrentUser } from "../../infra/auth/current-user.decorator.js"
 import { CurrentUserInterceptor } from "../../infra/auth/current-user.interceptor.js"
 import { ZodValidationPipe } from "../../infra/http/pipes/zod-validation-pipe.js"
 import { BalancePresenter } from "../../infra/http/presenters/balance.presenter.js"
+import { Public } from "../auth/public.decorator.js"
 import {
 	ConsolidatedBalanceDTO,
 	GetBalanceBreakdownResponse,
 	GetBalanceResponse,
+	GetEnvelopeBalanceResponse,
 	QueryBalanceBreakdownDTO,
 	QueryBalanceDTO,
 	QueryConsolidatedBalanceDTO,
+	QueryEnvelopeBalanceDTO,
 	queryBalanceBreakdownSchema,
 	queryBalanceSchema,
-	queryConsolidatedBalanceSchema
+	queryConsolidatedBalanceSchema,
+	queryEnvelopeBalanceSchema
 } from "./balance.dto.js"
 import { BalanceService } from "./balance.service.js"
 
@@ -97,6 +109,33 @@ export class BalanceController {
 			month: Number(params.month) - 1,
 			year: Number(params.year),
 			filterBy: query.filterBy
+		})
+	}
+
+	/**
+	 * Retrieves a user's expense totals for a given year/month, per envelope
+	 * category. Intended for service-to-service calls: it is marked `@Public()`
+	 * to skip JWT authentication and instead requires a valid `x-api-key`
+	 * header ({@link ApiKeyGuard}). Route params are validated against
+	 * `queryConsolidatedBalanceSchema` and the query string against
+	 * `queryEnvelopeBalanceSchema`.
+	 * @param params - The route params, containing `year` and `month` (1-indexed month).
+	 * @param query - Validated query parameters, containing the `userId`.
+	 * @returns One entry per envelope category with its id, description, and total.
+	 */
+	@Public()
+	@UseGuards(ApiKeyGuard)
+	@Get("/envelopes/:year/:month")
+	async getEnvelopeBalance(
+		@Param(new ZodValidationPipe(queryConsolidatedBalanceSchema))
+		params: QueryConsolidatedBalanceDTO,
+		@Query(new ZodValidationPipe(queryEnvelopeBalanceSchema))
+		query: QueryEnvelopeBalanceDTO
+	): Promise<GetEnvelopeBalanceResponse> {
+		return this.balanceService.getEnvelopeBalance({
+			userId: query.userId,
+			month: Number(params.month) - 1,
+			year: Number(params.year)
 		})
 	}
 }

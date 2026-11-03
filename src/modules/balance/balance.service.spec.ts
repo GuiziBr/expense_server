@@ -1,6 +1,11 @@
-import { InternalServerErrorException, Logger } from "@nestjs/common"
+import {
+	InternalServerErrorException,
+	Logger,
+	NotFoundException
+} from "@nestjs/common"
 import { Test } from "@nestjs/testing"
 import { endOfMonth } from "date-fns"
+import { DatabaseService } from "@/infra/database/database.service.js"
 import { ExpenseService } from "../expense/expense.service.js"
 import { createBank } from "../test-utils/bank.factory.js"
 import { createCategory } from "../test-utils/category.factory.js"
@@ -11,6 +16,7 @@ import { BalanceService } from "./balance.service.js"
 describe("BalanceService", () => {
 	let balanceService: BalanceService
 	let expenseService: ExpenseService
+	let databaseService: DatabaseService
 	let loggerSpy: ReturnType<typeof vi.spyOn>
 
 	const fakeExpenses = [
@@ -41,9 +47,20 @@ describe("BalanceService", () => {
 							.fn()
 							.mockResolvedValue(fakeSharedTotals),
 						getExpensesByDateRange: vi.fn().mockResolvedValue(fakeExpenses),
+						sumPersonalExpensesByEnvelopeCategory: vi
+							.fn()
+							.mockResolvedValue(fakeBalanceBreakdown),
 						sumPersonalExpensesBy: vi
 							.fn()
 							.mockResolvedValue(fakeBalanceBreakdown)
+					}
+				},
+				{
+					provide: DatabaseService,
+					useValue: {
+						user: {
+							findUnique: vi.fn().mockResolvedValue({ id: "owner-id" })
+						}
 					}
 				}
 			]
@@ -51,6 +68,7 @@ describe("BalanceService", () => {
 
 		balanceService = module.get<BalanceService>(BalanceService)
 		expenseService = module.get<ExpenseService>(ExpenseService)
+		databaseService = module.get<DatabaseService>(DatabaseService)
 		loggerSpy = vi.spyOn(Logger.prototype, "error")
 	})
 
@@ -472,6 +490,85 @@ describe("BalanceService", () => {
 
 			expect(loggerSpy).toHaveBeenCalledWith(
 				"Error - raw error - getting balance breakdown"
+			)
+		})
+	})
+
+	describe("getEnvelopeBalance", () => {
+		it("should throw not found and skip the aggregate when the user does not exist", async () => {
+			vi.spyOn(databaseService.user, "findUnique").mockResolvedValue(null)
+
+			await expect(
+				balanceService.getEnvelopeBalance({
+					year: 2024,
+					month: 1,
+					userId: "unknown-id"
+				})
+			).rejects.toThrow(NotFoundException)
+
+			expect(databaseService.user.findUnique).toHaveBeenCalledWith({
+				where: { id: "unknown-id" },
+				select: { id: true }
+			})
+			expect(
+				expenseService.sumPersonalExpensesByEnvelopeCategory
+			).not.toHaveBeenCalled()
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - User not found - unknown-id"
+			)
+		})
+
+		it("should throw error if error finding the user", async () => {
+			vi.spyOn(databaseService.user, "findUnique").mockRejectedValue(
+				new Error("Database error")
+			)
+
+			await expect(
+				balanceService.getEnvelopeBalance({
+					year: 2024,
+					month: 1,
+					userId: "owner-id"
+				})
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - Database error - getting envelope balance"
+			)
+		})
+
+		it("should sum envelope categories within the month", async () => {
+			const result = await balanceService.getEnvelopeBalance({
+				year: 2024,
+				month: 1,
+				userId: "owner-id"
+			})
+
+			expect(result).toEqual(fakeBalanceBreakdown)
+			expect(
+				expenseService.sumPersonalExpensesByEnvelopeCategory
+			).toHaveBeenCalledWith(
+				"owner-id",
+				new Date(2024, 1, 1),
+				endOfMonth(new Date(2024, 1, 1))
+			)
+		})
+
+		it("should throw error if error summing expenses", async () => {
+			vi.spyOn(
+				expenseService,
+				"sumPersonalExpensesByEnvelopeCategory"
+			).mockRejectedValue(new Error("Expenses error"))
+
+			await expect(
+				balanceService.getEnvelopeBalance({
+					year: 2022,
+					month: 1,
+					userId: "owner-id"
+				})
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - Expenses error - getting envelope balance"
 			)
 		})
 	})

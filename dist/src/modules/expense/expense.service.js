@@ -310,6 +310,30 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         })
             .sort((a, b) => b.total - a.total);
     }
+    async sumPersonalExpensesByEnvelopeCategory(ownerId, startDate, endDate) {
+        const envelopes = await this.databaseService.category.findMany({
+            where: { isEnvelope: true, deletedAt: null },
+            select: { id: true, description: true }
+        });
+        if (envelopes.length === 0)
+            return [];
+        const groups = await this.databaseService.expense.groupBy({
+            by: ["categoryId"],
+            where: {
+                ...this.buildPersonalExpensesWhere(ownerId, endDate, startDate),
+                categoryId: { in: envelopes.map(({ id }) => id) }
+            },
+            _sum: { amount: true }
+        });
+        const totals = new Map(groups.map((group) => [group.categoryId, group._sum.amount ?? 0]));
+        return envelopes
+            .map(({ id, description }) => ({
+            id,
+            description,
+            total: totals.get(id) ?? 0
+        }))
+            .sort((a, b) => b.total - a.total);
+    }
     async getSharedExpenses({ startDate, endDate, offset, limit, orderBy, orderType, filterBy, filterValue }) {
         const whereClause = this.buildSharedExpensesWhere(endDate, startDate);
         if (filterBy && filterValue) {

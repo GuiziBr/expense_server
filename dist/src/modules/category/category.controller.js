@@ -35,14 +35,14 @@ let CategoryController = class CategoryController {
         return CategoryPresenter.toHttp(category);
     }
     async createCategory(body) {
-        const { description } = body;
-        const category = await this.categoryService.create(description);
+        const { description, isEnvelope } = body;
+        const category = await this.categoryService.create(description, isEnvelope);
         return CategoryPresenter.toHttp(category);
     }
     async updateCategory(params, body) {
         const { id } = params;
-        const { description } = body;
-        const category = await this.categoryService.update(id, description);
+        const { description, isEnvelope } = body;
+        const category = await this.categoryService.update(id, description, isEnvelope);
         return CategoryPresenter.toHttp(category);
     }
     async deleteCategory(params) {
