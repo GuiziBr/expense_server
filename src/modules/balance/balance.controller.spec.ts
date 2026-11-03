@@ -1,4 +1,5 @@
 import { Test } from "@nestjs/testing"
+import { ApiKeyGuard } from "@/infra/auth/api-key.guard.js"
 import { CurrentUserInterceptor } from "@/infra/auth/current-user.interceptor.js"
 import { createExpense } from "../test-utils/expense.factory.js"
 import { BalanceController } from "./balance.controller.js"
@@ -87,6 +88,7 @@ describe("BalanceController", () => {
 					provide: BalanceService,
 					useValue: {
 						getBalance: vi.fn(),
+						getEnvelopeBalance: vi.fn().mockResolvedValue(fakeBalanceBreakdown),
 						getBalanceBreakdown: vi
 							.fn()
 							.mockResolvedValue(fakeBalanceBreakdown),
@@ -98,6 +100,8 @@ describe("BalanceController", () => {
 			]
 		})
 			.overrideInterceptor(CurrentUserInterceptor)
+			.useValue({})
+			.overrideGuard(ApiKeyGuard)
 			.useValue({})
 			.compile()
 
@@ -176,6 +180,22 @@ describe("BalanceController", () => {
 				month: 0,
 				year: 2022,
 				filterBy: "category"
+			})
+		})
+	})
+
+	describe("getEnvelopeBalance", () => {
+		it("should get envelope balance with a zero-indexed month", async () => {
+			const result = await balanceController.getEnvelopeBalance(
+				{ month: 2, year: 2024 },
+				{ userId: "user-id" }
+			)
+
+			expect(result).toEqual(fakeBalanceBreakdown)
+			expect(balanceService.getEnvelopeBalance).toHaveBeenCalledWith({
+				userId: "user-id",
+				month: 1,
+				year: 2024
 			})
 		})
 	})

@@ -3,6 +3,7 @@ import { z } from "zod"
 export interface CategoryDTO {
 	id: string
 	description: string
+	is_envelope: boolean
 	created_at: Date
 	updated_at: Date | null
 }
@@ -23,7 +24,8 @@ export const categoryByIdSchema = z.object({
 export type CategoryByIdDTO = z.infer<typeof categoryByIdSchema>
 
 export const createCategorySchema = z.object({
-	description: z.string().trim().min(1)
+	description: z.string().trim().min(1),
+	isEnvelope: z.boolean().optional()
 })
 
 export type CreateCategoryDTO = z.infer<typeof createCategorySchema>

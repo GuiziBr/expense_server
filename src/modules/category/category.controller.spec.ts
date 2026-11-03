@@ -51,6 +51,7 @@ describe("CategoryController", () => {
 			expect(result[0]).toEqual({
 				id: fakeCategory.id,
 				description: fakeCategory.description,
+				is_envelope: fakeCategory.isEnvelope,
 				created_at: fakeCategory.createdAt,
 				updated_at: fakeCategory.updatedAt
 			})
@@ -67,6 +68,7 @@ describe("CategoryController", () => {
 			expect(result).toEqual({
 				id: fakeCategory.id,
 				description: fakeCategory.description,
+				is_envelope: fakeCategory.isEnvelope,
 				created_at: fakeCategory.createdAt,
 				updated_at: fakeCategory.updatedAt
 			})
@@ -92,11 +94,21 @@ describe("CategoryController", () => {
 			expect(result).toEqual({
 				id: fakeCategory.id,
 				description: fakeCategory.description,
+				is_envelope: fakeCategory.isEnvelope,
 				created_at: fakeCategory.createdAt,
 				updated_at: fakeCategory.updatedAt
 			})
 
-			expect(categoryService.create).toBeCalledWith("description")
+			expect(categoryService.create).toBeCalledWith("description", undefined)
+		})
+
+		it("should forward the envelope flag", async () => {
+			await categoryController.createCategory({
+				description: "description",
+				isEnvelope: true
+			})
+
+			expect(categoryService.create).toBeCalledWith("description", true)
 		})
 	})
 
@@ -114,13 +126,28 @@ describe("CategoryController", () => {
 			expect(result).toEqual({
 				id: fakeCategory.id,
 				description: fakeCategory.description,
+				is_envelope: fakeCategory.isEnvelope,
 				created_at: fakeCategory.createdAt,
 				updated_at: fakeCategory.updatedAt
 			})
 
 			expect(categoryService.update).toBeCalledWith(
 				"category-id",
-				"new-description"
+				"new-description",
+				undefined
+			)
+		})
+
+		it("should forward the envelope flag", async () => {
+			await categoryController.updateCategory(
+				{ id: "category-id" },
+				{ description: "new-description", isEnvelope: true }
+			)
+
+			expect(categoryService.update).toBeCalledWith(
+				"category-id",
+				"new-description",
+				true
 			)
 		})
 	})

@@ -179,6 +179,17 @@ describe("CategoryService", () => {
 
 			expect(loggerSpy).not.toBeCalled()
 		})
+
+		it("should persist the envelope flag when provided", async () => {
+			const description = "category_description"
+			await categoryService.create(description, true)
+
+			expect(databaseService.category.upsert).toBeCalledWith({
+				where: { description },
+				update: { description, deletedAt: null, isEnvelope: true },
+				create: { description, isEnvelope: true }
+			})
+		})
 	})
 
 	describe("update", () => {
@@ -198,6 +209,19 @@ describe("CategoryService", () => {
 			})
 
 			expect(loggerSpy).toBeCalledWith("Category category-id not found")
+		})
+
+		it("should persist the envelope flag when provided", async () => {
+			await categoryService.update(fakeCategory.id, "updated-category", true)
+
+			expect(databaseService.category.update).toBeCalledWith({
+				where: { id: fakeCategory.id },
+				data: {
+					description: "updated-category",
+					deletedAt: null,
+					isEnvelope: true
+				}
+			})
 		})
 
 		it("should return updated category", async () => {

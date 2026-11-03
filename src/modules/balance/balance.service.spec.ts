@@ -41,6 +41,9 @@ describe("BalanceService", () => {
 							.fn()
 							.mockResolvedValue(fakeSharedTotals),
 						getExpensesByDateRange: vi.fn().mockResolvedValue(fakeExpenses),
+						sumPersonalExpensesByEnvelopeCategory: vi
+							.fn()
+							.mockResolvedValue(fakeBalanceBreakdown),
 						sumPersonalExpensesBy: vi
 							.fn()
 							.mockResolvedValue(fakeBalanceBreakdown)
@@ -472,6 +475,44 @@ describe("BalanceService", () => {
 
 			expect(loggerSpy).toHaveBeenCalledWith(
 				"Error - raw error - getting balance breakdown"
+			)
+		})
+	})
+
+	describe("getEnvelopeBalance", () => {
+		it("should sum envelope categories within the month", async () => {
+			const result = await balanceService.getEnvelopeBalance({
+				year: 2024,
+				month: 1,
+				userId: "owner-id"
+			})
+
+			expect(result).toEqual(fakeBalanceBreakdown)
+			expect(
+				expenseService.sumPersonalExpensesByEnvelopeCategory
+			).toHaveBeenCalledWith(
+				"owner-id",
+				new Date(2024, 1, 1),
+				endOfMonth(new Date(2024, 1, 1))
+			)
+		})
+
+		it("should throw error if error summing expenses", async () => {
+			vi.spyOn(
+				expenseService,
+				"sumPersonalExpensesByEnvelopeCategory"
+			).mockRejectedValue(new Error("Expenses error"))
+
+			await expect(
+				balanceService.getEnvelopeBalance({
+					year: 2022,
+					month: 1,
+					userId: "owner-id"
+				})
+			).rejects.toThrow(InternalServerErrorException)
+
+			expect(loggerSpy).toHaveBeenCalledWith(
+				"Error - Expenses error - getting envelope balance"
 			)
 		})
 	})

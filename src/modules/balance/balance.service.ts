@@ -19,7 +19,9 @@ import {
 	GetBalanceRequest,
 	GetBalanceResponse,
 	GetConsolidateBalanceRequest,
-	GetConsolidatedBalanceResponse
+	GetConsolidatedBalanceResponse,
+	GetEnvelopeBalanceRequest,
+	GetEnvelopeBalanceResponse
 } from "./balance.dto.js"
 
 @Injectable()
@@ -139,6 +141,36 @@ export class BalanceService {
 				`Error - ${errorMessage(error)} - getting balance breakdown`
 			)
 			throw new InternalServerErrorException("Error getting balance breakdown")
+		}
+	}
+
+	/**
+	 * Computes a user's expense totals for a given month/year, per envelope
+	 * category. Uses the same expense filter as {@link getBalanceBreakdown}.
+	 * @param request - The target `year`, zero-indexed `month`, and `userId`.
+	 * @returns One entry per envelope category with its id, description, and total, sorted by total descending.
+	 * @throws {InternalServerErrorException} If the underlying aggregate query fails.
+	 */
+	async getEnvelopeBalance({
+		year,
+		month,
+		userId
+	}: GetEnvelopeBalanceRequest): Promise<GetEnvelopeBalanceResponse> {
+		try {
+			const initialDate = new Date(year, month, 1)
+
+			const finalDate = endOfMonth(initialDate)
+
+			return await this.expensesService.sumPersonalExpensesByEnvelopeCategory(
+				userId,
+				initialDate,
+				finalDate
+			)
+		} catch (error) {
+			this.logger.error(
+				`Error - ${errorMessage(error)} - getting envelope balance`
+			)
+			throw new InternalServerErrorException("Error getting envelope balance")
 		}
 	}
 
