@@ -753,6 +753,7 @@ export type BankScalarFieldEnum = (typeof BankScalarFieldEnum)[keyof typeof Bank
 export declare const CategoryScalarFieldEnum: {
     readonly id: "id";
     readonly description: "description";
+    readonly isEnvelope: "isEnvelope";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
     readonly deletedAt: "deletedAt";

@@ -1,5 +1,5 @@
 import { ExpenseService } from "../expense/expense.service.js";
-import { GetBalanceBreakdownRequest, GetBalanceBreakdownResponse, GetBalanceRequest, GetBalanceResponse, GetConsolidateBalanceRequest, GetConsolidatedBalanceResponse } from "./balance.dto.js";
+import { GetBalanceBreakdownRequest, GetBalanceBreakdownResponse, GetBalanceRequest, GetBalanceResponse, GetConsolidateBalanceRequest, GetConsolidatedBalanceResponse, GetEnvelopeBalanceRequest, GetEnvelopeBalanceResponse } from "./balance.dto.js";
 export declare class BalanceService {
     private readonly expensesService;
     private readonly logger;
@@ -9,5 +9,6 @@ export declare class BalanceService {
     private getCategory;
     getBalance(data: GetBalanceRequest): Promise<GetBalanceResponse>;
     getBalanceBreakdown({ year, month, userId, filterBy }: GetBalanceBreakdownRequest): Promise<GetBalanceBreakdownResponse>;
+    getEnvelopeBalance({ year, month, userId }: GetEnvelopeBalanceRequest): Promise<GetEnvelopeBalanceResponse>;
     getConsolidatedBalance({ year, month, userId }: GetConsolidateBalanceRequest): Promise<GetConsolidatedBalanceResponse>;
 }

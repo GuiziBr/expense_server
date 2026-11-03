@@ -42,6 +42,7 @@ export const BankScalarFieldEnum = {
 export const CategoryScalarFieldEnum = {
     id: 'id',
     description: 'description',
+    isEnvelope: 'isEnvelope',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'

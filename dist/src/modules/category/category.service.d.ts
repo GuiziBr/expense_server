@@ -11,8 +11,8 @@ export declare class CategoryService {
         totalCount: number;
     }>;
     getById(id: string): Promise<Category | null>;
-    create(description: string): Promise<Category>;
-    update(id: string, description: string): Promise<Category>;
+    create(description: string, isEnvelope?: boolean): Promise<Category>;
+    update(id: string, description: string, isEnvelope?: boolean): Promise<Category>;
     delete(id: string): Promise<void>;
     private reactivateCategory;
 }
