@@ -295,7 +295,46 @@ describe("CategoryService", () => {
 
 			expect(databaseService.category.update).toBeCalledWith({
 				where: { id: deletedCategory.id },
-				data: { deletedAt: null }
+				data: { deletedAt: null, isEnvelope: false }
+			})
+		})
+
+		describe("envelope flag on reactivation", () => {
+			const editedCategory = createCategory({ isEnvelope: true })
+			const deletedCategory = createCategory({
+				isEnvelope: false,
+				deletedAt: new Date()
+			})
+
+			beforeEach(() => {
+				vi.spyOn(databaseService.category, "findUnique").mockImplementation(
+					((args: { where: { id?: string } }) =>
+						Promise.resolve(
+							args.where.id ? editedCategory : deletedCategory
+						)) as never
+				)
+			})
+
+			it("should keep the edited category's flag when isEnvelope is omitted", async () => {
+				await categoryService.update(editedCategory.id, "updated-category")
+
+				expect(databaseService.category.update).toBeCalledWith({
+					where: { id: deletedCategory.id },
+					data: { deletedAt: null, isEnvelope: true }
+				})
+			})
+
+			it("should use the provided isEnvelope over the edited category's flag", async () => {
+				await categoryService.update(
+					editedCategory.id,
+					"updated-category",
+					false
+				)
+
+				expect(databaseService.category.update).toBeCalledWith({
+					where: { id: deletedCategory.id },
+					data: { deletedAt: null, isEnvelope: false }
+				})
 			})
 		})
 

@@ -115,10 +115,11 @@ export class CategoryService {
 	 * Updates a category's description. If another category already has the target
 	 * description, the update is only allowed when that other category is soft-deleted,
 	 * in which case this category is soft-deleted and the other one is reactivated
-	 * with the new description via {@link reactivateCategory}.
+	 * with the new description via {@link reactivateCategory}. The reactivated category
+	 * takes over the envelope flag of the edited one unless `isEnvelope` is provided.
 	 * @param id - The id of the category to update.
 	 * @param description - The new description to apply.
-	 * @param isEnvelope - Optional envelope flag; when omitted, the current value is kept.
+	 * @param isEnvelope - Optional envelope flag; when omitted, the current value of the edited category is kept (also when another category is reactivated in its place).
 	 * @returns The updated (or reactivated) category.
 	 * @throws {NotFoundException} If the category is not found.
 	 * @throws {BadRequestException} If an active category already has the same description.
@@ -160,7 +161,7 @@ export class CategoryService {
 			const reactivatedCategory = await this.reactivateCategory(
 				id,
 				sameDescriptionCategory.id,
-				isEnvelope
+				isEnvelope ?? category.isEnvelope
 			)
 
 			return reactivatedCategory
