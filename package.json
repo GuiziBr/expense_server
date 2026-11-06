@@ -54,7 +54,7 @@
 		"@types/bcrypt": "^6.0.0",
 		"@types/express": "^5.0.6",
 		"@types/node": "^26.6.6",
-		"@vitest/coverage-v8": "^5.0.5",
+		"@vitest/coverage-v8": "^5.1.0",
 		"dotenv": "^18.0.9",
 		"prisma": "^7.10.1",
 		"source-map-support": "^0.5.21",
@@ -62,9 +62,9 @@
 		"tsconfig-paths": "^4.2.0",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
-		"ultracite": "^8.1.0",
+		"ultracite": "^8.1.1",
 		"unplugin-swc": "^2.0.0",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"engines": {
 		"node": ">=24.15"
