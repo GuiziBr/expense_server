@@ -459,13 +459,16 @@ export class ExpenseService {
 	}
 
 	/**
-	 * Soft-deletes an expense owned by the given user by setting its `deletedAt`
-	 * timestamp; does not remove the underlying record.
+	 * Soft-deletes an expense by setting its `deletedAt` timestamp; does not
+	 * remove the underlying record. Allowed for the expense owner, and for any
+	 * user when the expense is neither personal nor split (i.e. it was created
+	 * on behalf of the other user, who pays for it).
 	 * @param id - ID of the expense to delete.
-	 * @param userId - ID of the user performing the deletion; must be the expense owner.
+	 * @param userId - ID of the user performing the deletion.
 	 * @returns Nothing on success.
 	 * @throws {NotFoundException} If the expense does not exist.
-	 * @throws {ForbiddenException} If `userId` is not the expense's owner.
+	 * @throws {ForbiddenException} If `userId` is not the owner and the expense
+	 * is personal or split.
 	 * @throws {InternalServerErrorException} On any unexpected database error other than
 	 * a "record not found" error, which is treated as an already-deleted no-op.
 	 */
@@ -478,7 +481,12 @@ export class ExpenseService {
 			throw new NotFoundException("Expense not found")
 		}
 
-		if (expense.ownerId !== userId) {
+		// An expense that is neither personal nor split was created by the owner
+		// on behalf of the other user, who is the one paying for it, so they may
+		// delete it as well.
+		const isPaidByOtherUser = !expense.personal && !expense.split
+
+		if (expense.ownerId !== userId && !isPaidByOtherUser) {
 			throw new ForbiddenException("Unauthorized")
 		}
 

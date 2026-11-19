@@ -890,13 +890,40 @@ describe("ExpenseService", () => {
 			expect(databaseService.expense.update).not.toHaveBeenCalled()
 		})
 
-		it("should throw 403 if user is not the owner", async () => {
-			await expect(
-				expenseService.deleteExpense(fakeExpense.id, "other-user-id")
-			).rejects.toThrow(new ForbiddenException("Unauthorized"))
+		it("should soft delete when non-owner and expense is neither personal nor split", async () => {
+			vi.spyOn(databaseService.expense, "findFirst").mockResolvedValue({
+				...fakeExpense,
+				personal: false,
+				split: false
+			})
 
-			expect(databaseService.expense.update).not.toHaveBeenCalled()
+			await expenseService.deleteExpense(fakeExpense.id, "other-user-id")
+
+			expect(databaseService.expense.update).toBeCalledWith({
+				where: { id: fakeExpense.id },
+				data: { deletedAt: expect.any(Date) }
+			})
 		})
+
+		it.each([
+			{ personal: true, split: false },
+			{ personal: false, split: true }
+		])(
+			"should throw 403 if non-owner and expense is personal=$personal split=$split",
+			async ({ personal, split }) => {
+				vi.spyOn(databaseService.expense, "findFirst").mockResolvedValue({
+					...fakeExpense,
+					personal,
+					split
+				})
+
+				await expect(
+					expenseService.deleteExpense(fakeExpense.id, "other-user-id")
+				).rejects.toThrow(new ForbiddenException("Unauthorized"))
+
+				expect(databaseService.expense.update).not.toHaveBeenCalled()
+			}
+		)
 
 		it("should return without error if prisma record not found on update", async () => {
 			const prismaError = createPrismaError(constants.RECORD_NOT_FOUND, {})
