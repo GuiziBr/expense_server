@@ -245,7 +245,8 @@ let ExpenseService = ExpenseService_1 = class ExpenseService {
         if (!expense) {
             throw new NotFoundException("Expense not found");
         }
-        if (expense.ownerId !== userId) {
+        const isPaidByOtherUser = !expense.personal && !expense.split;
+        if (expense.ownerId !== userId && !isPaidByOtherUser) {
             throw new ForbiddenException("Unauthorized");
         }
         try {
